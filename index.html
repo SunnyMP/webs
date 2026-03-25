@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sunny's Plugins — Wiki</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:    #09090b;
+      --bg2:   #111116;
+      --line:  rgba(255,255,255,0.07);
+      --text:  #ebebef;
+      --muted: #52526a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+    .logo-dot {
+      width: 6px; height: 6px;
+      background: #00dc82;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00dc82;
+      animation: blink 2.8s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .nav-right { display: flex; gap: 22px; }
+    .nav-right a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      transition: color .15s;
+    }
+    .nav-right a:hover { color: var(--text); }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 32px;
+      gap: 48px;
+    }
+
+    .top {
+      text-align: center;
+    }
+    .top h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .top p {
+      font-size: 14px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* CARDS */
+    .cards {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card {
+      width: 220px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--bg2);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    }
+    .card-qh:hover  { border-color: rgba(100,200,255,.3); }
+    .card-af:hover  { border-color: rgba(180,140,255,.3); }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .3s;
+    }
+    .card:hover .card-img img {
+      transform: scale(1.04);
+    }
+
+    .card-body {
+      padding: 14px 16px 16px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .card-arrow {
+      font-size: 14px;
+      color: var(--muted);
+      transition: color .2s, transform .2s;
+    }
+    .card:hover .card-arrow { transform: translateX(3px); }
+    .card-qh:hover .card-arrow  { color: rgba(100,200,255,.8); }
+    .card-af:hover .card-arrow  { color: rgba(180,140,255,.8); }
+
+    /* FOOTER */
+    footer {
+      padding: 18px 40px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 520px) {
+      nav { padding: 16px 20px; }
+      .nav-right { display: none; }
+      main { padding: 60px 20px; }
+      footer { padding: 16px 20px; flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    Sunny's Plugins
+  </div>
+  <div class="nav-right">
+    <a href="https://github.com/xDrygo" target="_blank">github</a>
+    <a href="https://modrinth.com/user/Drygo" target="_blank">modrinth</a>
+  </div>
+</nav>
+
+<main>
+
+  <div class="top">
+    <h1>Wiki Oficial</h1>
+    <p>wiki.jolty.us</p>
+  </div>
+
+  <div class="cards">
+
+    <a class="card card-qh" href="quickhud/index.html">
+      <div class="card-img">
+        <img src="QuickHudicon.png" alt="QuickHud"/>
+      </div>
+      <div class="card-body">
+        <span class="card-name">QuickHud</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="card card-af" href="animatedframes/index.html">
+      <div class="card-img">
+        <img src="AnimatedFramesIcon1920.png" alt="AnimatedFrames"/>
+      </div>
+      <div class="card-body">
+        <span class="card-name">AnimatedFrames</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  <span>wiki.jolty.us</span>
+  <div class="footer-links">
+    <a href="https://github.com/xDrygo" target="_blank">github ↗</a>
+    <a href="https://modrinth.com/user/Drygo" target="_blank">modrinth ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>
