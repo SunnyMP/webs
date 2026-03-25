@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sunny's Plugins — Wiki</title>
+  <title>SunnyDev — Wiki</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -40,6 +40,7 @@
       align-items: center;
       gap: 8px;
       color: var(--text);
+      text-decoration: none;
     }
     .logo-dot {
       width: 6px; height: 6px;
@@ -50,15 +51,24 @@
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    .nav-right { display: flex; gap: 22px; }
-    .nav-right a {
+    .nav-right { display: flex; gap: 6px; }
+    .nav-link {
       font-size: 12px;
       color: var(--muted);
       text-decoration: none;
       font-family: 'JetBrains Mono', monospace;
-      transition: color .15s;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all .15s;
+      display: flex; align-items: center; gap: 6px;
     }
-    .nav-right a:hover { color: var(--text); }
+    .nav-link:hover {
+      color: var(--text);
+      background: #1a1a22;
+      border-color: var(--line);
+    }
+    .nav-link svg { width: 13px; height: 13px; fill: currentColor; }
 
     /* MAIN */
     main {
@@ -73,16 +83,16 @@
 
     .top {
       text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
     .top h1 {
       font-size: 36px;
       font-weight: 800;
       letter-spacing: -.025em;
       line-height: 1.1;
-      margin-bottom: 10px;
     }
     .top p {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
     }
@@ -111,8 +121,8 @@
       transform: translateY(-4px);
       box-shadow: 0 16px 40px rgba(0,0,0,.5);
     }
-    .card-qh:hover  { border-color: rgba(100,200,255,.3); }
-    .card-af:hover  { border-color: rgba(180,140,255,.3); }
+    .card-qh:hover { border-color: rgba(100,200,255,.35); }
+    .card-af:hover { border-color: rgba(180,140,255,.35); }
 
     .card-img {
       width: 100%;
@@ -122,7 +132,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
     .card-img img {
       width: 100%;
@@ -130,9 +139,7 @@
       object-fit: cover;
       transition: transform .3s;
     }
-    .card:hover .card-img img {
-      transform: scale(1.04);
-    }
+    .card:hover .card-img img { transform: scale(1.04); }
 
     .card-body {
       padding: 14px 16px 16px;
@@ -152,8 +159,8 @@
       transition: color .2s, transform .2s;
     }
     .card:hover .card-arrow { transform: translateX(3px); }
-    .card-qh:hover .card-arrow  { color: rgba(100,200,255,.8); }
-    .card-af:hover .card-arrow  { color: rgba(180,140,255,.8); }
+    .card-qh:hover .card-arrow { color: rgba(100,200,255,.9); }
+    .card-af:hover .card-arrow { color: rgba(180,140,255,.9); }
 
     /* FOOTER */
     footer {
@@ -180,7 +187,7 @@
 
     @media (max-width: 520px) {
       nav { padding: 16px 20px; }
-      .nav-right { display: none; }
+      .nav-link span { display: none; }
       main { padding: 60px 20px; }
       footer { padding: 16px 20px; flex-direction: column; gap: 8px; }
     }
@@ -189,18 +196,25 @@
 <body>
 
 <nav>
-  <div class="logo">
+  <a class="logo" href="#">
     <span class="logo-dot"></span>
-    Sunny's Plugins
-  </div>
+    SunnyDev Projects
+  </a>
   <div class="nav-right">
-    <a href="https://github.com/xDrygo" target="_blank">github</a>
-    <a href="https://modrinth.com/user/Drygo" target="_blank">modrinth</a>
+    <!-- Modrinth -->
+    <a class="nav-link" href="https://modrinth.com/user/SunnyMp" target="_blank">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.54 20.862a8.856 8.856 0 0 1-6.775-3.16l1.584-1.583a6.696 6.696 0 0 0 4.958 2.185 6.733 6.733 0 0 0 6.733-6.733 6.696 6.696 0 0 0-2.185-4.958l1.583-1.584a8.856 8.856 0 0 1 3.16 6.775c0 4.886-3.97 8.856-8.856 8.856h-.202zm.54-3.569a5.287 5.287 0 0 1-4.008-1.835l1.585-1.585a3.13 3.13 0 0 0 2.423 1.138 3.144 3.144 0 0 0 3.144-3.144 3.13 3.13 0 0 0-1.138-2.423l1.585-1.585A5.287 5.287 0 0 1 17.427 12a5.433 5.433 0 0 1-5.427 5.293z"/></svg>
+      <span>modrinth</span>
+    </a>
+    <!-- X / Twitter -->
+    <a class="nav-link" href="https://x.com/SunnyDeb_" target="_blank">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <span>twitter</span>
+    </a>
   </div>
 </nav>
 
 <main>
-
   <div class="top">
     <h1>Wiki Oficial</h1>
     <p>wiki.jolty.us</p>
@@ -210,7 +224,7 @@
 
     <a class="card card-qh" href="quickhud/index.html">
       <div class="card-img">
-        <img src="QuickHudicon.png" alt="QuickHud"/>
+        <img src="QuickHudicon.png" alt="QuickHud" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'font-size:48px;display:flex;align-items:center;justify-content:center;width:100%;height:100%\'>🖥️</div>'"/>
       </div>
       <div class="card-body">
         <span class="card-name">QuickHud</span>
@@ -220,7 +234,7 @@
 
     <a class="card card-af" href="animatedframes/index.html">
       <div class="card-img">
-        <img src="AnimatedFramesIcon1920.png" alt="AnimatedFrames"/>
+        <img src="AnimatedFramesIcon1920.png" alt="AnimatedFrames" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'font-size:48px;display:flex;align-items:center;justify-content:center;width:100%;height:100%\'>🎞️</div>'"/>
       </div>
       <div class="card-body">
         <span class="card-name">AnimatedFrames</span>
@@ -229,14 +243,13 @@
     </a>
 
   </div>
-
 </main>
 
 <footer>
   <span>wiki.jolty.us</span>
   <div class="footer-links">
-    <a href="https://github.com/xDrygo" target="_blank">github ↗</a>
-    <a href="https://modrinth.com/user/Drygo" target="_blank">modrinth ↗</a>
+    <a href="https://modrinth.com/user/SunnyMp" target="_blank">modrinth ↗</a>
+    <a href="https://x.com/SunnyDeb_" target="_blank">twitter ↗</a>
   </div>
 </footer>
 
