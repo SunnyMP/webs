@@ -454,35 +454,41 @@
 <body>
 
 <header>
-  <a class="header-brand" href="#">
+  <div class="mod-dropdown" id="modDropdown" style="height:var(--header-h);display:flex;align-items:center;">
+    <button class="mod-dropdown-btn" onclick="toggleDropdown()" style="height:100%;border-radius:0;border:none;background:transparent;padding:0 20px;gap:10px;border-right:1px solid var(--border);">
+      <a class="header-brand" href="#" style="pointer-events:none;">
     <div class="header-logo"><img src="data:image/png;base64,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" alt="QuickHud"/></div>
     <span class="header-title">QuickHud</span>
     <span class="header-sub">Wiki · v1.0</span>
-  </a>
-  <button class="mob-menu-btn" onclick="toggleSidebar()">☰</button>
-  <div class="header-right">
-    <div class="mod-dropdown" id="modDropdown">
-      <button class="mod-dropdown-btn" onclick="toggleDropdown()">
-        <span>⚡ QuickHud</span>
-        <span class="dd-arrow">▼</span>
-      </button>
-      <div class="mod-dropdown-menu">
-        <a class="mod-dropdown-item current" href="https://modrinth.com/plugin/quickhud">
+      </a>
+      <span class="dd-arrow">▼</span>
+    </button>
+    <div class="mod-dropdown-menu">
+      <a class="mod-dropdown-item" href="https://wiki.jolty.us">
+        <div class="item-icon" style="background:rgba(255,255,255,.07);">🏠</div>
+        <div class="item-info">
+          <span class="item-name">Inicio</span>
+          <span class="item-ver">wiki.jolty.us</span>
+        </div>
+      </a>
+        <a class="mod-dropdown-item current" href="https://wiki.jolty.us/quickhud">
           <div class="item-icon" style="background:rgba(79,255,176,.12);">⚡</div>
           <div class="item-info">
             <span class="item-name">QuickHud</span>
-            <span class="item-ver">v1.0 · Fabric / Forge</span>
+            <span class="item-ver">v1.0 · wiki.jolty.us</span>
           </div>
         </a>
-        <a class="mod-dropdown-item" href="https://wiki-animatedframes.netlify.app/">
-          <div class="item-icon" style="background:rgba(91,168,255,.12);">✨</div>
+        <a class="mod-dropdown-item" href="https://wiki.jolty.us/animatedframes">
+          <div class="item-icon" style="background:rgba(91,168,255,.12);">🎞️</div>
           <div class="item-info">
             <span class="item-name">AnimatedFrames</span>
-            <span class="item-ver">v1.6.1 · Fabric / Forge</span>
+            <span class="item-ver">v1.0 · wiki.jolty.us</span>
           </div>
         </a>
-      </div>
     </div>
+  </div>
+  <button class="mob-menu-btn" onclick="toggleSidebar()">☰</button>
+  <div class="header-right">
     <a class="ext-link" href="https://modrinth.com/plugin/quickhud" target="_blank">Modrinth ↗</a>
     <a class="ext-link" href="https://www.curseforge.com/minecraft/mc-mods/quickhud" target="_blank">CurseForge ↗</a>
     <div class="lang-btn">
