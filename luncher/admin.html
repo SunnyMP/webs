@@ -1,1 +1,1227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAS CLIENT — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :root {
+    --bg:    #04060f;
+    --bg2:   #080c1a;
+    --bg3:   #0c1228;
+    --bg4:   #101828;
+    --blue:  #1e6fff;
+    --blue2: #4f9fff;
+    --green: #10d48a;
+    --red:   #ff4d6a;
+    --amber: #ffb347;
+    --text:  #f0f4ff;
+    --muted: rgba(200,212,255,0.45);
+    --border: rgba(100,140,255,0.12);
+    --border2: rgba(100,140,255,0.22);
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+    --font-mono:    'DM Mono', monospace;
+
+    /* ADMIN EMAIL que tiene todos los permisos */
+    --super-admin: "agus5gmtin@gmail.com";
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Noise */
+  body::after {
+    content:'';
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.025;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:128px;
+  }
+
+  /* Blobs */
+  .blob { position:fixed;border-radius:50%;filter:blur(100px);opacity:0.08;z-index:0;pointer-events:none; }
+  .blob-1 { width:500px;height:500px;background:#1a5fff;top:-150px;right:-100px; }
+  .blob-2 { width:400px;height:400px;background:#3010ff;bottom:0;left:-120px; }
+
+  /* ═══════════════════════════════════════════
+     LOGIN SCREEN
+  ═══════════════════════════════════════════ */
+  #screen-login {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+  }
+  #screen-login.hidden { display: none; }
+
+  .login-card {
+    position: relative;
+    z-index: 2;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 52px 48px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  .login-card::before {
+    content:'';
+    position:absolute;inset:0;border-radius:20px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(30,111,255,0.1), transparent 70%);
+    pointer-events:none;
+  }
+  .login-logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--blue2);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .login-logo-dot {
+    width: 6px; height: 6px;
+    background: var(--blue);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--blue);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 8px var(--blue)} 50%{box-shadow:0 0 18px var(--blue)} }
+
+  .login-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .login-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+
+  #g_id_onload { display: none; }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    background: #fff;
+    color: #1f1f1f;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 13px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .btn-google:hover {
+    background: #f5f5f5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transform: translateY(-1px);
+  }
+  .btn-google svg { flex-shrink: 0; }
+
+  .login-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(200,212,255,0.2);
+    font-family: var(--font-mono);
+  }
+
+  /* Access denied */
+  #screen-denied {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 24px;
+  }
+  #screen-denied.show { display: flex; }
+  .denied-icon { font-size: 48px; }
+  .denied-title { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--red); }
+  .denied-sub { font-size: 14px; color: var(--muted); max-width: 320px; }
+  .denied-email { font-family: var(--font-mono); font-size: 12px; background: rgba(255,77,106,0.1); border: 1px solid rgba(255,77,106,0.25); border-radius: 8px; padding: 8px 16px; color: var(--red); margin-top: 8px; }
+
+  /* ═══════════════════════════════════════════
+     ADMIN PANEL
+  ═══════════════════════════════════════════ */
+  #screen-admin {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+    z-index: 2;
+  }
+  #screen-admin.show { display: flex; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+  }
+  .sidebar-top {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-brand .dot { width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue);animation:pulse 2s infinite; }
+  .sidebar-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .sidenav { padding: 16px 12px; flex: 1; }
+  .snav-group-label {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(200,212,255,0.22);
+    padding: 0 8px;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  .snav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    font-family: var(--font-body);
+  }
+  .snav-btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+  .snav-btn:hover { background: rgba(100,140,255,0.08); color: var(--text); }
+  .snav-btn.active { background: rgba(30,111,255,0.15); color: var(--blue2); }
+
+  .sidebar-user {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .su-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(30,111,255,0.2);
+    border: 1px solid var(--border2);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .su-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .su-info { flex: 1; min-width: 0; }
+  .su-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .su-role { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+  .su-role.admin { color: var(--blue2); }
+  .su-logout {
+    background: transparent; border: none;
+    color: var(--muted); cursor: pointer;
+    font-size: 16px; padding: 4px;
+    transition: color 0.15s;
+  }
+  .su-logout:hover { color: var(--red); }
+
+  /* Main content */
+  .admin-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .admin-topbar {
+    background: rgba(4,6,15,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: var(--font-mono); }
+
+  /* Pages */
+  .page { display: none; padding: 32px; }
+  .page.active { display: block; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .stat-label { font-size: 11px; font-family: var(--font-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .stat-val { font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -0.03em; }
+  .stat-val.blue { color: var(--blue2); }
+  .stat-val.green { color: var(--green); }
+  .stat-val.amber { color: var(--amber); }
+
+  /* Card */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+  .card-body { padding: 22px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+  }
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-danger { background: rgba(255,77,106,0.12); color: var(--red); border: 1px solid rgba(255,77,106,0.2); }
+
+  /* Form inputs */
+  .inp {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .inp:focus { border-color: rgba(30,111,255,0.5); }
+  .inp::placeholder { color: rgba(200,212,255,0.2); }
+  textarea.inp { resize: vertical; min-height: 80px; }
+
+  label.lbl { display: block; font-size: 11px; font-family: var(--font-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; margin-top: 14px; }
+  label.lbl:first-child { margin-top: 0; }
+
+  /* Toggle */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-info .ti-label { font-size: 13px; font-weight: 600; }
+  .toggle-info .ti-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .toggle { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.08);
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--blue); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+  /* Modpack list */
+  .mp-list { display: flex; flex-direction: column; gap: 10px; }
+  .mp-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.15s;
+  }
+  .mp-item:hover { border-color: var(--border2); }
+  .mp-thumb {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: rgba(30,111,255,0.15);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    overflow: hidden;
+  }
+  .mp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .mp-info { flex: 1; min-width: 0; }
+  .mp-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+  .mp-actions { display: flex; gap: 8px; }
+  .badge { display: inline-block; font-size: 10px; font-family: var(--font-mono); padding: 3px 8px; border-radius: 100px; font-weight: 500; }
+  .badge-blue { background: rgba(30,111,255,0.15); color: var(--blue2); border: 1px solid rgba(30,111,255,0.2); }
+  .badge-green { background: rgba(16,212,138,0.12); color: var(--green); border: 1px solid rgba(16,212,138,0.2); }
+  .badge-amber { background: rgba(255,179,71,0.12); color: var(--amber); border: 1px solid rgba(255,179,71,0.2); }
+
+  /* User table */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tbl th { text-align: left; font-size: 10px; font-family: var(--font-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: rgba(100,140,255,0.04); }
+
+  /* News form */
+  .news-list-admin { display: flex; flex-direction: column; gap: 8px; }
+  .news-item-admin {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+  }
+  .news-dot-pick { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .news-item-admin .ni-text { flex: 1; min-width: 0; }
+  .news-item-admin .ni-title2 { font-size: 13px; font-weight: 600; }
+  .news-item-admin .ni-body2 { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+  }
+  .modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+  .modal-close { position: absolute; top: 18px; right: 18px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 18px; transition: color 0.15s; }
+  .modal-close:hover { color: var(--text); }
+
+  /* Toast */
+  #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
+  .toast {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+    animation: slideIn 0.25s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .toast.ok { border-left: 3px solid var(--green); }
+  .toast.err { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--blue); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(30,111,255,0.25); border-radius: 3px; }
+
+  @media (max-width: 768px) {
+    .sidebar { width: 60px; }
+    .sidebar-top, .sidebar-user .su-info, .sidebar-user .sidebar-brand .dot + span { display: none; }
+    .snav-btn span { display: none; }
+    .snav-group-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- ══ LOGIN SCREEN ══════════════════════════════════════════════════════════ -->
+<div id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-dot"></div>
+      BAS CLIENT
+    </div>
+    <h1 class="login-title">Panel Admin</h1>
+    <p class="login-sub">Acceso exclusivo para administradores.<br>Iniciá sesión con tu cuenta de Google.</p>
+
+    <!-- Google One Tap (hidden) -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID"
+         data-callback="handleGoogleLogin"
+         data-auto_prompt="false">
+    </div>
+
+    <button class="btn-google" onclick="triggerGoogleLogin()">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.93 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Continuar con Google
+    </button>
+
+    <p class="login-note">Solo cuentas autorizadas pueden acceder</p>
+  </div>
+</div>
+
+<!-- ══ ACCESS DENIED ════════════════════════════════════════════════════════ -->
+<div id="screen-denied">
+  <div class="denied-icon">🚫</div>
+  <div class="denied-title">Acceso denegado</div>
+  <p class="denied-sub">Tu cuenta de Google no tiene permisos para acceder al panel de administración.</p>
+  <div class="denied-email" id="denied-email">—</div>
+  <button class="btn btn-ghost" style="margin-top:20px;" onclick="logout()">← Volver al inicio</button>
+</div>
+
+<!-- ══ ADMIN PANEL ════════════════════════════════════════════════════════ -->
+<div id="screen-admin">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-brand">
+        <div class="dot"></div>
+        <span>BAS CLIENT</span>
+      </div>
+      <div class="sidebar-label">Admin panel</div>
+    </div>
+
+    <nav class="sidenav">
+      <div class="snav-group-label">General</div>
+      <button class="snav-btn active" data-page="dashboard">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        <span>Dashboard</span>
+      </button>
+
+      <div class="snav-group-label">Contenido</div>
+      <button class="snav-btn" data-page="modpacks">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.52 15.5 0 12.36 0c-1.73 0-3.24.93-4.1 2.27L7 3.5 5.74 2.27C4.88.93 3.37 0 1.64 0 .73 0 0 .73 0 1.64v.18C0 3.95 2.04 6 4.54 6H4v2h-.5C2.12 8 1 9.12 1 10.5S2.12 13 3.5 13H4v6c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-6h.5c1.38 0 2.5-1.12 2.5-2.5S21.88 8 20.5 8H20V6z"/></svg>
+        <span>Modpacks</span>
+      </button>
+      <button class="snav-btn" data-page="news">
+        <svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+        <span>Noticias</span>
+      </button>
+
+      <div class="snav-group-label">Sistema</div>
+      <button class="snav-btn" data-page="users" id="nav-users">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span>Usuarios</span>
+      </button>
+      <button class="snav-btn" data-page="settings">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span>Ajustes</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="su-avatar" id="su-avatar">?</div>
+      <div class="su-info">
+        <div class="su-name" id="su-name">—</div>
+        <div class="su-role" id="su-role">—</div>
+      </div>
+      <button class="su-logout" onclick="logout()" title="Cerrar sesión">⏻</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Resumen del servidor</div>
+      </div>
+      <button class="btn btn-blue" id="topbar-action" style="display:none;"></button>
+    </div>
+
+    <!-- ─ DASHBOARD ─ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Modpacks</div>
+          <div class="stat-val blue" id="stat-packs">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Noticias activas</div>
+          <div class="stat-val green" id="stat-news">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Usuarios con acceso</div>
+          <div class="stat-val amber" id="stat-users">—</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">Estado del servidor</div>
+          <span class="badge badge-green" id="srv-badge">●&nbsp;Conectado</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+            Panel corriendo en <span style="font-family:var(--font-mono);color:var(--blue2);" id="srv-url">localhost:3001</span><br>
+            Todos los cambios se reflejan en el launcher en tiempo real.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Acceso rápido</div></div>
+        <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-blue" onclick="navTo('modpacks')">+ Subir modpack</button>
+          <button class="btn btn-ghost" onclick="navTo('news')">+ Nueva noticia</button>
+          <button class="btn btn-ghost" onclick="navTo('users')">Gestionar usuarios</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ MODPACKS ─ -->
+    <div class="page" id="page-modpacks">
+      <div style="margin-bottom:24px;display:flex;justify-content:flex-end;">
+        <button class="btn btn-blue" onclick="openModal('modal-modpack')">+ Subir modpack</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Modpacks publicados</div>
+        </div>
+        <div class="card-body">
+          <div class="mp-list" id="mp-list">
+            <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">
+              Cargando modpacks del servidor...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ NOTICIAS ─ -->
+    <div class="page" id="page-news">
+      <div style="margin-bottom:24px;display:flex;justify-content:flex-end;">
+        <button class="btn btn-blue" onclick="openModal('modal-news')">+ Nueva noticia</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Noticias del launcher</div></div>
+        <div class="card-body">
+          <div class="news-list-admin" id="news-admin-list">
+            <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Cargando noticias...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ USUARIOS ─ -->
+    <div class="page" id="page-users">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">Super Admin</div>
+          <span class="badge badge-blue">Fijo</span>
+        </div>
+        <div class="card-body">
+          <table class="tbl">
+            <thead><tr><th>Email</th><th>Rol</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">agus5gmtin@gmail.com</td>
+                <td><span class="badge badge-blue">Super Admin</span></td>
+                <td><span class="badge badge-green">● Activo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" id="card-users-admin" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Administradores adicionales</div>
+          <button class="btn btn-ghost" style="font-size:12px;" onclick="openModal('modal-user')">+ Añadir</button>
+        </div>
+        <div class="card-body">
+          <table class="tbl">
+            <thead><tr><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead>
+            <tbody id="extra-users-tbody">
+              <tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px;">Sin administradores adicionales</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="users-no-admin" style="display:none;">
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">
+            Solo el Super Admin puede gestionar usuarios.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ AJUSTES ─ -->
+    <div class="page" id="page-settings">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header"><div class="card-title">Servidor</div></div>
+        <div class="card-body">
+          <label class="lbl">URL del servidor (para el launcher)</label>
+          <input type="text" class="inp" id="s-server-url" value="http://localhost:3001" placeholder="http://localhost:3001">
+          <label class="lbl" style="margin-top:14px;">Contraseña del panel (legado)</label>
+          <input type="password" class="inp" id="s-server-pass" placeholder="bas2024">
+          <button class="btn btn-blue" style="margin-top:16px;" onclick="saveSettings()">Guardar cambios</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Launcher</div></div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="ti-label">Modo mantenimiento</div>
+              <div class="ti-sub">Bloquea el botón de jugar en el launcher</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="t-maintenance"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="ti-label">Permitir modo offline</div>
+              <div class="ti-sub">Los usuarios pueden jugar sin cuenta Microsoft</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="t-offline" checked><span class="toggle-slider"></span></label>
+          </div>
+          <button class="btn btn-blue" style="margin-top:16px;" onclick="saveSettings()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ MODALS ══════════════════════════════════════════════════════════════ -->
+
+<!-- Modal: Subir modpack -->
+<div class="modal-backdrop" id="modal-modpack">
+  <div class="modal">
+    <div class="modal-title">Subir modpack</div>
+    <button class="modal-close" onclick="closeModal('modal-modpack')">✕</button>
+    <label class="lbl">Nombre del modpack</label>
+    <input type="text" class="inp" id="mp-name" placeholder="SkyBlock Evolved">
+    <label class="lbl">Versión de Minecraft</label>
+    <input type="text" class="inp" id="mp-version" placeholder="1.20.1">
+    <label class="lbl">Loader</label>
+    <select class="inp" id="mp-loader">
+      <option value="Fabric">Fabric</option>
+      <option value="Forge">Forge</option>
+      <option value="NeoForge">NeoForge</option>
+      <option value="Quilt">Quilt</option>
+    </select>
+    <label class="lbl">URL de descarga (.mrpack)</label>
+    <input type="text" class="inp" id="mp-url" placeholder="https://...">
+    <label class="lbl">URL del ícono (opcional)</label>
+    <input type="text" class="inp" id="mp-icon" placeholder="https://...">
+    <label class="lbl">URL del banner (opcional)</label>
+    <input type="text" class="inp" id="mp-banner" placeholder="https://...">
+    <label class="lbl">Contraseña (opcional)</label>
+    <input type="password" class="inp" id="mp-pass" placeholder="Dejar vacío = público">
+    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="submitModpack()">Publicar modpack</button>
+  </div>
+</div>
+
+<!-- Modal: Nueva noticia -->
+<div class="modal-backdrop" id="modal-news">
+  <div class="modal">
+    <div class="modal-title">Nueva noticia</div>
+    <button class="modal-close" onclick="closeModal('modal-news')">✕</button>
+    <label class="lbl">Título</label>
+    <input type="text" class="inp" id="n-title" placeholder="Actualización v1.1">
+    <label class="lbl">Cuerpo del mensaje</label>
+    <textarea class="inp" id="n-body" placeholder="Descripción breve..."></textarea>
+    <label class="lbl">Color del punto</label>
+    <select class="inp" id="n-color">
+      <option value="blue">Azul</option>
+      <option value="green">Verde</option>
+      <option value="red">Rojo</option>
+      <option value="amber">Ámbar</option>
+    </select>
+    <label class="lbl">URL de imagen (opcional)</label>
+    <input type="text" class="inp" id="n-img" placeholder="https://...">
+    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="submitNews()">Publicar noticia</button>
+  </div>
+</div>
+
+<!-- Modal: Añadir usuario -->
+<div class="modal-backdrop" id="modal-user">
+  <div class="modal">
+    <div class="modal-title">Añadir administrador</div>
+    <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+    <label class="lbl">Email de Google</label>
+    <input type="email" class="inp" id="u-email" placeholder="usuario@gmail.com">
+    <label class="lbl">Rol</label>
+    <select class="inp" id="u-role">
+      <option value="admin">Administrador</option>
+      <option value="viewer">Solo lectura</option>
+    </select>
+    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="addUser()">Añadir usuario</button>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════
+const SUPER_ADMIN = 'agus5gmtin@gmail.com';
+const SERVER_URL  = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://luncher.jolty.us';
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let currentUser = null;
+let isAdmin = false;
+let extraUsers = JSON.parse(localStorage.getItem('bas_extra_users') || '[]');
+let modpacks = [];
+let news = [];
+
+// ══════════════════════════════════════════════════════════
+// GOOGLE LOGIN
+// ══════════════════════════════════════════════════════════
+function triggerGoogleLogin() {
+  // Si la librería de Google está cargada, la usamos.
+  // Si no, mostramos un aviso de configuración pendiente.
+  if (typeof google !== 'undefined' && google.accounts) {
+    google.accounts.id.initialize({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID', // ← reemplazar con tu Client ID real
+      callback: handleGoogleLogin,
+      auto_select: false
+    });
+    google.accounts.id.prompt();
+  } else {
+    // Modo desarrollo: login simulado solo para demostración
+    const email = prompt('Modo DEV — ingresá el email de Google para simular login:');
+    if (email) handleGoogleLogin({ email, name: email.split('@')[0], picture: null, _dev: true });
+  }
+}
+
+function handleGoogleLogin(response) {
+  let email, name, picture;
+
+  if (response._dev) {
+    // Modo dev (prompt)
+    email   = response.email;
+    name    = response.name;
+    picture = null;
+  } else {
+    // Decodificar JWT de Google
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    email   = payload.email;
+    name    = payload.name;
+    picture = payload.picture;
+  }
+
+  // Verificar acceso
+  const isSuperAdmin = email === SUPER_ADMIN;
+  const isExtraAdmin = extraUsers.find(u => u.email === email);
+
+  if (!isSuperAdmin && !isExtraAdmin) {
+    document.getElementById('screen-login').classList.add('hidden');
+    document.getElementById('denied-email').textContent = email;
+    document.getElementById('screen-denied').classList.add('show');
+    return;
+  }
+
+  // Guardar sesión
+  currentUser = { email, name, picture, role: isSuperAdmin ? 'super_admin' : isExtraAdmin.role };
+  isAdmin = isSuperAdmin;
+  sessionStorage.setItem('bas_session', JSON.stringify(currentUser));
+
+  document.getElementById('screen-login').classList.add('hidden');
+  document.getElementById('screen-denied').classList.remove('show');
+  showAdminPanel();
+}
+
+function checkSession() {
+  const s = sessionStorage.getItem('bas_session');
+  if (s) {
+    currentUser = JSON.parse(s);
+    isAdmin = currentUser.email === SUPER_ADMIN;
+    document.getElementById('screen-login').classList.add('hidden');
+    showAdminPanel();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('bas_session');
+  currentUser = null;
+  isAdmin = false;
+  document.getElementById('screen-admin').classList.remove('show');
+  document.getElementById('screen-denied').classList.remove('show');
+  document.getElementById('screen-login').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════════════════════
+// PANEL SETUP
+// ══════════════════════════════════════════════════════════
+function showAdminPanel() {
+  document.getElementById('screen-admin').classList.add('show');
+
+  // Sidebar user
+  const av = document.getElementById('su-avatar');
+  if (currentUser.picture) {
+    av.innerHTML = `<img src="${currentUser.picture}" alt="">`;
+  } else {
+    av.textContent = (currentUser.name || '?')[0].toUpperCase();
+  }
+  document.getElementById('su-name').textContent = currentUser.name || currentUser.email;
+  const roleEl = document.getElementById('su-role');
+  roleEl.textContent = isAdmin ? 'Super Admin' : currentUser.role;
+  if (isAdmin) roleEl.classList.add('admin');
+
+  // Mostrar/ocultar sección usuarios según rol
+  if (isAdmin) {
+    document.getElementById('card-users-admin').style.display = 'block';
+    document.getElementById('users-no-admin').style.display = 'none';
+  } else {
+    document.getElementById('card-users-admin').style.display = 'none';
+    document.getElementById('users-no-admin').style.display = 'block';
+  }
+
+  // Cargar datos
+  loadModpacks();
+  loadNews();
+  updateStats();
+}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+const pageNames = {
+  dashboard: ['Dashboard', 'Resumen del servidor'],
+  modpacks:  ['Modpacks', 'Gestión de modpacks'],
+  news:      ['Noticias', 'Contenido del launcher'],
+  users:     ['Usuarios', 'Control de acceso'],
+  settings:  ['Ajustes', 'Configuración del servidor']
+};
+
+document.querySelectorAll('.snav-btn').forEach(btn => {
+  btn.addEventListener('click', () => navTo(btn.dataset.page));
+});
+
+function navTo(page) {
+  document.querySelectorAll('.snav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+  const [title, sub] = pageNames[page] || ['—', '—'];
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-sub').textContent = sub;
+}
+
+// ══════════════════════════════════════════════════════════
+// LOAD DATA
+// ══════════════════════════════════════════════════════════
+async function loadModpacks() {
+  try {
+    const r = await fetch(SERVER_URL + '/api/modpacks', { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    modpacks = d.modpacks || [];
+  } catch {
+    modpacks = [];
+  }
+  renderModpackList();
+  updateStats();
+}
+
+async function loadNews() {
+  try {
+    const r = await fetch(SERVER_URL + '/api/news', { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    news = d.news || [];
+  } catch {
+    news = [];
+  }
+  renderNewsList();
+  updateStats();
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════
+function renderModpackList() {
+  const el = document.getElementById('mp-list');
+  if (!modpacks.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">Sin modpacks publicados. ¡Subí el primero!</div>';
+    return;
+  }
+  el.innerHTML = modpacks.map(mp => `
+    <div class="mp-item">
+      <div class="mp-thumb">${mp.icon ? `<img src="${mp.icon}" alt="">` : '📦'}</div>
+      <div class="mp-info">
+        <div class="mp-name">${mp.name}</div>
+        <div class="mp-meta">${mp.mcVersion || '?'} · ${mp.loader || 'Fabric'} ${mp.modsCount ? '· '+mp.modsCount+' mods' : ''}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${mp.password ? '<span class="badge badge-amber">🔒 Con contraseña</span>' : '<span class="badge badge-green">● Público</span>'}
+        <button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="deleteModpack('${mp.id}')">Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderNewsList() {
+  const el = document.getElementById('news-admin-list');
+  if (!news.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">Sin noticias publicadas.</div>';
+    return;
+  }
+  const colorMap = { blue: '#4f9fff', green: '#10d48a', red: '#ff4d6a', amber: '#ffb347' };
+  el.innerHTML = news.map((n, i) => `
+    <div class="news-item-admin">
+      <div class="news-dot-pick" style="background:${colorMap[n.color]||colorMap.blue};"></div>
+      <div class="ni-text">
+        <div class="ni-title2">${n.title}</div>
+        ${n.body ? `<div class="ni-body2">${n.body}</div>` : ''}
+      </div>
+      <button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="deleteNews(${i})">Eliminar</button>
+    </div>`).join('');
+}
+
+function updateStats() {
+  document.getElementById('stat-packs').textContent = modpacks.length;
+  document.getElementById('stat-news').textContent  = news.length;
+  document.getElementById('stat-users').textContent = 1 + extraUsers.length;
+  document.getElementById('srv-url').textContent = SERVER_URL;
+}
+
+// ══════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════
+async function submitModpack() {
+  const payload = {
+    name:     document.getElementById('mp-name').value.trim(),
+    mcVersion:document.getElementById('mp-version').value.trim(),
+    loader:   document.getElementById('mp-loader').value,
+    url:      document.getElementById('mp-url').value.trim(),
+    icon:     document.getElementById('mp-icon').value.trim() || null,
+    banner:   document.getElementById('mp-banner').value.trim() || null,
+    password: document.getElementById('mp-pass').value || null,
+  };
+  if (!payload.name || !payload.url) { toast('Completá nombre y URL', 'err'); return; }
+  try {
+    const r = await fetch(SERVER_URL + '/api/modpacks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': 'bas2024' },
+      body: JSON.stringify(payload)
+    });
+    if (r.ok) { toast('Modpack publicado ✓', 'ok'); closeModal('modal-modpack'); loadModpacks(); }
+    else       { toast('Error del servidor', 'err'); }
+  } catch { toast('No se pudo conectar al servidor', 'err'); }
+}
+
+async function deleteModpack(id) {
+  if (!confirm('¿Eliminar este modpack?')) return;
+  try {
+    await fetch(SERVER_URL + '/api/modpacks/' + id, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': 'bas2024' }
+    });
+    toast('Modpack eliminado', 'ok');
+    loadModpacks();
+  } catch { toast('Error al eliminar', 'err'); }
+}
+
+async function submitNews() {
+  const payload = {
+    title: document.getElementById('n-title').value.trim(),
+    body:  document.getElementById('n-body').value.trim(),
+    color: document.getElementById('n-color').value,
+    image: document.getElementById('n-img').value.trim() || null,
+  };
+  if (!payload.title) { toast('Ingresá un título', 'err'); return; }
+  try {
+    const r = await fetch(SERVER_URL + '/api/news', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': 'bas2024' },
+      body: JSON.stringify(payload)
+    });
+    if (r.ok) { toast('Noticia publicada ✓', 'ok'); closeModal('modal-news'); loadNews(); }
+    else       { toast('Error del servidor', 'err'); }
+  } catch { toast('No se pudo conectar al servidor', 'err'); }
+}
+
+async function deleteNews(index) {
+  if (!confirm('¿Eliminar esta noticia?')) return;
+  try {
+    await fetch(SERVER_URL + '/api/news/' + index, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': 'bas2024' }
+    });
+    toast('Noticia eliminada', 'ok');
+    loadNews();
+  } catch { toast('Error al eliminar', 'err'); }
+}
+
+function addUser() {
+  if (!isAdmin) { toast('Solo el Super Admin puede añadir usuarios', 'err'); return; }
+  const email = document.getElementById('u-email').value.trim().toLowerCase();
+  const role  = document.getElementById('u-role').value;
+  if (!email || !email.includes('@')) { toast('Email inválido', 'err'); return; }
+  if (extraUsers.find(u => u.email === email)) { toast('Usuario ya existe', 'err'); return; }
+  extraUsers.push({ email, role });
+  localStorage.setItem('bas_extra_users', JSON.stringify(extraUsers));
+  renderExtraUsers();
+  closeModal('modal-user');
+  toast('Usuario añadido ✓', 'ok');
+  updateStats();
+}
+
+function removeUser(email) {
+  extraUsers = extraUsers.filter(u => u.email !== email);
+  localStorage.setItem('bas_extra_users', JSON.stringify(extraUsers));
+  renderExtraUsers();
+  updateStats();
+  toast('Usuario eliminado', 'ok');
+}
+
+function renderExtraUsers() {
+  const tbody = document.getElementById('extra-users-tbody');
+  if (!extraUsers.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px;">Sin administradores adicionales</td></tr>';
+    return;
+  }
+  tbody.innerHTML = extraUsers.map(u => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:12px;">${u.email}</td>
+      <td><span class="badge badge-blue">${u.role === 'admin' ? 'Admin' : 'Solo lectura'}</span></td>
+      <td><button class="btn btn-danger" style="font-size:11px;padding:5px 10px;" onclick="removeUser('${u.email}')">Eliminar</button></td>
+    </tr>`).join('');
+}
+
+function saveSettings() {
+  toast('Ajustes guardados (conectar al backend para persistencia)', 'info');
+}
+
+// ══════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const icons = { ok: '✓', err: '✕', info: 'ℹ' };
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span> ${msg}`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+renderExtraUsers();
+checkSession();
+</script>
+</body>
+</html>
