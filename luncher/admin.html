@@ -2,564 +2,558 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAS CLIENT — Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAS CLIENT · Admin</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg:#04060f; --bg2:#080c1a; --bg3:#0c1228; --bg4:#101828;
-    --blue:#1e6fff; --blue2:#4f9fff; --green:#10d48a; --red:#ff4d6a; --amber:#ffb347;
-    --text:#f0f4ff; --muted:rgba(200,212,255,0.45);
-    --border:rgba(100,140,255,0.12); --border2:rgba(100,140,255,0.22);
-    --font-display:'Syne',sans-serif; --font-body:'DM Sans',sans-serif; --font-mono:'DM Mono',monospace;
-  }
-  html,body{height:100%}
-  body{background:var(--bg);color:var(--text);font-family:var(--font-body);overflow-x:hidden;position:relative;}
-  body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px;}
-  .blob{position:fixed;border-radius:50%;filter:blur(100px);opacity:0.08;z-index:0;pointer-events:none;}
-  .blob-1{width:500px;height:500px;background:#1a5fff;top:-150px;right:-100px;}
-  .blob-2{width:400px;height:400px;background:#3010ff;bottom:0;left:-120px;}
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+:root{--bg:#07070f;--bg2:#0b0b18;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);--blue:#1e78ff;--blue2:#4f9fff;--purple:#6c3fff;--text:#dde4f5;--muted:rgba(255,255,255,.4);--danger:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.layout{position:relative;z-index:1;display:flex;min-height:100vh}
 
-  /* LOGIN */
-  #screen-login{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);}
-  #screen-login.hidden{display:none;}
-  .login-card{position:relative;z-index:2;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:52px 48px;width:100%;max-width:400px;text-align:center;}
-  .login-card::before{content:'';position:absolute;inset:0;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,rgba(30,111,255,0.1),transparent 70%);pointer-events:none;}
-  .login-logo{font-family:var(--font-display);font-size:13px;font-weight:800;letter-spacing:0.1em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px;}
-  .login-logo-dot{width:6px;height:6px;background:var(--blue);border-radius:50%;box-shadow:0 0 8px var(--blue);animation:pulse 2s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{box-shadow:0 0 8px var(--blue)}50%{box-shadow:0 0 18px var(--blue)}}
-  .login-title{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:8px;}
-  .login-sub{font-size:13px;color:var(--muted);margin-bottom:36px;line-height:1.5;}
-  #g_id_onload{display:none;}
-  .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;color:#1f1f1f;font-family:var(--font-body);font-size:15px;font-weight:500;padding:13px 20px;border-radius:10px;border:none;cursor:pointer;transition:background 0.15s,box-shadow 0.15s,transform 0.12s;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
-  .btn-google:hover{background:#f5f5f5;box-shadow:0 4px 20px rgba(0,0,0,0.4);transform:translateY(-1px);}
-  .login-note{margin-top:20px;font-size:11px;color:rgba(200,212,255,0.2);font-family:var(--font-mono);}
+/* SIDEBAR */
+.sb{width:230px;background:rgba(7,7,15,.97);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;position:sticky;top:0;height:100vh}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:20px}
+.sb-logo img{width:38px;filter:drop-shadow(0 0 10px rgba(30,120,255,.5))}
+.sb-logo-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:3px;background:linear-gradient(135deg,var(--blue2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-logo-sub{font-size:10px;color:var(--muted);letter-spacing:1px}
+.sb-sec{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:0 12px;margin:14px 0 5px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;color:var(--muted);cursor:pointer;text-decoration:none;font-size:13px;background:none;border:none;width:100%;text-align:left;font-family:'Inter',sans-serif;transition:all .2s}
+.sb-link:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.sb-link.active{background:linear-gradient(135deg,rgba(30,120,255,.14),rgba(108,63,255,.08));color:var(--blue2);border:1px solid rgba(30,120,255,.22)}
+.sb-link svg{width:15px;height:15px;fill:currentColor;flex-shrink:0}
+.sb-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);padding-left:12px}
+.sb-bottom strong{color:var(--blue2);display:block;margin-bottom:2px}
 
-  /* DENIED */
-  #screen-denied{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:var(--bg);flex-direction:column;text-align:center;gap:16px;padding:24px;}
-  #screen-denied.show{display:flex;}
-  .denied-icon{font-size:48px;}
-  .denied-title{font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--red);}
-  .denied-sub{font-size:14px;color:var(--muted);max-width:320px;}
-  .denied-email{font-family:var(--font-mono);font-size:12px;background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.25);border-radius:8px;padding:8px 16px;color:var(--red);margin-top:8px;}
+/* LOGIN */
+#login-ov{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(7,7,15,.98)}
+.lbox{background:rgba(11,11,24,.98);border:1px solid rgba(30,120,255,.3);border-radius:18px;padding:40px;width:360px;text-align:center;box-shadow:0 0 60px rgba(30,120,255,.15)}
+.lbox img{width:70px;margin-bottom:14px;filter:drop-shadow(0 0 14px rgba(30,120,255,.5))}
+.lbox h2{font-family:'Rajdhani',sans-serif;font-size:26px;letter-spacing:4px;background:linear-gradient(135deg,#fff,var(--blue2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.lbox p{color:var(--muted);font-size:12px;margin-bottom:24px}
+.lbox input{width:100%;padding:10px 14px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;margin-bottom:12px;font-family:'Inter',sans-serif;text-align:center;letter-spacing:2px}
+.lbox input:focus{border-color:var(--blue)}
 
-  /* ADMIN */
-  #screen-admin{display:none;min-height:100vh;position:relative;z-index:2;}
-  #screen-admin.show{display:flex;}
+/* MAIN */
+.main{flex:1;padding:30px;overflow-y:auto}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;margin-bottom:20px}
 
-  .sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;}
-  .sidebar-top{padding:24px 20px 16px;border-bottom:1px solid var(--border);}
-  .sidebar-brand{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;}
-  .sidebar-brand .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue);animation:pulse 2s infinite;}
-  .sidebar-label{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
-  .sidenav{padding:16px 12px;flex:1;}
-  .snav-group-label{font-size:10px;font-family:var(--font-mono);letter-spacing:0.12em;text-transform:uppercase;color:rgba(200,212,255,0.22);padding:0 8px;margin-bottom:6px;margin-top:16px;}
-  .snav-btn{display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;text-align:left;transition:background 0.15s,color 0.15s;font-family:var(--font-body);}
-  .snav-btn svg{width:16px;height:16px;fill:currentColor;flex-shrink:0;}
-  .snav-btn:hover{background:rgba(100,140,255,0.08);color:var(--text);}
-  .snav-btn.active{background:rgba(30,111,255,0.15);color:var(--blue2);}
-  .sidebar-user{padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-  .su-avatar{width:34px;height:34px;border-radius:50%;background:rgba(30,111,255,0.2);border:1px solid var(--border2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
-  .su-avatar img{width:100%;height:100%;object-fit:cover;}
-  .su-info{flex:1;min-width:0;}
-  .su-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .su-role{font-size:10px;color:var(--muted);font-family:var(--font-mono);}
-  .su-role.admin{color:var(--blue2);}
-  .su-logout{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color 0.15s;}
-  .su-logout:hover{color:var(--red);}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue2);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 
-  .admin-main{flex:1;overflow-y:auto;}
-  .admin-topbar{background:rgba(4,6,15,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-  .topbar-title{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-0.02em;}
-  .topbar-sub{font-size:12px;color:var(--muted);margin-top:2px;font-family:var(--font-mono);}
+/* FORM */
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;margin-top:12px}
+label:first-of-type{margin-top:0}
+input[type=text],input[type=password],textarea,select{width:100%;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+select option{background:#0b0b18}
+textarea{resize:vertical}
 
-  .page{display:none;padding:32px;}
-  .page.active{display:block;}
+/* IMAGE UPLOAD */
+.img-upload{display:flex;gap:12px;flex-wrap:wrap}
+.img-slot{
+  flex:1;min-width:140px;border:2px dashed var(--border);border-radius:10px;
+  padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.img-slot:hover,.img-slot.drag{border-color:var(--blue);background:rgba(30,120,255,.04)}
+.img-slot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-slot-label{font-size:11px;color:var(--muted);margin-top:6px}
+.img-preview{width:100%;height:80px;object-fit:contain;border-radius:6px;display:none;margin-bottom:6px}
 
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px;}
-  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
-  .stat-label{font-size:11px;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-  .stat-val{font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-0.03em;}
-  .stat-val.blue{color:var(--blue2)} .stat-val.green{color:var(--green)} .stat-val.amber{color:var(--amber)}
+/* DROP ZONE mrpack */
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--blue);background:rgba(30,120,255,.04)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-zone p{color:var(--muted);font-size:13px}
+.drop-zone strong{color:var(--blue2)}
 
-  .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
-  .card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .card-title{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:-0.02em;}
-  .card-body{padding:22px;}
+/* PROG */
+.prog-wrap{margin-top:10px;display:none}
+.prog-track{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));width:0%;transition:width .3s;box-shadow:0 0 6px var(--blue)}
+.prog-lbl{font-size:12px;color:var(--muted);margin-bottom:5px}
 
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:opacity 0.15s,transform 0.12s;}
-  .btn:hover{opacity:0.85;transform:translateY(-1px);}
-  .btn-blue{background:var(--blue);color:#fff;}
-  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);}
-  .btn-ghost:hover{color:var(--text);}
-  .btn-danger{background:rgba(255,77,106,0.12);color:var(--red);border:1px solid rgba(255,77,106,0.2);}
+/* PACK LIST */
+.pack-list{display:flex;flex-direction:column;gap:10px}
+.pack-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
+.pack-row:hover{border-color:rgba(30,120,255,.25)}
+.pr-art{width:52px;height:52px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,rgba(30,120,255,.2),rgba(108,63,255,.2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;position:relative}
+.pr-art img{width:100%;height:100%;object-fit:contain}
+.pr-art .banner-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+.pr-info{flex:1;min-width:0}
+.pr-name{font-size:14px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pr-meta{font-size:11px;color:var(--muted)}
+.pr-acts{display:flex;gap:7px;flex-shrink:0}
+.badge{font-size:10px;padding:2px 7px;border-radius:4px}
+.badge-lock{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.badge-hid{background:rgba(255,255,255,.07);color:var(--muted);border:1px solid var(--border)}
 
-  .inp{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);font-family:var(--font-body);outline:none;transition:border-color 0.15s;}
-  .inp:focus{border-color:rgba(30,111,255,0.5);}
-  .inp::placeholder{color:rgba(200,212,255,0.2);}
-  textarea.inp{resize:vertical;min-height:80px;}
-  label.lbl{display:block;font-size:11px;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;margin-top:14px;}
-  label.lbl:first-child{margin-top:0;}
+/* NEWS */
+.news-list{display:flex;flex-direction:column;gap:8px}
+.nr{display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px}
+.nr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nr-dot.blue{background:var(--blue);box-shadow:0 0 5px var(--blue)}
+.nr-dot.purple{background:var(--purple);box-shadow:0 0 5px var(--purple)}
+.nr-dot.green{background:#22c55e;box-shadow:0 0 5px #22c55e}
+.nr-info{flex:1}
+.nr-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.nr-body{font-size:12px;color:var(--muted)}
 
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
-  .toggle-row:last-child{border-bottom:none;}
-  .toggle-info .ti-label{font-size:13px;font-weight:600;}
-  .toggle-info .ti-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-  .toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
-  .toggle input{opacity:0;width:0;height:0;position:absolute;}
-  .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.08);border-radius:11px;cursor:pointer;transition:background 0.2s;}
-  .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;}
-  .toggle input:checked+.toggle-slider{background:var(--blue);}
-  .toggle input:checked+.toggle-slider::before{transform:translateX(16px);}
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:0 0 18px rgba(30,120,255,.22)}
+.btn-primary:hover{opacity:.9;box-shadow:0 0 28px rgba(30,120,255,.38)}
+.btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:6px 12px!important;font-size:12px!important}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-  .mp-list{display:flex;flex-direction:column;gap:10px;}
-  .mp-item{display:flex;align-items:center;gap:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color 0.15s;}
-  .mp-item:hover{border-color:var(--border2);}
-  .mp-thumb{width:40px;height:40px;border-radius:8px;background:rgba(30,111,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;}
-  .mp-thumb img{width:100%;height:100%;object-fit:cover;}
-  .mp-info{flex:1;min-width:0;}
-  .mp-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .mp-meta{font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-top:2px;}
-  .badge{display:inline-block;font-size:10px;font-family:var(--font-mono);padding:3px 8px;border-radius:100px;font-weight:500;}
-  .badge-blue{background:rgba(30,111,255,0.15);color:var(--blue2);border:1px solid rgba(30,111,255,0.2);}
-  .badge-green{background:rgba(16,212,138,0.12);color:var(--green);border:1px solid rgba(16,212,138,0.2);}
-  .badge-amber{background:rgba(255,179,71,0.12);color:var(--amber);border:1px solid rgba(255,179,71,0.2);}
+/* MSG */
+.msg{padding:10px 14px;border-radius:8px;margin-top:8px;font-size:13px;display:none}
+.msg.ok{background:rgba(30,120,255,.1);border:1px solid rgba(30,120,255,.3);color:var(--blue2)}
+.msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
 
-  .tbl{width:100%;border-collapse:collapse;font-size:13px;}
-  .tbl th{text-align:left;font-size:10px;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;padding:10px 14px;border-bottom:1px solid var(--border);}
-  .tbl td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text);}
-  .tbl tr:last-child td{border-bottom:none;}
-  .tbl tr:hover td{background:rgba(100,140,255,0.04);}
+/* ROW */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
-  .news-list-admin{display:flex;flex-direction:column;gap:8px;}
-  .news-item-admin{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
-  .news-dot-pick{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-  .news-item-admin .ni-text{flex:1;min-width:0;}
-  .news-item-admin .ni-title2{font-size:13px;font-weight:600;}
-  .news-item-admin .ni-body2{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* TAB PAGES */
+.tab-page{display:none}.tab-page.active{display:block}
 
-  .modal-backdrop{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
-  .modal-backdrop.open{display:flex;}
-  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:100%;max-width:480px;position:relative;}
-  .modal-title{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-0.02em;margin-bottom:20px;}
-  .modal-close{position:absolute;top:18px;right:18px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:18px;transition:color 0.15s;}
-  .modal-close:hover{color:var(--text);}
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.modal.show{display:flex}
+.mbox{background:#0b0b18;border:1px solid rgba(30,120,255,.3);border-radius:16px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.mhdr h3{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px}
+.mclose{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px}
+.mclose:hover{color:var(--text)}
+.mbody{padding:20px;display:flex;flex-direction:column;gap:6px}
+.mftr{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border)}
 
-  #toast-container{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;gap:10px;}
-  .toast{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;min-width:220px;animation:slideIn 0.25s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
-  @keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
-  .toast.ok{border-left:3px solid var(--green);}
-  .toast.err{border-left:3px solid var(--red);}
-  .toast.info{border-left:3px solid var(--blue);}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
 
-  ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(30,111,255,0.25);border-radius:3px}
-
-  @media(max-width:768px){
-    .sidebar{width:60px;}
-    .sidebar-top,.su-info{display:none;}
-    .snav-btn span,.snav-group-label{display:none;}
-  }
 </style>
 </head>
 <body>
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
+<canvas id="c"></canvas>
 
 <!-- LOGIN -->
-<div id="screen-login">
-  <div class="login-card">
-    <div class="login-logo"><div class="login-logo-dot"></div>BAS CLIENT</div>
-    <h1 class="login-title">Panel Admin</h1>
-    <p class="login-sub">Acceso exclusivo para administradores.<br>Iniciá sesión con tu cuenta de Google.</p>
-    <div id="g_id_onload"
-         data-client_id="662998030420-4el7am4agh2nlcaknfqi3cma4qijsuev.apps.googleusercontent.com"
-         data-callback="handleGoogleLogin"
-         data-auto_prompt="false">
-    </div>
-    <button class="btn-google" onclick="triggerGoogleLogin()">
-      <svg width="20" height="20" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.93 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Continuar con Google
-    </button>
-    <p class="login-note">Solo cuentas autorizadas pueden acceder</p>
+<div id="login-ov">
+  <div class="lbox">
+    <img src="./basicon_nobg.png" onerror="this.src='./basicon.png'">
+    <h2>BAS CLIENT</h2>
+    <p>Panel de Administración</p>
+    <input type="text" id="admin-user" placeholder="Usuario" onkeydown="if(event.key==='Enter')login()" style="margin-bottom:8px">
+    <input type="password" id="admin-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="login()">🔐 Entrar</button>
+    <div class="msg" id="login-msg"></div>
   </div>
 </div>
 
-<!-- DENIED -->
-<div id="screen-denied">
-  <div class="denied-icon">🚫</div>
-  <div class="denied-title">Acceso denegado</div>
-  <p class="denied-sub">Tu cuenta de Google no tiene permisos para acceder al panel.</p>
-  <div class="denied-email" id="denied-email">—</div>
-  <button class="btn btn-ghost" style="margin-top:20px;" onclick="logout()">← Volver</button>
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="screen-admin">
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="sidebar-brand"><div class="dot"></div><span>BAS CLIENT</span></div>
-      <div class="sidebar-label">Admin panel</div>
+<div class="layout">
+  <aside class="sb">
+    <div class="sb-logo">
+      <img src="./basicon_nobg.png" onerror="this.src='./basicon.png'">
+      <div><div class="sb-logo-name">BAS</div><div class="sb-logo-sub">ADMIN</div></div>
     </div>
-    <nav class="sidenav">
-      <div class="snav-group-label">General</div>
-      <button class="snav-btn active" data-page="dashboard">
-        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>Dashboard</span>
-      </button>
-      <div class="snav-group-label">Contenido</div>
-      <button class="snav-btn" data-page="modpacks">
-        <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.52 15.5 0 12.36 0c-1.73 0-3.24.93-4.1 2.27L7 3.5 5.74 2.27C4.88.93 3.37 0 1.64 0 .73 0 0 .73 0 1.64v.18C0 3.95 2.04 6 4.54 6H4v2h-.5C2.12 8 1 9.12 1 10.5S2.12 13 3.5 13H4v6c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-6h.5c1.38 0 2.5-1.12 2.5-2.5S21.88 8 20.5 8H20V6z"/></svg><span>Modpacks</span>
-      </button>
-      <button class="snav-btn" data-page="news">
-        <svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg><span>Noticias</span>
-      </button>
-      <div class="snav-group-label">Sistema</div>
-      <button class="snav-btn" data-page="users">
-        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Usuarios</span>
-      </button>
-      <button class="snav-btn" data-page="settings">
-        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span>Ajustes</span>
-      </button>
-    </nav>
-    <div class="sidebar-user">
-      <div class="su-avatar" id="su-avatar">?</div>
-      <div class="su-info">
-        <div class="su-name" id="su-name">—</div>
-        <div class="su-role" id="su-role">—</div>
-      </div>
-      <button class="su-logout" onclick="logout()" title="Cerrar sesión">⏻</button>
+    <div class="sb-sec">Gestión</div>
+    <button class="sb-link active" onclick="tab('modpacks',this)">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.52 15.5 0 12.36 0c-1.73 0-3.24.93-4.1 2.27L7 3.5 5.74 2.27C4.88.93 3.37 0 1.64 0 .73 0 0 .73 0 1.64v.18C0 3.95 2.04 6 4.54 6H4v2h-.5C2.12 8 1 9.12 1 10.5S2.12 13 3.5 13H4v6c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-6h.5c1.38 0 2.5-1.12 2.5-2.5S21.88 8 20.5 8H20V6z"/></svg>
+      Modpacks
+    </button>
+    <button class="sb-link" onclick="tab('news',this)">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c-.01.55-.45 1-1 1zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/></svg>
+      Noticias
+    </button>
+    <div class="sb-bottom">
+      <strong id="srv-stat">Conectado</strong>
+      <span>localhost:3001</span>
     </div>
   </aside>
 
-  <main class="admin-main">
-    <div class="admin-topbar">
-      <div>
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
-        <div class="topbar-sub" id="topbar-sub">Resumen del servidor</div>
-      </div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Modpacks</div><div class="stat-val blue" id="stat-packs">—</div></div>
-        <div class="stat-card"><div class="stat-label">Noticias</div><div class="stat-val green" id="stat-news">—</div></div>
-        <div class="stat-card"><div class="stat-label">Usuarios con acceso</div><div class="stat-val amber" id="stat-users">—</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Estado del servidor</div><span class="badge badge-green" id="srv-badge">● Conectado</span></div>
-        <div class="card-body">
-          <div style="font-size:13px;color:var(--muted);line-height:1.7;">Servidor en <span style="font-family:var(--font-mono);color:var(--blue2);" id="srv-url">—</span><br>Cambios reflejados en el launcher en tiempo real.</div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:20px;">
-        <div class="card-header"><div class="card-title">Acceso rápido</div></div>
-        <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn btn-blue" onclick="navTo('modpacks')">+ Subir modpack</button>
-          <button class="btn btn-ghost" onclick="navTo('news')">+ Nueva noticia</button>
-          <button class="btn btn-ghost" onclick="navTo('users')">Gestionar usuarios</button>
-        </div>
-      </div>
-    </div>
+  <main class="main">
 
     <!-- MODPACKS -->
-    <div class="page" id="page-modpacks">
-      <div style="margin-bottom:24px;display:flex;justify-content:flex-end;">
-        <button class="btn btn-blue" onclick="openModal('modal-modpack')">+ Subir modpack</button>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Modpacks publicados</div></div>
-        <div class="card-body"><div class="mp-list" id="mp-list"><div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Cargando...</div></div></div>
-      </div>
-    </div>
+    <div class="tab-page active" id="tab-modpacks">
+      <div class="page-title">Modpacks</div>
 
-    <!-- NOTICIAS -->
-    <div class="page" id="page-news">
-      <div style="margin-bottom:24px;display:flex;justify-content:flex-end;">
-        <button class="btn btn-blue" onclick="openModal('modal-news')">+ Nueva noticia</button>
-      </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">Noticias del launcher</div></div>
-        <div class="card-body"><div class="news-list-admin" id="news-admin-list"><div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Cargando...</div></div></div>
-      </div>
-    </div>
+        <div class="card-title">⬆ Subir nuevo modpack</div>
 
-    <!-- USUARIOS -->
-    <div class="page" id="page-users">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Super Admin</div><span class="badge badge-blue">Fijo</span></div>
-        <div class="card-body">
-          <table class="tbl">
-            <thead><tr><th>Email</th><th>Rol</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr>
-                <td style="font-family:var(--font-mono);font-size:12px;">agus5gmtin@gmail.com</td>
-                <td><span class="badge badge-blue">Super Admin</span></td>
-                <td><span class="badge badge-green">● Activo</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card" id="card-extra-users">
-        <div class="card-header">
-          <div class="card-title">Administradores adicionales</div>
-          <button class="btn btn-ghost" style="font-size:12px;" onclick="openModal('modal-user')">+ Añadir</button>
-        </div>
-        <div class="card-body">
-          <table class="tbl">
-            <thead><tr><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead>
-            <tbody id="extra-users-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+        <label>Nombre del modpack *</label>
+        <input type="text" id="up-name" placeholder="Ej: Better Survival Pack">
 
-    <!-- AJUSTES -->
-    <div class="page" id="page-settings">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Servidor</div></div>
-        <div class="card-body">
-          <label class="lbl">URL del servidor</label>
-          <input type="text" class="inp" id="s-server-url" placeholder="http://localhost:3001">
-          <button class="btn btn-blue" style="margin-top:16px;" onclick="toast('Guardado','ok')">Guardar</button>
+        <label>Archivo .mrpack *</label>
+        <div class="drop-zone" id="dz">
+          <p>Arrastra tu <strong>.mrpack</strong> aquí o haz clic para seleccionar</p>
+          <input type="file" id="up-file" accept=".mrpack">
         </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Launcher</div></div>
-        <div class="card-body">
-          <div class="toggle-row">
-            <div class="toggle-info"><div class="ti-label">Modo mantenimiento</div><div class="ti-sub">Bloquea el botón de jugar</div></div>
-            <label class="toggle"><input type="checkbox" id="t-maintenance"><span class="toggle-slider"></span></label>
+        <div id="up-file-info" style="font-size:12px;color:var(--muted);margin-top:6px;display:none"></div>
+
+        <div class="row2" style="margin-top:12px">
+          <div>
+            <label>Imagen de icono / logo (opcional)</label>
+            <div class="img-slot" id="slot-icon">
+              <img id="prev-icon" class="img-preview" alt="icon preview">
+              <div style="font-size:24px">🎨</div>
+              <div class="img-slot-label">Icono del modpack<br><span style="font-size:10px">.png / .jpg</span></div>
+              <input type="file" id="up-icon" accept="image/*">
+            </div>
           </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><div class="ti-label">Permitir modo offline</div><div class="ti-sub">Jugar sin cuenta Microsoft</div></div>
-            <label class="toggle"><input type="checkbox" id="t-offline" checked><span class="toggle-slider"></span></label>
+          <div>
+            <label>Imagen de fondo / banner (opcional)</label>
+            <div class="img-slot" id="slot-banner">
+              <img id="prev-banner" class="img-preview" alt="banner preview">
+              <div style="font-size:24px">🖼️</div>
+              <div class="img-slot-label">Banner de fondo<br><span style="font-size:10px">.png / .jpg</span></div>
+              <input type="file" id="up-banner" accept="image/*">
+            </div>
           </div>
         </div>
+
+        <div class="row2" style="margin-top:12px">
+          <div>
+            <label>Contraseña (opcional)</label>
+            <input type="password" id="up-pass" placeholder="Sin contraseña = público">
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:4px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;color:var(--text);font-size:13px">
+              <input type="checkbox" id="up-hidden" style="width:auto;accent-color:#1e78ff"> Ocultar del launcher
+            </label>
+          </div>
+        </div>
+
+        <div class="prog-wrap" id="prog-wrap">
+          <div class="prog-lbl" id="prog-lbl">Subiendo...</div>
+          <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+        </div>
+        <div class="msg" id="up-msg"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="uploadPack()" id="up-btn">⬆ Subir Modpack</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📦 Modpacks (<span id="pack-count">0</span>)</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadPacks()">↻ Actualizar</button>
+        </div>
+        <div class="pack-list" id="pack-list"><div class="empty">Cargando...</div></div>
       </div>
     </div>
+
+    <!-- NEWS -->
+    <div class="tab-page" id="tab-news">
+      <div class="page-title">Noticias</div>
+
+      <div class="card">
+        <div class="card-title">✏️ Nueva noticia</div>
+        <label>Título *</label>
+        <input type="text" id="n-title" placeholder="Título de la noticia">
+        <label>Descripción</label>
+        <textarea id="n-body" rows="3" placeholder="Descripción de la noticia..."></textarea>
+        <label>Color</label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#4f9fff"><input type="radio" name="n-color" value="blue" checked style="accent-color:#1e78ff;width:auto"> Azul</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#a78bfa"><input type="radio" name="n-color" value="purple" style="accent-color:#6c3fff;width:auto"> Violeta</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#22c55e"><input type="radio" name="n-color" value="green" style="accent-color:#22c55e;width:auto"> Verde</label>
+        </div>
+        <label>Imagen (opcional — png, jpg o gif)</label>
+        <div class="img-slot" id="n-img-slot">
+          <img id="n-prev-img" class="img-preview" alt="">
+          <div style="font-size:22px">🖼️</div>
+          <div class="img-slot-label">Arrastra o clic · png/jpg/gif</div>
+          <input type="file" id="n-img-input" accept="image/png,image/jpeg,image/gif">
+        </div>
+        <div class="msg" id="n-msg"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="addNews()">+ Publicar</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📰 Noticias publicadas</div>
+        <div class="news-list" id="news-list"><div class="empty">Cargando...</div></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
-<!-- MODALS -->
-<div class="modal-backdrop" id="modal-modpack">
-  <div class="modal">
-    <div class="modal-title">Subir modpack</div>
-    <button class="modal-close" onclick="closeModal('modal-modpack')">✕</button>
-    <label class="lbl">Nombre</label><input type="text" class="inp" id="mp-name" placeholder="SkyBlock Evolved">
-    <label class="lbl">Versión de Minecraft</label><input type="text" class="inp" id="mp-version" placeholder="1.20.1">
-    <label class="lbl">Loader</label>
-    <select class="inp" id="mp-loader"><option value="Fabric">Fabric</option><option value="Forge">Forge</option><option value="NeoForge">NeoForge</option><option value="Quilt">Quilt</option></select>
-    <label class="lbl">URL de descarga (.mrpack)</label><input type="text" class="inp" id="mp-url" placeholder="https://...">
-    <label class="lbl">URL del ícono (opcional)</label><input type="text" class="inp" id="mp-icon" placeholder="https://...">
-    <label class="lbl">URL del banner (opcional)</label><input type="text" class="inp" id="mp-banner" placeholder="https://...">
-    <label class="lbl">Contraseña (opcional)</label><input type="password" class="inp" id="mp-pass" placeholder="Vacío = público">
-    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="submitModpack()">Publicar</button>
+<!-- EDIT MODAL -->
+<div class="modal" id="edit-modal">
+  <div class="mbox">
+    <div class="mhdr"><h3>EDITAR MODPACK</h3><button class="mclose" onclick="closeEdit()">✕</button></div>
+    <div class="mbody">
+      <label>Nombre</label><input type="text" id="e-name">
+
+      <label>Nueva imagen de icono</label>
+      <div class="img-slot" id="e-slot-icon" style="max-width:160px">
+        <img id="e-prev-icon" class="img-preview" alt="">
+        <div style="font-size:20px">🎨</div>
+        <div class="img-slot-label">Clic para cambiar</div>
+        <input type="file" id="e-icon" accept="image/*">
+      </div>
+
+      <label>Nueva imagen de banner</label>
+      <div class="img-slot" id="e-slot-banner" style="max-width:100%">
+        <img id="e-prev-banner" class="img-preview" alt="">
+        <div style="font-size:20px">🖼️</div>
+        <div class="img-slot-label">Clic para cambiar banner</div>
+        <input type="file" id="e-banner" accept="image/*">
+      </div>
+
+      <label>Nueva contraseña (vacío = sin cambio)</label>
+      <input type="password" id="e-pass" placeholder="Dejar vacío para no cambiar">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);font-size:13px;margin-top:12px">
+        <input type="checkbox" id="e-hidden" style="width:auto;accent-color:#1e78ff"> Oculto en el launcher
+      </label>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Guardar</button>
+    </div>
   </div>
 </div>
-
-<div class="modal-backdrop" id="modal-news">
-  <div class="modal">
-    <div class="modal-title">Nueva noticia</div>
-    <button class="modal-close" onclick="closeModal('modal-news')">✕</button>
-    <label class="lbl">Título</label><input type="text" class="inp" id="n-title" placeholder="Actualización v1.1">
-    <label class="lbl">Mensaje</label><textarea class="inp" id="n-body" placeholder="Descripción..."></textarea>
-    <label class="lbl">Color</label>
-    <select class="inp" id="n-color"><option value="blue">Azul</option><option value="green">Verde</option><option value="red">Rojo</option><option value="amber">Ámbar</option></select>
-    <label class="lbl">URL de imagen (opcional)</label><input type="text" class="inp" id="n-img" placeholder="https://...">
-    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="submitNews()">Publicar</button>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="modal-user">
-  <div class="modal">
-    <div class="modal-title">Añadir administrador</div>
-    <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
-    <label class="lbl">Email de Google</label><input type="email" class="inp" id="u-email" placeholder="usuario@gmail.com">
-    <label class="lbl">Rol</label>
-    <select class="inp" id="u-role"><option value="admin">Administrador</option><option value="viewer">Solo lectura</option></select>
-    <button class="btn btn-blue" style="width:100%;margin-top:20px;" onclick="addUser()">Añadir</button>
-  </div>
-</div>
-
-<div id="toast-container"></div>
 
 <script>
-const SUPER_ADMIN = 'agus5gmtin@gmail.com';
-const SERVER_URL  = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://luncher.jolty.us';
+// Stars
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+function rs(){c.width=innerWidth;c.height=innerHeight}rs();addEventListener('resize',rs);
+const stars=Array.from({length:160},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,a:Math.random(),da:(Math.random()*.012+.003)*(Math.random()>.5?1:-1)}));
+function drawS(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${Math.max(.04,s.a)})`;ctx.fill()});requestAnimationFrame(drawS)}
+drawS();
 
-let currentUser = null, isAdmin = false;
-let extraUsers  = JSON.parse(localStorage.getItem('bas_extra_users') || '[]');
-let modpacks = [], news = [];
-
-// ── GOOGLE LOGIN ──────────────────────────────────────────
-function triggerGoogleLogin() {
-  if (typeof google !== 'undefined' && google.accounts) {
-    google.accounts.id.initialize({
-      client_id: '662998030420-4el7am4agh2nlcaknfqi3cma4qijsuev.apps.googleusercontent.com',
-      callback: handleGoogleLogin,
-      auto_select: false
-    });
-    google.accounts.id.prompt();
+// Auth
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'bas2024';
+let TOKEN = localStorage.getItem('bas_token')||'';
+if(TOKEN){document.getElementById('login-ov').style.display='none';loadAll();}
+function login(){
+  const u=document.getElementById('admin-user').value.trim();
+  const p=document.getElementById('admin-pass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    TOKEN=btoa(u+':'+p);
+    localStorage.setItem('bas_token',TOKEN);
+    document.getElementById('login-ov').style.display='none';
+    loadAll();
   } else {
-    const email = prompt('Modo DEV — email para simular login:');
-    if (email) handleGoogleLogin({ email, name: email.split('@')[0], picture: null, _dev: true });
+    showMsg('login-msg','Usuario o contraseña incorrectos','err');
   }
 }
+function H(){return{'Content-Type':'application/json','x-admin-token':TOKEN}}
+function HT(){return{'x-admin-token':TOKEN}}
 
-function handleGoogleLogin(response) {
-  let email, name, picture;
-  if (response._dev) {
-    email = response.email; name = response.name; picture = null;
-  } else {
-    const p = JSON.parse(atob(response.credential.split('.')[1]));
-    email = p.email; name = p.name; picture = p.picture;
+// Tab navigation
+function tab(name,el){
+  document.querySelectorAll('.tab-page').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function loadAll(){loadPacks();loadNews();}
+
+// File setup
+let selFile=null,selIcon=null,selBanner=null;
+
+const dz=document.getElementById('dz');
+const fi=document.getElementById('up-file');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',()=>{if(fi.files[0])setFile(fi.files[0])});
+
+function setFile(f){
+  selFile=f;
+  const info=document.getElementById('up-file-info');
+  info.textContent=`✓ ${f.name} · ${(f.size/1024/1024).toFixed(1)} MB`;
+  info.style.display='block';
+  if(!document.getElementById('up-name').value) document.getElementById('up-name').value=f.name.replace('.mrpack','');
+}
+
+// Image slots
+setupImgSlot('up-icon','prev-icon','slot-icon',f=>selIcon=f);
+setupImgSlot('up-banner','prev-banner','slot-banner',f=>selBanner=f);
+setupImgSlot('e-icon','e-prev-icon','e-slot-icon',f=>selEditIcon=f);
+setupImgSlot('e-banner','e-prev-banner','e-slot-banner',f=>selEditBanner=f);
+
+function setupImgSlot(inputId,prevId,slotId,cb){
+  const input=document.getElementById(inputId);
+  const prev=document.getElementById(prevId);
+  const slot=document.getElementById(slotId);
+  if(!input)return;
+  slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag')});
+  slot.addEventListener('dragleave',()=>slot.classList.remove('drag'));
+  slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag');if(e.dataTransfer.files[0]){input.files=e.dataTransfer.files;handleImg(e.dataTransfer.files[0],prev,cb)}});
+  input.addEventListener('change',()=>{if(input.files[0])handleImg(input.files[0],prev,cb)});
+}
+
+function handleImg(file,prevEl,cb){
+  cb(file);
+  const reader=new FileReader();
+  reader.onload=e=>{prevEl.src=e.target.result;prevEl.style.display='block'};
+  reader.readAsDataURL(file);
+}
+
+// Upload
+async function uploadPack(){
+  if(!selFile){showMsg('up-msg','Selecciona un archivo .mrpack','err');return}
+  const name=document.getElementById('up-name').value.trim();
+  if(!name){showMsg('up-msg','Escribe el nombre','err');return}
+
+  const btn=document.getElementById('up-btn');
+  btn.disabled=true;btn.textContent='Subiendo...';
+  const pw=document.getElementById('prog-wrap');pw.style.display='block';
+  const pf=document.getElementById('prog-fill');
+  const pl=document.getElementById('prog-lbl');
+
+  const form=new FormData();
+  form.append('file',selFile);
+  form.append('name',name);
+  form.append('password',document.getElementById('up-pass').value||'');
+  form.append('hidden',document.getElementById('up-hidden').checked?'true':'false');
+  if(selIcon) form.append('icon',selIcon);
+  if(selBanner) form.append('banner',selBanner);
+
+  const xhr=new XMLHttpRequest();
+  xhr.open('POST','/api/modpacks/upload');
+  xhr.setRequestHeader('x-admin-token',TOKEN);
+  xhr.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);pf.style.width=p+'%';pl.textContent=`Subiendo... ${p}%`}};
+  xhr.onload=()=>{
+    btn.disabled=false;btn.textContent='⬆ Subir Modpack';
+    const d=JSON.parse(xhr.responseText);
+    if(d.success){
+      showMsg('up-msg','✓ Modpack subido correctamente','ok');
+      selFile=null;selIcon=null;selBanner=null;
+      document.getElementById('up-file-info').style.display='none';
+      document.getElementById('up-name').value='';
+      document.getElementById('up-pass').value='';
+      document.getElementById('up-hidden').checked=false;
+      document.getElementById('prev-icon').style.display='none';
+      document.getElementById('prev-banner').style.display='none';
+      pf.style.width='0%';
+      loadPacks();
+    }else showMsg('up-msg','Error: '+d.error,'err');
+  };
+  xhr.onerror=()=>{btn.disabled=false;btn.textContent='⬆ Subir Modpack';showMsg('up-msg','Error de red','err')};
+  xhr.send(form);
+}
+
+// Pack list
+async function loadPacks(){
+  const r=await fetch('/api/modpacks',{headers:HT()});
+  const d=await r.json();
+  // Admin gets all including hidden - fetch with token
+  const r2=await fetch('/api/modpacks?admin=1',{headers:HT()});
+  const allPacks=d.modpacks||[];
+  document.getElementById('pack-count').textContent=allPacks.length;
+  const list=document.getElementById('pack-list');
+  if(!allPacks.length){list.innerHTML='<div class="empty">No hay modpacks subidos</div>';return}
+  list.innerHTML=allPacks.map(mp=>`
+    <div class="pack-row">
+      <div class="pr-art">
+        ${mp.banner?`<img class="banner-thumb" src="${mp.banner}" alt="">`:''}
+        ${mp.icon?`<img src="${mp.icon}" alt="" style="position:relative;z-index:1;width:36px;height:36px;object-fit:contain">`:`<span style="position:relative;z-index:1">📦</span>`}
+      </div>
+      <div class="pr-info">
+        <div class="pr-name">
+          ${mp.name}
+          ${mp.password?'<span class="badge badge-lock">🔒</span>':''}
+          ${mp.hidden?'<span class="badge badge-hid">👁 oculto</span>':''}
+        </div>
+        <div class="pr-meta">${mp.mcVersion||'?'} · ${mp.loader||'Fabric'} · ${mp.modsCount||0} mods · ${(mp.size/1024/1024).toFixed(1)} MB</div>
+      </div>
+      <div class="pr-acts">
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${mp.id}','${mp.name.replace(/'/g,"\\'")}',${!!mp.hidden})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="delPack('${mp.id}','${mp.name.replace(/'/g,"\\'")}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function delPack(id,name){
+  if(!confirm(`¿Eliminar "${name}"?`))return;
+  await fetch(`/api/modpacks/${id}`,{method:'DELETE',headers:HT()});
+  loadPacks();
+}
+
+// Edit modal
+let editId=null,selEditIcon=null,selEditBanner=null;
+function openEdit(id,name,hidden){
+  editId=id;selEditIcon=null;selEditBanner=null;
+  document.getElementById('e-name').value=name;
+  document.getElementById('e-hidden').checked=hidden;
+  document.getElementById('e-pass').value='';
+  document.getElementById('e-prev-icon').style.display='none';
+  document.getElementById('e-prev-banner').style.display='none';
+  document.getElementById('edit-modal').classList.add('show');
+}
+function closeEdit(){document.getElementById('edit-modal').classList.remove('show');editId=null}
+async function saveEdit(){
+  if(!editId)return;
+  const form=new FormData();
+  form.append('name',document.getElementById('e-name').value.trim());
+  form.append('hidden',document.getElementById('e-hidden').checked?'true':'false');
+  const pass=document.getElementById('e-pass').value;
+  if(pass)form.append('password',pass);
+  if(selEditIcon)form.append('icon',selEditIcon);
+  if(selEditBanner)form.append('banner',selEditBanner);
+  const xhr=new XMLHttpRequest();
+  xhr.open('PATCH',`/api/modpacks/${editId}`);
+  xhr.setRequestHeader('x-admin-token',TOKEN);
+  xhr.onload=()=>{closeEdit();loadPacks()};
+  xhr.send(form);
+}
+
+// News
+async function loadNews(){
+  const r=await fetch('/api/news');
+  const d=await r.json();
+  const list=document.getElementById('news-list');
+  if(!d.news?.length){list.innerHTML='<div class="empty">No hay noticias</div>';return}
+  list.innerHTML=d.news.map(n=>`
+    <div class="nr">
+      <div class="nr-dot ${n.color||'blue'}"></div>
+      <div class="nr-info"><div class="nr-title">${n.title}</div><div class="nr-body">${n.body||''}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="delNews('${n.id}')">🗑</button>
+    </div>`).join('');
+}
+
+let selNewsImg = null;
+setupImgSlot('n-img-input','n-prev-img','n-img-slot',f=>selNewsImg=f);
+
+async function addNews(){
+  const title=document.getElementById('n-title').value.trim();
+  if(!title){showMsg('n-msg','Escribe un título','err');return}
+  const color=document.querySelector('input[name="n-color"]:checked')?.value||'blue';
+  let imageB64=null;
+  if(selNewsImg){
+    imageB64=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(selNewsImg);});
   }
-  const isSuperAdmin  = email === SUPER_ADMIN;
-  const isExtraAdmin  = extraUsers.find(u => u.email === email);
-  if (!isSuperAdmin && !isExtraAdmin) {
-    document.getElementById('screen-login').classList.add('hidden');
-    document.getElementById('denied-email').textContent = email;
-    document.getElementById('screen-denied').classList.add('show');
-    return;
-  }
-  currentUser = { email, name, picture, role: isSuperAdmin ? 'super_admin' : isExtraAdmin.role };
-  isAdmin = isSuperAdmin;
-  sessionStorage.setItem('bas_session', JSON.stringify(currentUser));
-  document.getElementById('screen-login').classList.add('hidden');
-  showAdminPanel();
+  await fetch('/api/news',{method:'POST',headers:H(),body:JSON.stringify({title,body:document.getElementById('n-body').value,color,image:imageB64})});
+  document.getElementById('n-title').value='';
+  document.getElementById('n-body').value='';
+  document.getElementById('n-prev-img').style.display='none';
+  selNewsImg=null;
+  showMsg('n-msg','✓ Noticia publicada','ok');
+  loadNews();
 }
 
-function checkSession() {
-  const s = sessionStorage.getItem('bas_session');
-  if (s) { currentUser = JSON.parse(s); isAdmin = currentUser.email === SUPER_ADMIN; document.getElementById('screen-login').classList.add('hidden'); showAdminPanel(); }
+async function delNews(id){
+  if(!confirm('¿Eliminar esta noticia?'))return;
+  await fetch(`/api/news/${id}`,{method:'DELETE',headers:H()});
+  loadNews();
 }
 
-function logout() {
-  sessionStorage.removeItem('bas_session');
-  currentUser = null; isAdmin = false;
-  document.getElementById('screen-admin').classList.remove('show');
-  document.getElementById('screen-denied').classList.remove('show');
-  document.getElementById('screen-login').classList.remove('hidden');
-}
 
-// ── PANEL ─────────────────────────────────────────────────
-function showAdminPanel() {
-  document.getElementById('screen-admin').classList.add('show');
-  const av = document.getElementById('su-avatar');
-  if (currentUser.picture) { av.innerHTML = `<img src="${currentUser.picture}" alt="">`; }
-  else { av.textContent = (currentUser.name||'?')[0].toUpperCase(); }
-  document.getElementById('su-name').textContent = currentUser.name || currentUser.email;
-  const roleEl = document.getElementById('su-role');
-  roleEl.textContent = isAdmin ? 'Super Admin' : currentUser.role;
-  if (isAdmin) roleEl.classList.add('admin');
-  document.getElementById('card-extra-users').style.display = isAdmin ? 'block' : 'none';
-  document.getElementById('srv-url').textContent = SERVER_URL;
-  loadModpacks(); loadNews(); updateStats();
+function showMsg(id,txt,type){
+  const el=document.getElementById(id);
+  el.textContent=txt;el.className=`msg ${type}`;el.style.display='block';
+  setTimeout(()=>el.style.display='none',4500);
 }
-
-// ── NAV ───────────────────────────────────────────────────
-const pageNames = { dashboard:['Dashboard','Resumen del servidor'], modpacks:['Modpacks','Gestión de modpacks'], news:['Noticias','Contenido del launcher'], users:['Usuarios','Control de acceso'], settings:['Ajustes','Configuración'] };
-document.querySelectorAll('.snav-btn').forEach(btn => btn.addEventListener('click', () => navTo(btn.dataset.page)));
-function navTo(page) {
-  document.querySelectorAll('.snav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
-  const [t,s] = pageNames[page]||['—','—'];
-  document.getElementById('topbar-title').textContent = t;
-  document.getElementById('topbar-sub').textContent = s;
-}
-
-// ── DATA ──────────────────────────────────────────────────
-async function loadModpacks() {
-  try { const r = await fetch(SERVER_URL+'/api/modpacks',{signal:AbortSignal.timeout(5000)}); const d = await r.json(); modpacks = d.modpacks||[]; document.getElementById('srv-badge').textContent='● Conectado'; } catch { modpacks=[]; document.getElementById('srv-badge').textContent='● Sin conexión'; }
-  renderModpackList(); updateStats();
-}
-async function loadNews() {
-  try { const r = await fetch(SERVER_URL+'/api/news',{signal:AbortSignal.timeout(5000)}); const d = await r.json(); news = d.news||[]; } catch { news=[]; }
-  renderNewsList(); updateStats();
-}
-
-function renderModpackList() {
-  const el = document.getElementById('mp-list');
-  if (!modpacks.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">Sin modpacks. ¡Subí el primero!</div>'; return; }
-  el.innerHTML = modpacks.map(mp=>`<div class="mp-item"><div class="mp-thumb">${mp.icon?`<img src="${mp.icon}" alt="">`:' 📦'}</div><div class="mp-info"><div class="mp-name">${mp.name}</div><div class="mp-meta">${mp.mcVersion||'?'} · ${mp.loader||'Fabric'}</div></div><div style="display:flex;gap:8px;align-items:center;">${mp.password?'<span class="badge badge-amber">🔒 Con contraseña</span>':'<span class="badge badge-green">● Público</span>'}<button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="deleteModpack('${mp.id}')">Eliminar</button></div></div>`).join('');
-}
-
-function renderNewsList() {
-  const el = document.getElementById('news-admin-list');
-  if (!news.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">Sin noticias.</div>'; return; }
-  const cm = {blue:'#4f9fff',green:'#10d48a',red:'#ff4d6a',amber:'#ffb347'};
-  el.innerHTML = news.map((n,i)=>`<div class="news-item-admin"><div class="news-dot-pick" style="background:${cm[n.color]||cm.blue};"></div><div class="ni-text"><div class="ni-title2">${n.title}</div>${n.body?`<div class="ni-body2">${n.body}</div>`:''}</div><button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="deleteNews(${i})">Eliminar</button></div>`).join('');
-}
-
-function updateStats() {
-  document.getElementById('stat-packs').textContent = modpacks.length;
-  document.getElementById('stat-news').textContent  = news.length;
-  document.getElementById('stat-users').textContent = 1 + extraUsers.length;
-}
-
-// ── ACTIONS ───────────────────────────────────────────────
-async function submitModpack() {
-  const payload = { name:document.getElementById('mp-name').value.trim(), mcVersion:document.getElementById('mp-version').value.trim(), loader:document.getElementById('mp-loader').value, url:document.getElementById('mp-url').value.trim(), icon:document.getElementById('mp-icon').value.trim()||null, banner:document.getElementById('mp-banner').value.trim()||null, password:document.getElementById('mp-pass').value||null };
-  if (!payload.name||!payload.url) { toast('Completá nombre y URL','err'); return; }
-  try { const r = await fetch(SERVER_URL+'/api/modpacks',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':'bas2024'},body:JSON.stringify(payload)}); if(r.ok){toast('Modpack publicado ✓','ok');closeModal('modal-modpack');loadModpacks();}else{toast('Error del servidor','err');} } catch { toast('No se pudo conectar','err'); }
-}
-async function deleteModpack(id) {
-  if (!confirm('¿Eliminar este modpack?')) return;
-  try { await fetch(SERVER_URL+'/api/modpacks/'+id,{method:'DELETE',headers:{'x-admin-password':'bas2024'}}); toast('Eliminado','ok'); loadModpacks(); } catch { toast('Error','err'); }
-}
-async function submitNews() {
-  const payload = { title:document.getElementById('n-title').value.trim(), body:document.getElementById('n-body').value.trim(), color:document.getElementById('n-color').value, image:document.getElementById('n-img').value.trim()||null };
-  if (!payload.title) { toast('Ingresá un título','err'); return; }
-  try { const r = await fetch(SERVER_URL+'/api/news',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':'bas2024'},body:JSON.stringify(payload)}); if(r.ok){toast('Noticia publicada ✓','ok');closeModal('modal-news');loadNews();}else{toast('Error del servidor','err');} } catch { toast('No se pudo conectar','err'); }
-}
-async function deleteNews(index) {
-  if (!confirm('¿Eliminar esta noticia?')) return;
-  try { await fetch(SERVER_URL+'/api/news/'+index,{method:'DELETE',headers:{'x-admin-password':'bas2024'}}); toast('Eliminada','ok'); loadNews(); } catch { toast('Error','err'); }
-}
-function addUser() {
-  if (!isAdmin) { toast('Solo el Super Admin puede añadir usuarios','err'); return; }
-  const email = document.getElementById('u-email').value.trim().toLowerCase();
-  const role  = document.getElementById('u-role').value;
-  if (!email||!email.includes('@')) { toast('Email inválido','err'); return; }
-  if (extraUsers.find(u=>u.email===email)) { toast('Ya existe','err'); return; }
-  extraUsers.push({email,role}); localStorage.setItem('bas_extra_users',JSON.stringify(extraUsers));
-  renderExtraUsers(); closeModal('modal-user'); toast('Usuario añadido ✓','ok'); updateStats();
-}
-function removeUser(email) {
-  extraUsers = extraUsers.filter(u=>u.email!==email); localStorage.setItem('bas_extra_users',JSON.stringify(extraUsers));
-  renderExtraUsers(); updateStats(); toast('Eliminado','ok');
-}
-function renderExtraUsers() {
-  const tb = document.getElementById('extra-users-tbody');
-  if (!extraUsers.length) { tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px;">Sin administradores adicionales</td></tr>'; return; }
-  tb.innerHTML = extraUsers.map(u=>`<tr><td style="font-family:var(--font-mono);font-size:12px;">${u.email}</td><td><span class="badge badge-blue">${u.role==='admin'?'Admin':'Solo lectura'}</span></td><td><button class="btn btn-danger" style="font-size:11px;padding:5px 10px;" onclick="removeUser('${u.email}')">Eliminar</button></td></tr>`).join('');
-}
-
-// ── MODALS ────────────────────────────────────────────────
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-
-// ── TOAST ─────────────────────────────────────────────────
-function toast(msg,type='info'){
-  const icons={ok:'✓',err:'✕',info:'ℹ'};
-  const el=document.createElement('div'); el.className='toast '+type;
-  el.innerHTML=`<span>${icons[type]||'ℹ'}</span> ${msg}`;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},3500);
-}
-
-renderExtraUsers();
-checkSession();
 </script>
 </body>
 </html>
