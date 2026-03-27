@@ -336,7 +336,7 @@ function login(){
   const u=document.getElementById('admin-user').value.trim();
   const p=document.getElementById('admin-pass').value;
   if(u===ADMIN_USER && p===ADMIN_PASS){
-    TOKEN=btoa(u+':'+p);
+    TOKEN=ADMIN_PASS; // El servidor espera la contraseña directa como token
     localStorage.setItem('bas_token',TOKEN);
     document.getElementById('login-ov').style.display='none';
     loadAll();
