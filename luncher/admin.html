@@ -174,7 +174,7 @@ textarea{resize:vertical}
     </button>
     <div class="sb-bottom">
       <strong id="srv-stat">Conectado</strong>
-      <span>localhost:3001</span>
+      <span>luncher.jolty.us</span>
     </div>
   </aside>
 
@@ -355,7 +355,17 @@ function tab(name,el){
   el.classList.add('active');
 }
 
-function loadAll(){loadPacks();loadNews();}
+function loadAll(){loadPacks();loadNews();checkSrv();}
+
+async function checkSrv(){
+  const el=document.getElementById('srv-stat');
+  try{
+    await fetch('/api/modpacks',{signal:AbortSignal.timeout(4000)});
+    el.textContent='● Conectado';el.style.color='#22c55e';
+  }catch{
+    el.textContent='● Sin conexión';el.style.color='#ef4444';
+  }
+}
 
 // File setup
 let selFile=null,selIcon=null,selBanner=null;
