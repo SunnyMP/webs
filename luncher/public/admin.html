@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAS CLIENT · Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+:root{--bg:#07070f;--bg2:#0b0b18;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);--blue:#1e78ff;--blue2:#4f9fff;--purple:#6c3fff;--text:#dde4f5;--muted:rgba(255,255,255,.4);--danger:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.layout{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sb{width:230px;background:rgba(7,7,15,.97);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;position:sticky;top:0;height:100vh}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:20px}
+.sb-logo img{width:38px;filter:drop-shadow(0 0 10px rgba(30,120,255,.5))}
+.sb-logo-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:3px;background:linear-gradient(135deg,var(--blue2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-logo-sub{font-size:10px;color:var(--muted);letter-spacing:1px}
+.sb-sec{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:0 12px;margin:14px 0 5px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;color:var(--muted);cursor:pointer;text-decoration:none;font-size:13px;background:none;border:none;width:100%;text-align:left;font-family:'Inter',sans-serif;transition:all .2s}
+.sb-link:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.sb-link.active{background:linear-gradient(135deg,rgba(30,120,255,.14),rgba(108,63,255,.08));color:var(--blue2);border:1px solid rgba(30,120,255,.22)}
+.sb-link svg{width:15px;height:15px;fill:currentColor;flex-shrink:0}
+.sb-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);padding-left:12px}
+.sb-bottom strong{color:var(--blue2);display:block;margin-bottom:2px}
+
+/* MAIN */
+.main{flex:1;padding:30px;overflow-y:auto}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;margin-bottom:20px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue2);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* FORM */
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;margin-top:12px}
+label:first-of-type{margin-top:0}
+input[type=text],input[type=password],textarea,select{width:100%;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+select option{background:#0b0b18}
+textarea{resize:vertical}
+
+/* IMAGE / MEDIA UPLOAD */
+.img-upload{display:flex;gap:12px;flex-wrap:wrap}
+.img-slot{flex:1;min-width:140px;border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.img-slot:hover,.img-slot.drag{border-color:var(--blue);background:rgba(30,120,255,.04)}
+.img-slot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-slot-label{font-size:11px;color:var(--muted);margin-top:6px}
+.img-preview{width:100%;height:80px;object-fit:contain;border-radius:6px;display:none;margin-bottom:6px}
+.vid-preview{width:100%;max-height:100px;border-radius:6px;display:none;margin-bottom:6px}
+
+/* DROP ZONE mrpack */
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--blue);background:rgba(30,120,255,.04)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-zone p{color:var(--muted);font-size:13px}
+.drop-zone strong{color:var(--blue2)}
+
+/* PROG */
+.prog-wrap{margin-top:10px;display:none}
+.prog-track{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));width:0%;transition:width .3s;box-shadow:0 0 6px var(--blue)}
+.prog-lbl{font-size:12px;color:var(--muted);margin-bottom:5px}
+
+/* PACK LIST */
+.pack-list{display:flex;flex-direction:column;gap:10px}
+.pack-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
+.pack-row:hover{border-color:rgba(30,120,255,.25)}
+.pr-art{width:52px;height:52px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,rgba(30,120,255,.2),rgba(108,63,255,.2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;position:relative}
+.pr-art img{width:100%;height:100%;object-fit:contain}
+.pr-art .banner-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+.pr-info{flex:1;min-width:0}
+.pr-name{font-size:14px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pr-meta{font-size:11px;color:var(--muted)}
+.pr-acts{display:flex;gap:7px;flex-shrink:0}
+.badge{font-size:10px;padding:2px 7px;border-radius:4px}
+.badge-lock{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.badge-hid{background:rgba(255,255,255,.07);color:var(--muted);border:1px solid var(--border)}
+
+/* NEWS */
+.news-list{display:flex;flex-direction:column;gap:8px}
+.nr{display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px}
+.nr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nr-dot.blue{background:var(--blue);box-shadow:0 0 5px var(--blue)}
+.nr-dot.purple{background:var(--purple);box-shadow:0 0 5px var(--purple)}
+.nr-dot.green{background:#22c55e;box-shadow:0 0 5px #22c55e}
+.nr-info{flex:1;min-width:0}
+.nr-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.nr-body{font-size:12px;color:var(--muted)}
+.nr-media{margin-top:6px;max-height:80px;border-radius:6px;object-fit:cover;display:block;max-width:100%}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:0 0 18px rgba(30,120,255,.22)}
+.btn-primary:hover{opacity:.9;box-shadow:0 0 28px rgba(30,120,255,.38)}
+.btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:6px 12px!important;font-size:12px!important}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* MSG */
+.msg{padding:10px 14px;border-radius:8px;margin-top:8px;font-size:13px;display:none}
+.msg.ok{background:rgba(30,120,255,.1);border:1px solid rgba(30,120,255,.3);color:var(--blue2)}
+.msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger)}
+
+/* ROW */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* TAB PAGES */
+.tab-page{display:none}.tab-page.active{display:block}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.modal.show{display:flex}
+.mbox{background:#0b0b18;border:1px solid rgba(30,120,255,.3);border-radius:16px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.mhdr h3{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px}
+.mclose{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px}
+.mclose:hover{color:var(--text)}
+.mbody{padding:20px;display:flex;flex-direction:column;gap:6px}
+.mftr{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border)}
+
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="layout">
+  <aside class="sb">
+    <div class="sb-logo">
+      <img src="./basicon_nobg.png" onerror="this.src='./basicon.png'">
+      <div><div class="sb-logo-name">BAS</div><div class="sb-logo-sub">ADMIN</div></div>
+    </div>
+    <div class="sb-sec">Gestión</div>
+    <button class="sb-link active" onclick="tab('modpacks',this)">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.52 15.5 0 12.36 0c-1.73 0-3.24.93-4.1 2.27L7 3.5 5.74 2.27C4.88.93 3.37 0 1.64 0 .73 0 0 .73 0 1.64v.18C0 3.95 2.04 6 4.54 6H4v2h-.5C2.12 8 1 9.12 1 10.5S2.12 13 3.5 13H4v6c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-6h.5c1.38 0 2.5-1.12 2.5-2.5S21.88 8 20.5 8H20V6z"/></svg>
+      Modpacks
+    </button>
+    <button class="sb-link" onclick="tab('news',this)">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c-.01.55-.45 1-1 1zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/></svg>
+      Noticias
+    </button>
+    <div class="sb-bottom">
+      <strong id="srv-stat">Conectando...</strong>
+      <span>luncher.jolty.us</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- MODPACKS -->
+    <div class="tab-page active" id="tab-modpacks">
+      <div class="page-title">Modpacks</div>
+
+      <div class="card">
+        <div class="card-title">⬆ Subir nuevo modpack</div>
+
+        <label>Nombre del modpack *</label>
+        <input type="text" id="up-name" placeholder="Ej: Better Survival Pack">
+
+        <label>Archivo .mrpack *</label>
+        <div class="drop-zone" id="dz">
+          <p>Arrastra tu <strong>.mrpack</strong> aquí o haz clic para seleccionar</p>
+          <input type="file" id="up-file" accept=".mrpack">
+        </div>
+        <div id="up-file-info" style="font-size:12px;color:var(--muted);margin-top:6px;display:none"></div>
+
+        <div class="row2" style="margin-top:12px">
+          <div>
+            <label>Icono / logo (opcional)</label>
+            <div class="img-slot" id="slot-icon">
+              <img id="prev-icon" class="img-preview" alt="">
+              <div style="font-size:24px">🎨</div>
+              <div class="img-slot-label">Icono · png/jpg</div>
+              <input type="file" id="up-icon" accept="image/*">
+            </div>
+          </div>
+          <div>
+            <label>Banner de fondo (opcional)</label>
+            <div class="img-slot" id="slot-banner">
+              <img id="prev-banner" class="img-preview" alt="">
+              <div style="font-size:24px">🖼️</div>
+              <div class="img-slot-label">Banner · png/jpg</div>
+              <input type="file" id="up-banner" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <div class="row2" style="margin-top:12px">
+          <div>
+            <label>Contraseña (opcional)</label>
+            <input type="password" id="up-pass" placeholder="Sin contraseña = público">
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:4px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;color:var(--text);font-size:13px">
+              <input type="checkbox" id="up-hidden" style="width:auto;accent-color:#1e78ff"> Ocultar del launcher
+            </label>
+          </div>
+        </div>
+
+        <div class="prog-wrap" id="prog-wrap">
+          <div class="prog-lbl" id="prog-lbl">Subiendo...</div>
+          <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+        </div>
+        <div class="msg" id="up-msg"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="uploadPack()" id="up-btn">⬆ Subir Modpack</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📦 Modpacks (<span id="pack-count">0</span>)</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadPacks()">↻ Actualizar</button>
+        </div>
+        <div class="pack-list" id="pack-list"><div class="empty">Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- NEWS -->
+    <div class="tab-page" id="tab-news">
+      <div class="page-title">Noticias</div>
+
+      <div class="card">
+        <div class="card-title">✏️ Nueva noticia</div>
+        <label>Título *</label>
+        <input type="text" id="n-title" placeholder="Título de la noticia">
+        <label>Descripción</label>
+        <textarea id="n-body" rows="3" placeholder="Descripción..."></textarea>
+        <label>Color</label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#4f9fff"><input type="radio" name="n-color" value="blue" checked style="accent-color:#1e78ff;width:auto"> Azul</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#a78bfa"><input type="radio" name="n-color" value="purple" style="accent-color:#6c3fff;width:auto"> Violeta</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;color:#22c55e"><input type="radio" name="n-color" value="green" style="accent-color:#22c55e;width:auto"> Verde</label>
+        </div>
+
+        <label>Media (opcional — imagen png/jpg/gif o video mp4/webm)</label>
+        <div class="img-slot" id="n-media-slot">
+          <img id="n-prev-img" class="img-preview" alt="">
+          <video id="n-prev-vid" class="vid-preview" muted loop autoplay playsinline></video>
+          <div style="font-size:22px" id="n-media-icon">🖼️ / 🎬</div>
+          <div class="img-slot-label">Arrastra o clic · png · jpg · gif · mp4 · webm</div>
+          <input type="file" id="n-media-input" accept="image/png,image/jpeg,image/gif,video/mp4,video/webm">
+        </div>
+
+        <div class="msg" id="n-msg"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="addNews()" id="n-btn">+ Publicar</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📰 Noticias publicadas</div>
+        <div class="news-list" id="news-list"><div class="empty">Cargando...</div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal" id="edit-modal">
+  <div class="mbox">
+    <div class="mhdr"><h3>EDITAR MODPACK</h3><button class="mclose" onclick="closeEdit()">✕</button></div>
+    <div class="mbody">
+      <label>Nombre</label><input type="text" id="e-name">
+      <label>Nueva imagen de icono</label>
+      <div class="img-slot" id="e-slot-icon" style="max-width:160px">
+        <img id="e-prev-icon" class="img-preview" alt="">
+        <div style="font-size:20px">🎨</div>
+        <div class="img-slot-label">Clic para cambiar</div>
+        <input type="file" id="e-icon" accept="image/*">
+      </div>
+      <label>Nueva imagen de banner</label>
+      <div class="img-slot" id="e-slot-banner">
+        <img id="e-prev-banner" class="img-preview" alt="">
+        <div style="font-size:20px">🖼️</div>
+        <div class="img-slot-label">Clic para cambiar banner</div>
+        <input type="file" id="e-banner" accept="image/*">
+      </div>
+      <label>Nueva contraseña (vacío = sin cambio)</label>
+      <input type="password" id="e-pass" placeholder="Dejar vacío para no cambiar">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);font-size:13px;margin-top:12px">
+        <input type="checkbox" id="e-hidden" style="width:auto;accent-color:#1e78ff"> Oculto en el launcher
+      </label>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Stars: 24fps cap, 100 particles, static (no movement) ── */
+(function(){
+  const c=document.getElementById('c'),ctx=c.getContext('2d');
+  function rs(){c.width=innerWidth;c.height=innerHeight}rs();addEventListener('resize',rs);
+  const stars=Array.from({length:100},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.3+.2,a:Math.random(),da:(Math.random()*.006+.002)*(Math.random()>.5?1:-1)}));
+  let last=0;
+  function draw(ts){requestAnimationFrame(draw);if(ts-last<42)return;last=ts;ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,220,255,${Math.max(.04,s.a*.6)})`;ctx.fill()});}
+  requestAnimationFrame(draw);
+})();
+
+/* ── API base — sin token, acceso directo ── */
+function H(){return{'Content-Type':'application/json'}}
+function HT(){return{}}  // sin header de auth
+
+function tab(name,el){
+  document.querySelectorAll('.tab-page').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+window.addEventListener('load',()=>{loadPacks();loadNews();checkSrv();});
+
+async function checkSrv(){
+  const el=document.getElementById('srv-stat');
+  try{
+    await fetch('/api/modpacks',{signal:AbortSignal.timeout(4000)});
+    el.textContent='● Conectado';el.style.color='#22c55e';
+  }catch{el.textContent='● Sin conexión';el.style.color='#ef4444';}
+}
+
+/* ── File selectors ── */
+let selFile=null,selIcon=null,selBanner=null,selEditIcon=null,selEditBanner=null,selNewsMedia=null;
+
+const dz=document.getElementById('dz'),fi=document.getElementById('up-file');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',()=>{if(fi.files[0])setFile(fi.files[0])});
+
+function setFile(f){
+  selFile=f;
+  const info=document.getElementById('up-file-info');
+  info.textContent=`✓ ${f.name} · ${(f.size/1024/1024).toFixed(1)} MB`;
+  info.style.display='block';
+  if(!document.getElementById('up-name').value)document.getElementById('up-name').value=f.name.replace('.mrpack','');
+}
+
+setupImgSlot('up-icon','prev-icon','slot-icon',f=>{selIcon=f});
+setupImgSlot('up-banner','prev-banner','slot-banner',f=>{selBanner=f});
+setupImgSlot('e-icon','e-prev-icon','e-slot-icon',f=>{selEditIcon=f});
+setupImgSlot('e-banner','e-prev-banner','e-slot-banner',f=>{selEditBanner=f});
+
+function setupImgSlot(inputId,prevId,slotId,cb){
+  const input=document.getElementById(inputId),prev=document.getElementById(prevId),slot=document.getElementById(slotId);
+  if(!input)return;
+  slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag')});
+  slot.addEventListener('dragleave',()=>slot.classList.remove('drag'));
+  slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag');if(e.dataTransfer.files[0]){input.files=e.dataTransfer.files;handleImg(e.dataTransfer.files[0],prev,cb)}});
+  input.addEventListener('change',()=>{if(input.files[0])handleImg(input.files[0],prev,cb)});
+}
+function handleImg(file,prevEl,cb){
+  cb(file);
+  const r=new FileReader();
+  r.onload=e=>{prevEl.src=e.target.result;prevEl.style.display='block'};
+  r.readAsDataURL(file);
+}
+
+/* ── Media slot for news (image or video) ── */
+const nMediaInput=document.getElementById('n-media-input');
+const nPrevImg=document.getElementById('n-prev-img');
+const nPrevVid=document.getElementById('n-prev-vid');
+const nMediaIcon=document.getElementById('n-media-icon');
+const nSlot=document.getElementById('n-media-slot');
+
+nSlot.addEventListener('dragover',e=>{e.preventDefault();nSlot.classList.add('drag')});
+nSlot.addEventListener('dragleave',()=>nSlot.classList.remove('drag'));
+nSlot.addEventListener('drop',e=>{e.preventDefault();nSlot.classList.remove('drag');if(e.dataTransfer.files[0])setNewsMedia(e.dataTransfer.files[0])});
+nMediaInput.addEventListener('change',()=>{if(nMediaInput.files[0])setNewsMedia(nMediaInput.files[0])});
+
+function setNewsMedia(file){
+  selNewsMedia=file;
+  const isVideo=file.type.startsWith('video/');
+  nPrevImg.style.display='none';nPrevVid.style.display='none';
+  nMediaIcon.style.display='none';
+  if(isVideo){
+    nPrevVid.src=URL.createObjectURL(file);
+    nPrevVid.style.display='block';
+  }else{
+    const r=new FileReader();r.onload=e=>{nPrevImg.src=e.target.result;nPrevImg.style.display='block'};
+    r.readAsDataURL(file);
+  }
+}
+
+/* ── Upload modpack (XHR con progreso) ── */
+async function uploadPack(){
+  if(!selFile){showMsg('up-msg','Selecciona un archivo .mrpack','err');return}
+  const name=document.getElementById('up-name').value.trim();
+  if(!name){showMsg('up-msg','Escribe el nombre','err');return}
+  const btn=document.getElementById('up-btn');
+  btn.disabled=true;btn.textContent='Subiendo...';
+  document.getElementById('prog-wrap').style.display='block';
+  const pf=document.getElementById('prog-fill'),pl=document.getElementById('prog-lbl');
+
+  const form=new FormData();
+  form.append('file',selFile);form.append('name',name);
+  form.append('password',document.getElementById('up-pass').value||'');
+  form.append('hidden',document.getElementById('up-hidden').checked?'true':'false');
+  if(selIcon)form.append('icon',selIcon);
+  if(selBanner)form.append('banner',selBanner);
+
+  const xhr=new XMLHttpRequest();
+  xhr.open('POST','/api/modpacks/upload');
+  xhr.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);pf.style.width=p+'%';pl.textContent=`Subiendo... ${p}%`}};
+  xhr.onload=()=>{
+    btn.disabled=false;btn.textContent='⬆ Subir Modpack';
+    const d=JSON.parse(xhr.responseText);
+    if(d.success){
+      showMsg('up-msg','✓ Modpack subido','ok');
+      selFile=null;selIcon=null;selBanner=null;
+      document.getElementById('up-file-info').style.display='none';
+      document.getElementById('up-name').value='';
+      document.getElementById('up-pass').value='';
+      document.getElementById('up-hidden').checked=false;
+      document.getElementById('prev-icon').style.display='none';
+      document.getElementById('prev-banner').style.display='none';
+      pf.style.width='0%';
+      loadPacks();
+    }else showMsg('up-msg','Error: '+d.error,'err');
+  };
+  xhr.onerror=()=>{btn.disabled=false;btn.textContent='⬆ Subir Modpack';showMsg('up-msg','Error de red','err')};
+  xhr.send(form);
+}
+
+/* ── Pack list ── */
+async function loadPacks(){
+  const r=await fetch('/api/modpacks');
+  const d=await r.json();
+  const packs=d.modpacks||[];
+  document.getElementById('pack-count').textContent=packs.length;
+  const list=document.getElementById('pack-list');
+  if(!packs.length){list.innerHTML='<div class="empty">No hay modpacks subidos</div>';return}
+  list.innerHTML=packs.map(mp=>`
+    <div class="pack-row">
+      <div class="pr-art">
+        ${mp.banner?`<img class="banner-thumb" src="${mp.banner}" alt="">` :''}
+        ${mp.icon?`<img src="${mp.icon}" alt="" style="position:relative;z-index:1;width:36px;height:36px;object-fit:contain">`:`<span style="position:relative;z-index:1">📦</span>`}
+      </div>
+      <div class="pr-info">
+        <div class="pr-name">
+          ${mp.name}
+          ${mp.password?'<span class="badge badge-lock">🔒</span>':''}
+          ${mp.hidden?'<span class="badge badge-hid">👁 oculto</span>':''}
+        </div>
+        <div class="pr-meta">${mp.mcVersion||'?'} · ${mp.loader||'Fabric'} · ${mp.modsCount||0} mods · ${(mp.size/1024/1024).toFixed(1)} MB</div>
+      </div>
+      <div class="pr-acts">
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${mp.id}','${mp.name.replace(/'/g,"\\'")}',${!!mp.hidden})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="delPack('${mp.id}','${mp.name.replace(/'/g,"\\'")}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function delPack(id,name){
+  if(!confirm(`¿Eliminar "${name}"?`))return;
+  await fetch(`/api/modpacks/${id}`,{method:'DELETE'});
+  loadPacks();
+}
+
+/* ── Edit modal ── */
+let editId=null;
+function openEdit(id,name,hidden){
+  editId=id;selEditIcon=null;selEditBanner=null;
+  document.getElementById('e-name').value=name;
+  document.getElementById('e-hidden').checked=hidden;
+  document.getElementById('e-pass').value='';
+  document.getElementById('e-prev-icon').style.display='none';
+  document.getElementById('e-prev-banner').style.display='none';
+  document.getElementById('edit-modal').classList.add('show');
+}
+function closeEdit(){document.getElementById('edit-modal').classList.remove('show');editId=null}
+async function saveEdit(){
+  if(!editId)return;
+  const form=new FormData();
+  form.append('name',document.getElementById('e-name').value.trim());
+  form.append('hidden',document.getElementById('e-hidden').checked?'true':'false');
+  const pass=document.getElementById('e-pass').value;
+  if(pass)form.append('password',pass);
+  if(selEditIcon)form.append('icon',selEditIcon);
+  if(selEditBanner)form.append('banner',selEditBanner);
+  const xhr=new XMLHttpRequest();
+  xhr.open('PATCH',`/api/modpacks/${editId}`);
+  xhr.onload=()=>{closeEdit();loadPacks()};
+  xhr.send(form);
+}
+
+/* ── News ── */
+async function loadNews(){
+  const r=await fetch('/api/news');
+  const d=await r.json();
+  const list=document.getElementById('news-list');
+  if(!d.news?.length){list.innerHTML='<div class="empty">No hay noticias</div>';return}
+  list.innerHTML=d.news.map(n=>{
+    let mediaHTML='';
+    if(n.mediaType==='video'&&n.mediaUrl){
+      mediaHTML=`<video class="nr-media" src="${n.mediaUrl}" muted autoplay loop playsinline style="max-height:80px"></video>`;
+    }else{
+      const src=n.mediaUrl||n.image||null;
+      if(src)mediaHTML=`<img class="nr-media" src="${src}" alt="">`;
+    }
+    return `<div class="nr">
+      <div class="nr-dot ${n.color||'blue'}"></div>
+      <div class="nr-info">
+        <div class="nr-title">${n.title}</div>
+        ${n.body?`<div class="nr-body">${n.body}</div>`:''}
+        ${mediaHTML}
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="delNews('${n.id}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+async function addNews(){
+  const title=document.getElementById('n-title').value.trim();
+  if(!title){showMsg('n-msg','Escribe un título','err');return}
+  const btn=document.getElementById('n-btn');
+  btn.disabled=true;btn.textContent='Publicando...';
+  const color=document.querySelector('input[name="n-color"]:checked')?.value||'blue';
+
+  if(selNewsMedia){
+    // Subir via multipart
+    const form=new FormData();
+    form.append('title',title);
+    form.append('body',document.getElementById('n-body').value);
+    form.append('color',color);
+    form.append('media',selNewsMedia);
+    await fetch('/api/news',{method:'POST',body:form});
+  }else{
+    await fetch('/api/news',{method:'POST',headers:H(),body:JSON.stringify({title,body:document.getElementById('n-body').value,color})});
+  }
+
+  btn.disabled=false;btn.textContent='+ Publicar';
+  document.getElementById('n-title').value='';
+  document.getElementById('n-body').value='';
+  nPrevImg.style.display='none';nPrevVid.style.display='none';
+  nPrevVid.src='';nMediaIcon.style.display='';
+  selNewsMedia=null;
+  showMsg('n-msg','✓ Noticia publicada','ok');
+  loadNews();
+}
+
+async function delNews(id){
+  if(!confirm('¿Eliminar esta noticia?'))return;
+  await fetch(`/api/news/${id}`,{method:'DELETE'});
+  loadNews();
+}
+
+function showMsg(id,txt,type){
+  const el=document.getElementById(id);
+  el.textContent=txt;el.className=`msg ${type}`;el.style.display='block';
+  setTimeout(()=>el.style.display='none',4500);
+}
+</script>
+</body>
+</html>
