@@ -199,7 +199,93 @@ app.delete('/api/news/:id', (req, res) => {
 // Servir archivos de uploads (videos/imágenes de noticias)
 app.use('/uploads', express.static(UPLOADS));
 
+// ── STATS ─────────────────────────────────────────────────────────────────────
+// El launcher manda una sesión al terminar de jugar
+app.post('/api/stats', (req, res) => {
+  const { uuid, name, packId, packName, minutes, mcVersion, loader } = req.body;
+  if (!name || !packId) return res.status(400).json({ error:'Faltan datos' });
+  const data = load();
+  if (!data.stats) data.stats = { players:{}, sessions:[] };
+  const stats = data.stats;
+
+  // Actualizar jugador
+  const pid = uuid || name; // usar uuid si existe, sino nombre
+  if (!stats.players[pid]) stats.players[pid] = { name, uuid:uuid||null, totalMinutes:0, sessions:0, packs:{}, firstSeen:new Date().toISOString() };
+  stats.players[pid].totalMinutes += (minutes||0);
+  stats.players[pid].sessions += 1;
+  stats.players[pid].lastSeen = new Date().toISOString();
+  stats.players[pid].packs[packId] = (stats.players[pid].packs[packId]||0) + 1;
+
+  // Sesión global
+  stats.sessions.unshift({ name, uuid:uuid||null, packId, packName, minutes:minutes||0, mcVersion, loader, date:new Date().toISOString() });
+  if (stats.sessions.length > 500) stats.sessions.pop();
+
+  save(data);
+  res.json({ success:true });
+});
+
+// Admin: ver todas las stats
+app.get('/api/stats', (req, res) => {
+  const data = load();
+  const stats = data.stats || { players:{}, sessions:[] };
+  const players = Object.values(stats.players||{});
+  const sessions = stats.sessions||[];
+
+  // Calcular modpacks más usados globalmente
+  const packCount = {};
+  sessions.forEach(s => { packCount[s.packName] = (packCount[s.packName]||0)+1; });
+  const topPacks = Object.entries(packCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count])=>({name,count}));
+
+  const totalMinutes = players.reduce((acc,p)=>acc+(p.totalMinutes||0),0);
+
+  res.json({
+    success:true,
+    totalPlayers: players.length,
+    totalSessions: sessions.length,
+    totalMinutes,
+    topPacks,
+    players: players.sort((a,b)=>(b.totalMinutes||0)-(a.totalMinutes||0)),
+    recentSessions: sessions.slice(0,20)
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`\n🚀 BAS CLIENT Server → http://localhost:${PORT}`);
   console.log(`📊 Admin → http://localhost:${PORT}/admin\n`);
+});
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+app.post('/api/stats', (req, res) => {
+  const { uuid: playerUuid, name, packId, packName, minutes, loader, mcVersion } = req.body;
+  if (!name || minutes === undefined) return res.status(400).json({ error:'Faltan datos' });
+  const data = load();
+  if (!data.players) data.players = {};
+  const key = playerUuid || name;
+  if (!data.players[key]) {
+    data.players[key] = { uuid:playerUuid||null, name, type:playerUuid?'microsoft':'offline', totalMinutes:0, sessions:[], firstSeen:new Date().toISOString() };
+  }
+  const player = data.players[key];
+  player.name = name;
+  player.totalMinutes = (player.totalMinutes||0) + Math.max(0, minutes);
+  player.lastSeen = new Date().toISOString();
+  player.lastPack = packName||packId||'?';
+  player.sessions = player.sessions||[];
+  player.sessions.unshift({ packId, packName, minutes, mcVersion, loader, date:new Date().toISOString() });
+  if (player.sessions.length > 100) player.sessions.pop();
+  save(data);
+  res.json({ success:true });
+});
+
+app.get('/api/stats', (req, res) => {
+  const data = load();
+  const players = Object.values(data.players||{});
+  players.sort((a,b) => (b.totalMinutes||0) - (a.totalMinutes||0));
+  res.json({ success:true, players });
+});
+
+app.delete('/api/stats/:key', (req, res) => {
+  const data = load();
+  const key = req.params.key;
+  if (data.players?.[key]) delete data.players[key];
+  save(data); res.json({ success:true });
 });

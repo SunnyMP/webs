@@ -127,6 +127,20 @@ textarea{resize:vertical}
 
 .empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
+
+/* Stats */
+.stats-table{width:100%;border-collapse:collapse;font-size:13px}
+.stats-table th{text-align:left;padding:8px 12px;font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:600}
+.stats-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.stats-table tr:last-child td{border-bottom:none}
+.stats-table tr:hover td{background:rgba(255,255,255,.02)}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-n{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--blue2);line-height:1}
+.stat-l{font-size:11px;color:var(--muted);margin-top:3px}
+.badge-pack{background:rgba(30,120,255,.1);border:1px solid rgba(30,120,255,.25);color:var(--blue2);border-radius:20px;padding:3px 10px;font-size:12px}
+.badge-pack b{color:#fff;margin-left:4px}
+.session-r{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.session-r:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -146,6 +160,10 @@ textarea{resize:vertical}
     <button class="sb-link" onclick="tab('news',this)">
       <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c-.01.55-.45 1-1 1zM6 10h2v2H6v-2zm0 4h8v2H6v-2zm10 0h2v2h-2v-2zm-6-4h8v2h-8v-2z"/></svg>
       Noticias
+    </button>
+    <button class="sb-link" onclick="tab('stats',this);loadStats()">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Estadísticas
     </button>
     <div class="sb-bottom">
       <strong id="srv-stat">Conectando...</strong>
@@ -262,6 +280,48 @@ textarea{resize:vertical}
       </div>
     </div>
 
+    <!-- STATS -->
+    <div class="tab-page" id="tab-stats">
+      <div class="page-title">Estadísticas de jugadores</div>
+
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>👥 Jugadores (<span id="players-count">0</span>)</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadStats()">↻ Actualizar</button>
+        </div>
+        <!-- Resumen rápido -->
+        <div id="stats-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
+        <!-- Tabla de jugadores -->
+        <div style="overflow-x:auto">
+          <table class="stats-table" id="players-table">
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Tipo</th>
+                <th>Tiempo total</th>
+                <th>Sesiones</th>
+                <th>Último modpack</th>
+                <th>Última vez</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="players-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detalle jugador -->
+      <div class="card" id="player-detail" style="display:none">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span id="detail-title">Historial</span>
+          <button class="btn btn-ghost btn-sm" onclick="closeDetail()">✕ Cerrar</button>
+        </div>
+        <div id="detail-sessions"></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -322,7 +382,7 @@ function tab(name,el){
   el.classList.add('active');
 }
 
-window.addEventListener('load',()=>{loadPacks();loadNews();checkSrv();});
+window.addEventListener('load',()=>{loadPacks();loadNews();loadStats();checkSrv();});
 
 async function checkSrv(){
   const el=document.getElementById('srv-stat');
@@ -567,6 +627,69 @@ function showMsg(id,txt,type){
   el.textContent=txt;el.className=`msg ${type}`;el.style.display='block';
   setTimeout(()=>el.style.display='none',4500);
 }
+
+/* ── Stats ── */
+async function loadStats(){
+  try{
+    const r=await fetch('/api/stats');
+    const d=await r.json();
+    if(!d.success)return;
+
+    document.getElementById('players-count').textContent=d.totalPlayers;
+
+    // Resumen
+    const totalH=Math.floor((d.totalMinutes||0)/60);
+    const totalM=(d.totalMinutes||0)%60;
+    document.getElementById('stats-summary').innerHTML=`
+      <div class="stat-card"><div class="stat-n">${d.totalPlayers}</div><div class="stat-l">Jugadores únicos</div></div>
+      <div class="stat-card"><div class="stat-n">${d.totalSessions}</div><div class="stat-l">Sesiones totales</div></div>
+      <div class="stat-card"><div class="stat-n">${totalH}h ${totalM}m</div><div class="stat-l">Tiempo total jugado</div></div>
+      ${d.topPacks?.length?`<div class="stat-card" style="grid-column:1/-1"><div class="stat-l" style="margin-bottom:8px">Modpacks más jugados</div><div style="display:flex;gap:8px;flex-wrap:wrap">${d.topPacks.map(p=>`<span class="badge badge-pack">${p.name} <b>${p.count}</b></span>`).join('')}</div></div>`:''}`;
+
+    // Tabla jugadores
+    const tbody=document.getElementById('players-tbody');
+    if(!d.players?.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">Sin jugadores aún</td></tr>';return;}
+    tbody.innerHTML=d.players.map(p=>{
+      const h=Math.floor((p.totalMinutes||0)/60),m=(p.totalMinutes||0)%60;
+      const lastPack=Object.entries(p.packs||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+      const lastSeen=p.lastSeen?new Date(p.lastSeen).toLocaleDateString('es',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          ${p.uuid?`<img src="https://mc-heads.net/avatar/${p.uuid}/22" style="width:22px;height:22px;border-radius:4px;image-rendering:pixelated">`:
+          `<div style="width:22px;height:22px;border-radius:4px;background:rgba(30,120,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px">${(p.name||'?')[0].toUpperCase()}</div>`}
+          <span>${p.name}</span></div></td>
+        <td style="color:var(--muted);font-size:12px">${p.uuid?'Microsoft':'Offline'}</td>
+        <td><b>${h>0?h+'h ':''}</b>${m}m</td>
+        <td>${p.sessions}</td>
+        <td style="color:var(--muted);font-size:12px">${lastPack}</td>
+        <td style="color:var(--muted);font-size:12px">${lastSeen}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="openDetail('${p.uuid||p.name}')">Ver</button></td>
+      </tr>`;
+    }).join('');
+
+    // Guardar para detail
+    window._statsData=d;
+  }catch(e){console.error('Stats error',e);}
+}
+
+function openDetail(pid){
+  const d=window._statsData;if(!d)return;
+  const p=d.players.find(p=>(p.uuid||p.name)===pid);if(!p)return;
+  document.getElementById('detail-title').textContent='Historial de '+p.name;
+  const sessions=d.recentSessions.filter(s=>( s.uuid||s.name)===pid);
+  const detail=document.getElementById('detail-sessions');
+  if(!sessions.length){detail.innerHTML='<p class="empty">Sin sesiones recientes</p>';
+  }else{
+    detail.innerHTML=sessions.map(s=>`<div class="session-r">
+      <div><b>${s.packName}</b> <span style="color:var(--muted);font-size:11px">${s.mcVersion||''} · ${s.loader||''}</span></div>
+      <div style="color:var(--muted);font-size:12px">${new Date(s.date).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})} · ${s.minutes}min</div>
+    </div>`).join('');
+  }
+  document.getElementById('player-detail').style.display='block';
+  document.getElementById('player-detail').scrollIntoView({behavior:'smooth'});
+}
+function closeDetail(){document.getElementById('player-detail').style.display='none';}
+
 </script>
 </body>
 </html>
