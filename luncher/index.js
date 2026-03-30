@@ -82,6 +82,7 @@ app.post('/api/modpacks/upload', packUpload, async (req, res) => {
     const name     = req.body.name || path.basename(mrpackFile.originalname, '.mrpack');
     const password = req.body.password?.trim() || null;
     const hidden   = req.body.hidden === 'true';
+    const category = req.body.category?.trim() || null;
 
     let mcVersion='?', loader='Fabric', modsCount=0, iconB64=null;
     try {
@@ -112,7 +113,7 @@ app.post('/api/modpacks/upload', packUpload, async (req, res) => {
 
     const mp = {
       id:uuid(), name, filename:mrpackFile.filename,
-      mcVersion, loader, modsCount,
+      mcVersion, loader, modsCount, category,
       icon: req.files?.icon?.[0] ? toB64(req.files.icon[0]) : iconB64,
       banner: req.files?.banner?.[0] ? toB64(req.files.banner[0]) : null,
       hidden:!!hidden, password:!!password,
@@ -130,6 +131,7 @@ app.patch('/api/modpacks/:id', upload.fields([{name:'banner',maxCount:1},{name:'
   if (!mp) return res.status(404).json({ error:'No encontrado' });
   if (req.body.name) mp.name = req.body.name;
   if (req.body.hidden !== undefined) mp.hidden = req.body.hidden === 'true';
+  if (req.body.category !== undefined) mp.category = req.body.category || null;
   if (req.body.password !== undefined) {
     if (req.body.password) { mp.password=true; mp.passwordHash=bcrypt.hashSync(req.body.password,10); }
     else { mp.password=false; mp.passwordHash=null; }
