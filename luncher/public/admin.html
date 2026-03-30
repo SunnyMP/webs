@@ -230,6 +230,7 @@ textarea{resize:vertical}
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-lbl" id="prog-lbl">Subiendo...</div>
           <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+          <button class="btn btn-danger btn-sm" style="margin-top:8px" onclick="cancelUpload()">✕ Cancelar subida</button>
         </div>
         <div class="msg" id="up-msg"></div>
         <button class="btn btn-primary" style="margin-top:14px" onclick="uploadPack()" id="up-btn">⬆ Subir Modpack</button>
@@ -424,6 +425,16 @@ function setNewsMedia(file){
 }
 
 /* ── Upload modpack (XHR con progreso) ── */
+let currentXHR = null;
+
+function cancelUpload(){
+  if(currentXHR){ currentXHR.abort(); currentXHR=null; }
+  const btn=document.getElementById('up-btn');
+  btn.disabled=false; btn.textContent='⬆ Subir Modpack';
+  document.getElementById('prog-wrap').style.display='none';
+  document.getElementById('prog-fill').style.width='0%';
+  showMsg('up-msg','Subida cancelada','err');
+}
 async function uploadPack(){
   if(!selFile){showMsg('up-msg','Selecciona un archivo .mrpack','err');return}
   const name=document.getElementById('up-name').value.trim();
@@ -442,6 +453,7 @@ async function uploadPack(){
   if(selBanner)form.append('banner',selBanner);
 
   const xhr=new XMLHttpRequest();
+  currentXHR=xhr;
   xhr.open('POST','/api/modpacks/upload');
   xhr.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);pf.style.width=p+'%';pl.textContent=`Subiendo... ${p}%`}};
   xhr.onload=()=>{
