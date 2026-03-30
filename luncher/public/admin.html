@@ -198,11 +198,15 @@ textarea{resize:vertical}
             <label>Contraseña (opcional)</label>
             <input type="password" id="up-pass" placeholder="Sin contraseña = público">
           </div>
-          <div style="display:flex;align-items:flex-end;padding-bottom:4px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;color:var(--text);font-size:13px">
-              <input type="checkbox" id="up-hidden" style="width:auto;accent-color:#1e78ff"> Ocultar del launcher
-            </label>
+          <div>
+            <label>Categoría (opcional)</label>
+            <input type="text" id="up-category" placeholder="Ej: Survival, PvP, Skyblock...">
           </div>
+        </div>
+        <div style="margin-top:8px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;color:var(--text);font-size:13px">
+            <input type="checkbox" id="up-hidden" style="width:auto;accent-color:#1e78ff"> Ocultar del launcher
+          </label>
         </div>
 
         <div class="prog-wrap" id="prog-wrap">
@@ -283,6 +287,8 @@ textarea{resize:vertical}
       </div>
       <label>Nueva contraseña (vacío = sin cambio)</label>
       <input type="password" id="e-pass" placeholder="Dejar vacío para no cambiar">
+      <label>Categoría</label>
+      <input type="text" id="e-category" placeholder="Ej: Survival, PvP, Skyblock...">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);font-size:13px;margin-top:12px">
         <input type="checkbox" id="e-hidden" style="width:auto;accent-color:#1e78ff"> Oculto en el launcher
       </label>
@@ -402,6 +408,7 @@ async function uploadPack(){
   const form=new FormData();
   form.append('file',selFile);form.append('name',name);
   form.append('password',document.getElementById('up-pass').value||'');
+  form.append('category',document.getElementById('up-category').value.trim()||'');
   form.append('hidden',document.getElementById('up-hidden').checked?'true':'false');
   if(selIcon)form.append('icon',selIcon);
   if(selBanner)form.append('banner',selBanner);
@@ -418,6 +425,7 @@ async function uploadPack(){
       document.getElementById('up-file-info').style.display='none';
       document.getElementById('up-name').value='';
       document.getElementById('up-pass').value='';
+      document.getElementById('up-category').value='';
       document.getElementById('up-hidden').checked=false;
       document.getElementById('prev-icon').style.display='none';
       document.getElementById('prev-banner').style.display='none';
@@ -452,7 +460,7 @@ async function loadPacks(){
         <div class="pr-meta">${mp.mcVersion||'?'} · ${mp.loader||'Fabric'} · ${mp.modsCount||0} mods · ${(mp.size/1024/1024).toFixed(1)} MB</div>
       </div>
       <div class="pr-acts">
-        <button class="btn btn-ghost btn-sm" onclick="openEdit('${mp.id}','${mp.name.replace(/'/g,"\\'")}',${!!mp.hidden})">✏️</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${mp.id}','${mp.name.replace(/'/g,"\\'")}',${!!mp.hidden},'${(mp.category||'').replace(/'/g,"\\'")}')">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="delPack('${mp.id}','${mp.name.replace(/'/g,"\\'")}')">🗑</button>
       </div>
     </div>`).join('');
@@ -466,11 +474,12 @@ async function delPack(id,name){
 
 /* ── Edit modal ── */
 let editId=null;
-function openEdit(id,name,hidden){
+function openEdit(id,name,hidden,category){
   editId=id;selEditIcon=null;selEditBanner=null;
   document.getElementById('e-name').value=name;
   document.getElementById('e-hidden').checked=hidden;
   document.getElementById('e-pass').value='';
+  document.getElementById('e-category').value=category||'';
   document.getElementById('e-prev-icon').style.display='none';
   document.getElementById('e-prev-banner').style.display='none';
   document.getElementById('edit-modal').classList.add('show');
@@ -481,6 +490,7 @@ async function saveEdit(){
   const form=new FormData();
   form.append('name',document.getElementById('e-name').value.trim());
   form.append('hidden',document.getElementById('e-hidden').checked?'true':'false');
+  form.append('category',document.getElementById('e-category').value.trim()||'');
   const pass=document.getElementById('e-pass').value;
   if(pass)form.append('password',pass);
   if(selEditIcon)form.append('icon',selEditIcon);
