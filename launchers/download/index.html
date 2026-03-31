@@ -173,7 +173,7 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
     <span id="ver-txt">v1.0.0 · Windows</span>
   </div>
 
-  <a href="/api/launcher/download" class="btn-dl" id="btn-dl">
+  <a href="https://basclient.jolty.us/api/launcher/download" class="btn-dl" id="btn-dl">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
     Descargar para Windows
   </a>
@@ -234,7 +234,7 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 // Cargar versión y estado del launcher desde la API
 async function loadLauncherInfo(){
   try{
-    const r=await fetch('/api/launcher');
+    const r=await fetch('https://basclient.jolty.us/api/launcher');
     const d=await r.json();
     if(d.version) document.getElementById('ver-txt').textContent=`v${d.version} · Windows`;
     if(!d.available){
