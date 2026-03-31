@@ -10,9 +10,11 @@ const cors     = require('cors');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-const UPLOADS = path.join(__dirname, 'uploads');
-const DATA    = path.join(__dirname, 'data.json');
-if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
+const UPLOADS      = path.join(__dirname, 'uploads');
+const DATA         = path.join(__dirname, 'data.json');
+const LAUNCHER_DIR = path.join(__dirname, 'launcher-releases');
+if (!fs.existsSync(UPLOADS))      fs.mkdirSync(UPLOADS,      { recursive:true });
+if (!fs.existsSync(LAUNCHER_DIR)) fs.mkdirSync(LAUNCHER_DIR, { recursive:true });
 
 function load() {
   try { return JSON.parse(fs.readFileSync(DATA, 'utf8')); }
@@ -21,7 +23,13 @@ function load() {
 function save(d) { fs.writeFileSync(DATA, JSON.stringify(d, null, 2)); }
 
 app.use(cors({
-  origin: ['https://luncher.jolty.us', 'http://localhost:3001', 'http://localhost:3000'],
+  origin: [
+    'https://luncher.jolty.us',
+    'https://basclient.jolty.us',
+    'https://launcher.jolty.us',
+    'http://localhost:3001',
+    'http://localhost:3000'
+  ],
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','x-pack-password'],
   credentials: true
@@ -30,9 +38,11 @@ app.options('*', cors());
 app.use(express.json({ limit: '200mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/bas-client', (req, res) => res.sendFile(path.join(__dirname, 'public', 'bas-client.html')));
 
+// ── MULTER ────────────────────────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: UPLOADS,
   filename: (req, file, cb) => cb(null, uuid() + path.extname(file.originalname))
@@ -41,10 +51,19 @@ const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   cb(null, ['.mrpack','.zip','.png','.jpg','.jpeg','.gif','.webp','.mp4','.webm'].includes(ext));
 };
-const upload = multer({ storage, fileFilter, limits: { fileSize: 4 * 1024 * 1024 * 1024 } });
+const upload     = multer({ storage, fileFilter, limits:{ fileSize:4*1024*1024*1024 } });
 const packUpload = upload.fields([{name:'file',maxCount:1},{name:'banner',maxCount:1},{name:'icon',maxCount:1}]);
 const newsUpload = upload.single('media');
+const launcherUpload = multer({
+  storage: multer.diskStorage({
+    destination: LAUNCHER_DIR,
+    filename: (req, file, cb) => cb(null, 'BAS-CLIENT-Setup.exe')
+  }),
+  fileFilter: (req, file, cb) => cb(null, file.originalname.endsWith('.exe')),
+  limits: { fileSize: 500*1024*1024 }
+}).single('launcher');
 
+// ── MODPACKS ──────────────────────────────────────────────────────────────────
 app.get('/api/modpacks', (req, res) => {
   const { modpacks } = load();
   res.json({ success:true, modpacks: modpacks.filter(m=>!m.hidden).map(m=>({...m,passwordHash:undefined})) });
@@ -107,8 +126,8 @@ app.post('/api/modpacks/upload', packUpload, async (req, res) => {
     const mp = {
       id:uuid(), name, filename:mrpackFile.filename,
       mcVersion, loader, modsCount, category,
-      icon: req.files?.icon?.[0] ? toB64(req.files.icon[0]) : iconB64,
-      banner: req.files?.banner?.[0] ? toB64(req.files.banner[0]) : null,
+      icon:  req.files?.icon?.[0]   ? toB64(req.files.icon[0])   : iconB64,
+      banner:req.files?.banner?.[0] ? toB64(req.files.banner[0]) : null,
       hidden:!!hidden, password:!!password,
       passwordHash: password ? bcrypt.hashSync(password,10) : null,
       size:mrpackFile.size, uploadedAt:new Date().toISOString()
@@ -122,16 +141,16 @@ app.patch('/api/modpacks/:id', upload.fields([{name:'banner',maxCount:1},{name:'
   const data = load();
   const mp = data.modpacks.find(m => m.id === req.params.id);
   if (!mp) return res.status(404).json({ error:'No encontrado' });
-  if (req.body.name) mp.name = req.body.name;
-  if (req.body.hidden !== undefined) mp.hidden = req.body.hidden === 'true';
+  if (req.body.name)    mp.name    = req.body.name;
+  if (req.body.hidden   !== undefined) mp.hidden   = req.body.hidden   === 'true';
   if (req.body.category !== undefined) mp.category = req.body.category || null;
   if (req.body.password !== undefined) {
-    if (req.body.password) { mp.password=true; mp.passwordHash=bcrypt.hashSync(req.body.password,10); }
-    else { mp.password=false; mp.passwordHash=null; }
+    if (req.body.password) { mp.password=true;  mp.passwordHash=bcrypt.hashSync(req.body.password,10); }
+    else                   { mp.password=false; mp.passwordHash=null; }
   }
   const toB64=(f)=>{const buf=fs.readFileSync(f.path);const ext=path.extname(f.originalname).toLowerCase();const mime=ext==='.jpg'||ext==='.jpeg'?'image/jpeg':ext==='.gif'?'image/gif':ext==='.webp'?'image/webp':'image/png';fs.unlinkSync(f.path);return `data:${mime};base64,`+buf.toString('base64');};
   if (req.files?.banner?.[0]) mp.banner = toB64(req.files.banner[0]);
-  if (req.files?.icon?.[0]) mp.icon = toB64(req.files.icon[0]);
+  if (req.files?.icon?.[0])   mp.icon   = toB64(req.files.icon[0]);
   save(data);
   res.json({ success:true, modpack:{...mp,passwordHash:undefined} });
 });
@@ -146,6 +165,7 @@ app.delete('/api/modpacks/:id', (req, res) => {
   save(data); res.json({ success:true });
 });
 
+// ── NEWS ──────────────────────────────────────────────────────────────────────
 app.get('/api/news', (req, res) => {
   const { news } = load();
   res.json({ success:true, news: news||[] });
@@ -157,10 +177,10 @@ app.post('/api/news', newsUpload, (req, res) => {
   let mediaUrl=null, mediaType=null;
   if (req.file) {
     const ext = path.extname(req.file.originalname).toLowerCase();
-    mediaUrl = `/uploads/${req.file.filename}`;
+    mediaUrl  = `/uploads/${req.file.filename}`;
     mediaType = (ext==='.mp4'||ext==='.webm') ? 'video' : 'image';
   } else if (req.body.image) {
-    mediaUrl = req.body.image;
+    mediaUrl  = req.body.image;
     mediaType = 'image';
   }
   const data = load(); if (!data.news) data.news = [];
@@ -180,7 +200,7 @@ app.delete('/api/news/:id', (req, res) => {
   save(data); res.json({ success:true });
 });
 
-// Ping de instalacion — el launcher llama esto la primera vez
+// ── INSTALACIONES ─────────────────────────────────────────────────────────────
 app.post('/api/ping', (req, res) => {
   const { uuid: uid, name } = req.body;
   const data = load();
@@ -197,6 +217,37 @@ app.post('/api/ping', (req, res) => {
 app.get('/api/installs', (req, res) => {
   const data = load();
   res.json({ success:true, count: data.installs?.count || 0 });
+});
+
+// ── LAUNCHER .EXE ─────────────────────────────────────────────────────────────
+app.get('/api/launcher', (req, res) => {
+  const data    = load();
+  const exePath = path.join(LAUNCHER_DIR, 'BAS-CLIENT-Setup.exe');
+  res.json({
+    success:   true,
+    version:   data.launcherVersion   || '1.0.0',
+    available: fs.existsSync(exePath),
+    updatedAt: data.launcherUpdatedAt || null
+  });
+});
+
+app.get('/api/launcher/download', (req, res) => {
+  const exePath = path.join(LAUNCHER_DIR, 'BAS-CLIENT-Setup.exe');
+  if (!fs.existsSync(exePath)) return res.status(404).json({ error:'Archivo no disponible aún' });
+  res.download(exePath, 'BAS-CLIENT-Setup.exe');
+});
+
+app.post('/api/launcher/upload', (req, res) => {
+  launcherUpload(req, res, err => {
+    if (err)       return res.status(500).json({ error:err.message });
+    if (!req.file) return res.status(400).json({ error:'Sin archivo' });
+    const version = req.body.version?.trim() || '1.0.0';
+    const data = load();
+    data.launcherVersion   = version;
+    data.launcherUpdatedAt = new Date().toISOString();
+    save(data);
+    res.json({ success:true, version });
+  });
 });
 
 app.use('/uploads', express.static(UPLOADS));
