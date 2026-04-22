@@ -3,249 +3,861 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAS CLIENT — Descargar</title>
-<meta name="description" content="Descargá BAS CLIENT, el launcher de Minecraft con modpacks, cuentas Microsoft y más.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>SyncSound — Audio en tiempo real</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#04060f;
-  --blue:#1e6fff;
-  --blue2:#5aa0ff;
-  --purple:#6c3fff;
-  --text:#f0f4ff;
-  --muted:rgba(200,215,255,0.4);
-}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;overflow:hidden}
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
-/* Fondo con ruido sutil */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:.6;
-}
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #f0f0ff;
+    --muted: #6b6b8a;
+    --glow: rgba(124, 58, 237, 0.3);
+  }
 
-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Blobs */
-.blob{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
-.b1{width:600px;height:600px;background:rgba(30,111,255,.12);top:-200px;right:-100px}
-.b2{width:400px;height:400px;background:rgba(108,63,255,.09);bottom:-100px;left:-80px}
-.b3{width:300px;height:300px;background:rgba(30,111,255,.07);bottom:100px;right:200px}
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* Layout */
-.wrap{
-  position:relative;z-index:2;
-  height:100vh;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:24px;gap:0;
-}
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(124,58,237,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(168,85,247,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* Logo */
-.logo-wrap{
-  width:90px;height:90px;
-  background:rgba(30,111,255,.08);
-  border:1px solid rgba(30,111,255,.2);
-  border-radius:24px;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:28px;
-  position:relative;
-  box-shadow:0 0 40px rgba(30,111,255,.15);
-  opacity:0;animation:up .5s .0s ease forwards;
-}
-.logo-wrap::after{
-  content:'';position:absolute;inset:-1px;
-  border-radius:25px;
-  background:linear-gradient(135deg,rgba(30,111,255,.3),rgba(108,63,255,.1),transparent 60%);
-  z-index:-1;
-}
-.logo-wrap svg{width:48px;height:48px;fill:var(--blue2)}
+  .app { position: relative; z-index: 1; }
 
-/* Título */
-.title{
-  font-family:'Rajdhani',sans-serif;
-  font-size:clamp(52px,10vw,96px);
-  font-weight:700;
-  letter-spacing:-.02em;
-  line-height:.9;
-  text-align:center;
-  margin-bottom:10px;
-  opacity:0;animation:up .5s .08s ease forwards;
-}
-.title .bas{
-  background:linear-gradient(135deg,#fff 10%,var(--blue2) 60%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.title .client{
-  background:linear-gradient(135deg,var(--blue2) 0%,var(--purple) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  font-size:.55em;display:block;letter-spacing:.15em;margin-top:4px;
-}
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
 
-/* Badge versión */
-.ver-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(30,111,255,.08);
-  border:1px solid rgba(30,111,255,.18);
-  border-radius:100px;
-  padding:4px 14px;
-  font-size:11px;color:var(--blue2);letter-spacing:.12em;
-  margin-bottom:36px;
-  opacity:0;animation:up .5s .16s ease forwards;
-}
-.ver-dot{width:5px;height:5px;border-radius:50%;background:var(--blue2);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-/* Botón descargar */
-.btn-dl{
-  display:inline-flex;align-items:center;gap:12px;
-  padding:15px 36px;border-radius:12px;
-  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;letter-spacing:.05em;
-  text-decoration:none;border:none;cursor:pointer;
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  color:#fff;
-  box-shadow:0 4px 32px rgba(30,111,255,.35),0 0 0 1px rgba(30,111,255,.2);
-  position:relative;overflow:hidden;
-  opacity:0;animation:up .5s .24s ease forwards;
-  transition:transform .15s,box-shadow .2s;
-}
-.btn-dl::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%);
-}
-.btn-dl:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(30,111,255,.5),0 0 0 1px rgba(30,111,255,.3)}
-.btn-dl:active{transform:translateY(0)}
-.btn-dl svg{width:18px;height:18px;flex-shrink:0}
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 20px var(--glow);
+  }
 
-/* Nota */
-.note{
-  margin-top:12px;font-size:10.5px;color:rgba(200,215,255,.2);letter-spacing:.06em;
-  opacity:0;animation:up .5s .3s ease forwards;
-}
+  .logo-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
 
-/* Links X */
-.x-links{
-  position:fixed;bottom:28px;
-  display:flex;gap:16px;
-  opacity:0;animation:up .5s .38s ease forwards;
-}
-.x-link{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 14px;border-radius:8px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  color:var(--muted);font-size:12px;letter-spacing:.04em;
-  text-decoration:none;
-  transition:all .2s;
-}
-.x-link:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:var(--text)}
-.x-link svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+  .logo-text span { color: var(--accent2); }
 
-@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .status-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-badge.online { border-color: var(--green); color: var(--green); }
+  .status-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HOME SCREEN ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 .highlight {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 520px) { .cards { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px var(--glow);
+  }
+
+  .card-icon {
+    font-size: 2.4rem;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .card.primary {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(168,85,247,0.05));
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px var(--glow);
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent2); }
+
+  .btn-danger {
+    background: rgba(239,68,68,0.15);
+    color: var(--red);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+  .btn-green {
+    background: rgba(16,185,129,0.15);
+    color: var(--green);
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+
+  .btn-green:hover { background: rgba(16,185,129,0.25); }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .panel-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── ROOM SCREEN ── */
+  .room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .room-info h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+
+  .room-info .room-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .badge.green { border-color: var(--green); color: var(--green); }
+  .badge.purple { border-color: var(--accent2); color: var(--accent2); }
+  .badge.yellow { border-color: var(--yellow); color: var(--yellow); }
+
+  .room-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .room-actions .btn { width: auto; padding: 10px 18px; font-size: 0.85rem; }
+
+  /* ── AUDIO PANEL ── */
+  .audio-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .audio-icon { font-size: 1.8rem; }
+
+  .audio-info { flex: 1; min-width: 160px; }
+  .audio-info .title { font-weight: 700; font-size: 0.95rem; }
+  .audio-info .subtitle { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+  .visualizer {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 32px;
+  }
+
+  .bar {
+    width: 4px;
+    border-radius: 2px;
+    background: var(--accent2);
+    animation: wave 0.8s ease-in-out infinite;
+    min-height: 4px;
+  }
+
+  .bar:nth-child(1) { animation-delay: 0s; }
+  .bar:nth-child(2) { animation-delay: 0.1s; }
+  .bar:nth-child(3) { animation-delay: 0.2s; }
+  .bar:nth-child(4) { animation-delay: 0.3s; }
+  .bar:nth-child(5) { animation-delay: 0.4s; }
+  .bar:nth-child(6) { animation-delay: 0.2s; }
+  .bar:nth-child(7) { animation-delay: 0.1s; }
+
+  @keyframes wave {
+    0%, 100% { height: 6px; }
+    50% { height: 28px; }
+  }
+
+  .visualizer.paused .bar { animation-play-state: paused; height: 4px; }
+
+  /* ── PARTICIPANTS ── */
+  .participants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .participant {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .participant.listening { border-color: rgba(16,185,129,0.3); }
+
+  .participant-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .participant-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
+  .participant-role { font-size: 0.72rem; color: var(--muted); }
+
+  /* ── SHARE BOX ── */
+  .share-box {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .share-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    margin: 8px 0;
+  }
+
+  .share-box p { color: var(--muted); font-size: 0.82rem; }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--accent2);
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { background: rgba(124,58,237,0.25); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+  .modal .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.success { border-color: var(--green); color: var(--green); }
+  #toast.error { border-color: var(--red); color: var(--red); }
+  #toast.info { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── INSTRUCTIONS ── */
+  .instructions {
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+
+  .instructions ol {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .instructions ol li {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .instructions ol li:last-child { margin-bottom: 0; }
+
+  .instructions ol li::before {
+    content: counter(steps);
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .instructions .note {
+    font-size: 0.75rem;
+    color: var(--accent2);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(124,58,237,0.2);
+  }
+
+  /* ── VOLUME ── */
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .volume-control label {
+    font-size: 0.8rem;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 0;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    padding: 0;
+    border: none;
+    flex: 1;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent2);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--glow);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    main { padding: 24px 16px; }
+    .panel { padding: 20px 16px; }
+  }
 </style>
 </head>
 <body>
+<div class="app">
 
-<canvas id="stars"></canvas>
-<div class="blob b1"></div>
-<div class="blob b2"></div>
-<div class="blob b3"></div>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🔊</div>
+      <div class="logo-text">Sync<span>Sound</span></div>
+    </div>
+    <div id="connectionStatus" class="status-badge">
+      <span class="dot"></span>
+      <span id="statusText">Listo</span>
+    </div>
+  </header>
 
-<div class="wrap">
+  <main>
 
-  <div class="logo-wrap">
-    <!-- Ícono de lanzador / cohete -->
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" opacity=".3"/>
-      <path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 2.38-1.28 4.47-3.19 5.62L12 21l-.81-5.88C9.28 13.97 8 11.88 8 9.5A6.5 6.5 0 0 1 9.5 3zM12 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
-    </svg>
-  </div>
+    <!-- ── HOME SCREEN ── -->
+    <div id="homeScreen" class="screen active">
+      <div class="hero">
+        <h1>Comparte audio<br>en <span class="highlight">tiempo real</span></h1>
+        <p>El admin elige qué audio suena. Todos los conectados escuchan lo mismo, al instante.</p>
+      </div>
+      <div class="cards">
+        <div class="card primary" onclick="showModal('createModal')">
+          <span class="card-icon">🎛️</span>
+          <h3>Crear sala</h3>
+          <p>Sé el admin. Comparte el audio de cualquier app o pestaña.</p>
+        </div>
+        <div class="card" onclick="showModal('joinModal')">
+          <span class="card-icon">🎧</span>
+          <h3>Unirse</h3>
+          <p>Ingresa con código y contraseña para escuchar la sala.</p>
+        </div>
+      </div>
+    </div>
 
-  <h1 class="title">
-    <span class="bas">BAS</span>
-    <span class="client">CLIENT</span>
-  </h1>
+    <!-- ── ADMIN ROOM SCREEN ── -->
+    <div id="adminScreen" class="screen">
 
-  <div class="ver-badge">
-    <span class="ver-dot"></span>
-    <span id="ver-txt">v1.0.0 · Windows</span>
-  </div>
+      <div class="room-header">
+        <div class="room-info">
+          <h2 id="adminRoomName">Mi Sala</h2>
+          <div class="room-meta">
+            <span class="badge purple" id="adminRoleTag">👑 Admin</span>
+            <span class="badge green" id="listenerCount">0 oyentes</span>
+            <span class="badge" id="adminRoomCode"></span>
+          </div>
+        </div>
+        <div class="room-actions">
+          <button class="btn btn-danger" onclick="leaveRoom()">Cerrar sala</button>
+        </div>
+      </div>
 
-  <a href="https://basclient.jolty.us/api/launcher/download" class="btn-dl" id="btn-dl">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-    Descargar para Windows
-  </a>
+      <!-- Audio Source -->
+      <div class="panel">
+        <div class="panel-title">🎚️ Fuente de audio</div>
 
-  <p class="note">Windows 10 / 11 &nbsp;·&nbsp; Java 17+ recomendado</p>
+        <div class="audio-status" id="adminAudioStatus">
+          <div class="audio-icon">🔇</div>
+          <div class="audio-info">
+            <div class="title" id="adminAudioTitle">Sin audio activo</div>
+            <div class="subtitle" id="adminAudioSub">Elige una fuente para empezar</div>
+          </div>
+          <div class="visualizer paused" id="adminVisualizer">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
 
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <button class="btn btn-secondary" id="btnShareTab" onclick="shareTabAudio()">
+            🌐 Pestaña / App
+          </button>
+          <button class="btn btn-secondary" id="btnShareMic" onclick="shareMicAudio()">
+            🎤 Micrófono
+          </button>
+        </div>
+        <button class="btn btn-danger" id="btnStopAudio" onclick="stopAudio()" disabled>
+          ⏹ Detener audio
+        </button>
+      </div>
+
+      <!-- Share info -->
+      <div class="panel">
+        <div class="panel-title">🔗 Compartir sala</div>
+        <div class="share-box">
+          <p>Código de la sala</p>
+          <div class="share-code" id="shareCode">------</div>
+          <p>Contraseña: <span id="sharePass" style="color:var(--accent2);font-family:'DM Mono',monospace"></span></p>
+          <button class="copy-btn" onclick="copyRoomInfo()">📋 Copiar datos</button>
+        </div>
+      </div>
+
+      <!-- Participants -->
+      <div class="panel">
+        <div class="panel-title">👥 Participantes</div>
+        <div class="participants-list" id="participantsList">
+          <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:12px">
+            Esperando participantes...
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── LISTENER ROOM SCREEN ── -->
+    <div id="listenerScreen" class="screen">
+
+      <div class="room-header">
+        <div class="room-info">
+          <h2 id="listenerRoomName">Sala</h2>
+          <div class="room-meta">
+            <span class="badge purple">🎧 Oyente</span>
+            <span class="badge" id="listenerRoomCode"></span>
+          </div>
+        </div>
+        <div class="room-actions">
+          <button class="btn btn-secondary" onclick="leaveRoom()">Salir</button>
+        </div>
+      </div>
+
+      <!-- Audio Player -->
+      <div class="panel">
+        <div class="panel-title">🔊 Audio recibido</div>
+
+        <div class="audio-status" id="listenerAudioStatus">
+          <div class="audio-icon" id="listenerIcon">⏳</div>
+          <div class="audio-info">
+            <div class="title" id="listenerAudioTitle">Esperando al admin...</div>
+            <div class="subtitle" id="listenerAudioSub">Cuando el admin inicie el audio, lo escucharás aquí</div>
+          </div>
+          <div class="visualizer paused" id="listenerVisualizer">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+
+        <div class="volume-control">
+          <label>🔈 Volumen</label>
+          <input type="range" id="volumeSlider" min="0" max="100" value="80" oninput="setVolume(this.value)">
+          <span id="volumeVal" style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted);min-width:30px">80%</span>
+        </div>
+
+        <audio id="remoteAudio" autoplay style="display:none"></audio>
+      </div>
+
+      <!-- Instructions for listener -->
+      <div class="panel">
+        <div class="panel-title">ℹ️ Información</div>
+        <div class="instructions">
+          <ol>
+            <li>El admin controla qué audio escuchas</li>
+            <li>El audio llega en tiempo real vía WebRTC</li>
+            <li>Usa el control de volumen para ajustar</li>
+            <li>Si el audio se interrumpe, el admin lo reanudará</li>
+          </ol>
+          <div class="note">⚡ Tecnología P2P — sin latencia de servidor de medios</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
 </div>
 
-<!-- Links de X -->
-<div class="x-links">
-  <a href="https://x.com/SunnyAim_" target="_blank" rel="noopener" class="x-link">
-    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-    @SunnyAim_
-  </a>
-  <a href="https://x.com/SunnyDeb_" target="_blank" rel="noopener" class="x-link">
-    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-    @SunnyDeb_
-  </a>
+<!-- ── MODAL: CREAR SALA ── -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <h3>🎛️ Crear sala</h3>
+    <p class="subtitle">Serás el admin. Tú eliges el audio.</p>
+    <div class="form-group">
+      <label>Nombre de la sala</label>
+      <input type="text" id="createRoomName" placeholder="Ej: Sala de música" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label>Tu nombre</label>
+      <input type="text" id="createAdminName" placeholder="Tu nombre" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>Contraseña de la sala</label>
+      <input type="text" id="createRoomPass" placeholder="Contraseña para unirse" maxlength="20">
+    </div>
+    <button class="btn btn-primary" onclick="createRoom()">✨ Crear sala</button>
+    <div class="divider">o</div>
+    <button class="btn btn-secondary" onclick="hideModal('createModal')">Cancelar</button>
+  </div>
 </div>
 
-<script>
-// Stars
-(function(){
-  const c=document.getElementById('stars'),ctx=c.getContext('2d',{alpha:true});
-  let W,H;
-  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
-  resize();addEventListener('resize',resize);
-  const stars=Array.from({length:60},()=>({
-    x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-    r:Math.random()*1.1+.2,a:Math.random(),
-    da:(Math.random()*.004+.001)*(Math.random()>.5?1:-1)
-  }));
-  const shoots=[];
-  function spawnShoot(){
-    shoots.push({x:Math.random()*W,y:Math.random()*H*.4,len:Math.random()*80+40,sp:Math.random()*4+2,a:1,ang:Math.PI/4+(Math.random()-.5)*.4});
-    setTimeout(spawnShoot,Math.random()*16000+10000);
-  }
-  setTimeout(spawnShoot,4000);
-  let last=0;
-  function draw(ts){
-    requestAnimationFrame(draw);
-    if(ts-last<66)return;last=ts;
-    ctx.clearRect(0,0,W,H);
-    stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(190,210,255,${Math.max(.03,s.a*.55)})`;ctx.fill();});
-    for(let i=shoots.length-1;i>=0;i--){
-      const s=shoots[i];
-      const x2=s.x-Math.cos(s.ang)*s.len,y2=s.y-Math.sin(s.ang)*s.len;
-      const g=ctx.createLinearGradient(s.x,s.y,x2,y2);
-      g.addColorStop(0,`rgba(255,255,255,${s.a})`);g.addColorStop(1,'rgba(255,255,255,0)');
-      ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(x2,y2);ctx.strokeStyle=g;ctx.lineWidth=1;ctx.stroke();
-      s.x+=Math.cos(s.ang)*s.sp;s.y+=Math.sin(s.ang)*s.sp;
-      s.a-=.022;if(s.a<=0)shoots.splice(i,1);
-    }
-  }
-  requestAnimationFrame(draw);
-})();
+<!-- ── MODAL: UNIRSE ── -->
+<div class="modal-overlay" id="joinModal">
+  <div class="modal">
+    <h3>🎧 Unirse a sala</h3>
+    <p class="subtitle">Ingresa los datos que te compartió el admin.</p>
+    <div class="form-group">
+      <label>Tu nombre</label>
+      <input type="text" id="joinName" placeholder="Tu nombre" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>Código de sala</label>
+      <input type="text" id="joinCode" placeholder="Ej: ABC123" maxlength="8" style="text-transform:uppercase">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="joinPass" placeholder="Contraseña de la sala">
+    </div>
+    <button class="btn btn-primary" onclick="joinRoom()">🚀 Unirse</button>
+    <div class="divider">o</div>
+    <button class="btn btn-secondary" onclick="hideModal('joinModal')">Cancelar</button>
+  </div>
+</div>
 
-// Cargar versión y estado del launcher desde la API
-async function loadLauncherInfo(){
-  try{
-    const r=await fetch('https://basclient.jolty.us/api/launcher');
-    const d=await r.json();
-    if(d.version) document.getElementById('ver-txt').textContent=`v${d.version} · Windows`;
-    if(!d.available){
-      const btn=document.getElementById('btn-dl');
-      btn.style.opacity='.5';btn.style.cursor='not-allowed';
-      btn.onclick=e=>e.preventDefault();
-      btn.innerHTML=btn.innerHTML.replace('Descargar para Windows','Próximamente');
-    }
-  }catch{}
-}
-loadLauncherInfo();
-</script>
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
