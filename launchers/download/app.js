@@ -10,7 +10,8 @@
 */
 
 // ─── FIREBASE CONFIG (base de datos pública para señalización) ────────────────
-https://syncsound-f06ec-default-rtdb.firebaseio.com/let useFirebase = true;
+const FB_URL = 'https://syncsound-f06ec-default-rtdb.firebaseio.com';
+let useFirebase = true;
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 const state = {
