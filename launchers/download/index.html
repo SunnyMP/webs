@@ -17,6 +17,7 @@
     --green: #10b981;
     --red: #ef4444;
     --yellow: #f59e0b;
+    --blue: #3b82f6;
     --text: #f0f0ff;
     --muted: #6b6b8a;
     --glow: rgba(124, 58, 237, 0.3);
@@ -57,30 +58,18 @@
     backdrop-filter: blur(10px);
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .logo { display: flex; align-items: center; gap: 12px; }
 
   .logo-icon {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 18px;
     box-shadow: 0 0 20px var(--glow);
   }
 
-  .logo-text {
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-
+  .logo-text { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
   .logo-text span { color: var(--accent2); }
 
   .status-badge {
@@ -90,33 +79,22 @@
     border-radius: 20px;
     border: 1px solid var(--border);
     color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: flex; align-items: center; gap: 6px;
   }
 
   .status-badge.online { border-color: var(--green); color: var(--green); }
   .status-badge .dot {
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: currentColor;
     animation: pulse 2s infinite;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   /* ── MAIN ── */
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
 
-  /* ── SCREENS ── */
   .screen { display: none; }
   .screen.active { display: block; animation: fadeIn 0.3s ease; }
 
@@ -125,11 +103,8 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── HOME SCREEN ── */
-  .hero {
-    text-align: center;
-    margin-bottom: 56px;
-  }
+  /* ── HOME ── */
+  .hero { text-align: center; margin-bottom: 56px; }
 
   .hero h1 {
     font-size: clamp(2rem, 5vw, 3.2rem);
@@ -146,13 +121,7 @@
     background-clip: text;
   }
 
-  .hero p {
-    color: var(--muted);
-    font-size: 1rem;
-    max-width: 440px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
+  .hero p { color: var(--muted); font-size: 1rem; max-width: 440px; margin: 0 auto; line-height: 1.6; }
 
   .cards {
     display: grid;
@@ -180,40 +149,23 @@
     box-shadow: 0 12px 40px var(--glow);
   }
 
-  .card-icon {
-    font-size: 2.4rem;
-    margin-bottom: 14px;
-    display: block;
-  }
-
-  .card h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .card p {
-    font-size: 0.82rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
+  .card-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
+  .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
 
   .card.primary {
     border-color: var(--accent);
     background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(168,85,247,0.05));
   }
 
-  /* ── FORM ELEMENTS ── */
+  /* ── FORM ── */
   .form-group { margin-bottom: 18px; }
 
   label {
     display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
+    font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
   }
 
   input {
@@ -233,19 +185,10 @@
   input::placeholder { color: var(--muted); }
 
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 13px 24px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
-    transition: all 0.2s ease;
-    width: 100%;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 24px; border-radius: 10px; border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+    transition: all 0.2s ease; width: 100%;
   }
 
   .btn-primary {
@@ -253,133 +196,83 @@
     color: white;
     box-shadow: 0 4px 20px var(--glow);
   }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px var(--glow); }
 
-  .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 30px var(--glow);
-  }
-
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { border-color: var(--accent2); }
 
-  .btn-danger {
-    background: rgba(239,68,68,0.15);
-    color: var(--red);
-    border: 1px solid rgba(239,68,68,0.3);
-  }
-
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
   .btn-danger:hover { background: rgba(239,68,68,0.25); }
 
-  .btn-green {
-    background: rgba(16,185,129,0.15);
-    color: var(--green);
-    border: 1px solid rgba(16,185,129,0.3);
-  }
-
+  .btn-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
   .btn-green:hover { background: rgba(16,185,129,0.25); }
 
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+  .btn-blue { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+  .btn-blue:hover { background: rgba(59,130,246,0.25); }
+
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Active source highlight */
+  .btn.active-source {
+    background: rgba(59,130,246,0.25) !important;
+    border-color: var(--blue) !important;
+    color: var(--blue) !important;
+    box-shadow: 0 0 16px rgba(59,130,246,0.3);
   }
 
   /* ── PANEL ── */
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 20px;
-  }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
 
   .panel-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
   }
 
-  /* ── ROOM SCREEN ── */
+  /* ── ROOM HEADER ── */
   .room-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 28px;
   }
 
-  .room-info h2 {
-    font-size: 1.6rem;
-    font-weight: 800;
-  }
+  .room-info h2 { font-size: 1.6rem; font-weight: 800; }
 
   .room-info .room-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 4px; flex-wrap: wrap;
   }
 
   .badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted);
   }
 
   .badge.green { border-color: var(--green); color: var(--green); }
   .badge.purple { border-color: var(--accent2); color: var(--accent2); }
   .badge.yellow { border-color: var(--yellow); color: var(--yellow); }
+  .badge.blue { border-color: var(--blue); color: var(--blue); }
 
   .room-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .room-actions .btn { width: auto; padding: 10px 18px; font-size: 0.85rem; }
 
-  /* ── AUDIO PANEL ── */
+  /* ── AUDIO STATUS ── */
   .audio-status {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    background: var(--surface2);
-    border-radius: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px; background: var(--surface2);
+    border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap;
   }
 
   .audio-icon { font-size: 1.8rem; }
-
   .audio-info { flex: 1; min-width: 160px; }
   .audio-info .title { font-weight: 700; font-size: 0.95rem; }
   .audio-info .subtitle { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
 
-  .visualizer {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 32px;
-  }
+  .visualizer { display: flex; align-items: center; gap: 3px; height: 32px; }
 
   .bar {
-    width: 4px;
-    border-radius: 2px;
-    background: var(--accent2);
-    animation: wave 0.8s ease-in-out infinite;
-    min-height: 4px;
+    width: 4px; border-radius: 2px; background: var(--accent2);
+    animation: wave 0.8s ease-in-out infinite; min-height: 4px;
   }
 
   .bar:nth-child(1) { animation-delay: 0s; }
@@ -390,44 +283,105 @@
   .bar:nth-child(6) { animation-delay: 0.2s; }
   .bar:nth-child(7) { animation-delay: 0.1s; }
 
-  @keyframes wave {
-    0%, 100% { height: 6px; }
-    50% { height: 28px; }
-  }
-
+  @keyframes wave { 0%, 100% { height: 6px; } 50% { height: 28px; } }
   .visualizer.paused .bar { animation-play-state: paused; height: 4px; }
 
-  /* ── PARTICIPANTS ── */
-  .participants-list {
-    display: flex;
-    flex-direction: column;
+  /* ── SOURCE GRID ── */
+  .source-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
+    margin-bottom: 12px;
   }
 
+  @media (max-width: 520px) {
+    .source-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── ADMIN SCREEN PREVIEW ── */
+  #adminScreenPreview {
+    display: none;
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--blue);
+    position: relative;
+    background: #000;
+  }
+
+  #adminScreenPreview .preview-label {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(0,0,0,0.7);
+    color: var(--blue);
+    font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    border: 1px solid rgba(59,130,246,0.4);
+    z-index: 2;
+  }
+
+  #adminPreviewVideo {
+    width: 100%;
+    max-height: 240px;
+    object-fit: contain;
+    display: block;
+    background: #000;
+  }
+
+  /* ── LISTENER SCREEN CONTAINER ── */
+  .screen-container {
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--blue);
+    background: #000;
+  }
+
+  .screen-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(59,130,246,0.1);
+    border-bottom: 1px solid rgba(59,130,246,0.2);
+  }
+
+  .screen-label {
+    font-size: 0.78rem; font-weight: 700;
+    color: var(--blue); font-family: 'DM Mono', monospace;
+  }
+
+  .fullscreen-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 1.1rem;
+    padding: 2px 6px; border-radius: 4px;
+    transition: color 0.2s;
+  }
+  .fullscreen-btn:hover { color: var(--blue); }
+
+  #remoteScreenVideo {
+    width: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    display: block;
+    background: #000;
+  }
+
+  /* ── PARTICIPANTS ── */
+  .participants-list { display: flex; flex-direction: column; gap: 10px; }
+
   .participant {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--surface2);
-    border-radius: 10px;
-    border: 1px solid transparent;
-    transition: border-color 0.2s;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; background: var(--surface2);
+    border-radius: 10px; border: 1px solid transparent; transition: border-color 0.2s;
   }
 
   .participant.listening { border-color: rgba(16,185,129,0.3); }
 
   .participant-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
   }
 
   .participant-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
@@ -435,65 +389,38 @@
 
   /* ── SHARE BOX ── */
   .share-box {
-    background: var(--surface2);
-    border: 1px dashed var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
+    background: var(--surface2); border: 1px dashed var(--border);
+    border-radius: 12px; padding: 20px; text-align: center;
   }
 
   .share-code {
-    font-family: 'DM Mono', monospace;
-    font-size: 2rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    color: var(--accent2);
-    margin: 8px 0;
+    font-family: 'DM Mono', monospace; font-size: 2rem; font-weight: 500;
+    letter-spacing: 0.2em; color: var(--accent2); margin: 8px 0;
   }
 
   .share-box p { color: var(--muted); font-size: 0.82rem; }
 
   .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 12px;
-    padding: 8px 16px;
-    background: rgba(124,58,237,0.15);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    color: var(--accent2);
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 12px; padding: 8px 16px;
+    background: rgba(124,58,237,0.15); border: 1px solid var(--accent);
+    border-radius: 8px; color: var(--accent2); cursor: pointer;
+    font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 600;
     transition: all 0.2s;
   }
-
   .copy-btn:hover { background: rgba(124,58,237,0.25); }
 
   /* ── MODAL ── */
   .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 100; align-items: center; justify-content: center; padding: 24px;
   }
-
   .modal-overlay.open { display: flex; }
 
   .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px;
-    width: 100%;
-    max-width: 420px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; width: 100%; max-width: 420px;
     animation: slideUp 0.25s ease;
   }
 
@@ -507,20 +434,12 @@
 
   /* ── TOAST ── */
   #toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
+    position: fixed; bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(80px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-size: 0.85rem;
-    z-index: 999;
-    transition: transform 0.3s ease;
-    white-space: nowrap;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 20px; font-size: 0.85rem;
+    z-index: 999; transition: transform 0.3s ease; white-space: nowrap;
   }
-
   #toast.show { transform: translateX(-50%) translateY(0); }
   #toast.success { border-color: var(--green); color: var(--green); }
   #toast.error { border-color: var(--red); color: var(--red); }
@@ -528,112 +447,68 @@
 
   /* ── DIVIDER ── */
   .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0;
-    color: var(--muted);
-    font-size: 0.78rem;
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0; color: var(--muted); font-size: 0.78rem;
   }
-
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   /* ── INSTRUCTIONS ── */
   .instructions {
-    background: rgba(124,58,237,0.08);
-    border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
+    background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px; padding: 16px 20px;
   }
 
-  .instructions ol {
-    list-style: none;
-    counter-reset: steps;
-  }
+  .instructions ol { list-style: none; counter-reset: steps; }
 
   .instructions ol li {
-    counter-increment: steps;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.5;
+    counter-increment: steps; display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 8px; font-size: 0.85rem; color: var(--muted); line-height: 1.5;
   }
-
   .instructions ol li:last-child { margin-bottom: 0; }
 
   .instructions ol li::before {
-    content: counter(steps);
-    min-width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
+    content: counter(steps); min-width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: white; font-size: 0.7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
   }
 
   .instructions .note {
-    font-size: 0.75rem;
-    color: var(--accent2);
-    margin-top: 10px;
-    padding-top: 10px;
+    font-size: 0.75rem; color: var(--accent2);
+    margin-top: 10px; padding-top: 10px;
     border-top: 1px solid rgba(124,58,237,0.2);
   }
 
   /* ── VOLUME ── */
-  .volume-control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 12px;
-  }
+  .volume-control { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
 
   .volume-control label {
-    font-size: 0.8rem;
-    text-transform: none;
-    letter-spacing: 0;
-    margin-bottom: 0;
-    color: var(--muted);
-    white-space: nowrap;
+    font-size: 0.8rem; text-transform: none; letter-spacing: 0;
+    margin-bottom: 0; color: var(--muted); white-space: nowrap;
   }
 
   input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border);
-    outline: none;
-    padding: 0;
-    border: none;
-    flex: 1;
+    -webkit-appearance: none; appearance: none; height: 4px;
+    border-radius: 2px; background: var(--border); outline: none; padding: 0; border: none; flex: 1;
   }
 
   input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--accent2);
-    cursor: pointer;
+    -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--accent2); cursor: pointer;
     box-shadow: 0 0 8px var(--glow);
   }
 
-  /* Responsive */
+  /* ── SCREEN SHARE TIP ── */
+  .screen-tip {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.78rem;
+    color: #93c5fd;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
   @media (max-width: 600px) {
     header { padding: 16px 20px; }
     main { padding: 24px 16px; }
@@ -660,19 +535,19 @@
     <!-- ── HOME SCREEN ── -->
     <div id="homeScreen" class="screen active">
       <div class="hero">
-        <h1>Comparte audio<br>en <span class="highlight">tiempo real</span></h1>
-        <p>El admin elige qué audio suena. Todos los conectados escuchan lo mismo, al instante.</p>
+        <h1>Comparte audio<br>y pantalla en <span class="highlight">tiempo real</span></h1>
+        <p>El admin elige qué audio o pantalla se comparte. Todos los conectados ven y escuchan lo mismo, al instante.</p>
       </div>
       <div class="cards">
         <div class="card primary" onclick="showModal('createModal')">
           <span class="card-icon">🎛️</span>
           <h3>Crear sala</h3>
-          <p>Sé el admin. Comparte el audio de cualquier app o pestaña.</p>
+          <p>Sé el admin. Comparte audio, micrófono o tu pantalla.</p>
         </div>
         <div class="card" onclick="showModal('joinModal')">
           <span class="card-icon">🎧</span>
           <h3>Unirse</h3>
-          <p>Ingresa con código y contraseña para escuchar la sala.</p>
+          <p>Ingresa con código y contraseña para ver y escuchar la sala.</p>
         </div>
       </div>
     </div>
@@ -694,14 +569,14 @@
         </div>
       </div>
 
-      <!-- Audio Source -->
+      <!-- Audio / Screen Source -->
       <div class="panel">
-        <div class="panel-title">🎚️ Fuente de audio</div>
+        <div class="panel-title">🎚️ Fuente de transmisión</div>
 
         <div class="audio-status" id="adminAudioStatus">
           <div class="audio-icon">🔇</div>
           <div class="audio-info">
-            <div class="title" id="adminAudioTitle">Sin audio activo</div>
+            <div class="title" id="adminAudioTitle">Sin transmisión activa</div>
             <div class="subtitle" id="adminAudioSub">Elige una fuente para empezar</div>
           </div>
           <div class="visualizer paused" id="adminVisualizer">
@@ -711,17 +586,32 @@
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <!-- 3 source buttons -->
+        <div class="source-grid">
           <button class="btn btn-secondary" id="btnShareTab" onclick="shareTabAudio()">
-            🌐 Pestaña / App
+            🌐 Audio de pestaña
           </button>
           <button class="btn btn-secondary" id="btnShareMic" onclick="shareMicAudio()">
             🎤 Micrófono
           </button>
+          <button class="btn btn-blue" id="btnShareScreen" onclick="shareScreen()">
+            🖥️ Compartir pantalla
+          </button>
         </div>
+
         <button class="btn btn-danger" id="btnStopAudio" onclick="stopAudio()" disabled>
-          ⏹ Detener audio
+          ⏹ Detener transmisión
         </button>
+
+        <div class="screen-tip">
+          💡 <strong>Compartir pantalla</strong> funciona como Discord: los participantes ven tu pantalla y escuchan el audio del sistema en tiempo real. Activa "compartir audio de pestaña" en el diálogo del navegador para incluir sonido.
+        </div>
+
+        <!-- Admin screen preview -->
+        <div id="adminScreenPreview">
+          <div class="preview-label">🔴 Vista previa — lo que ven tus participantes</div>
+          <video id="adminPreviewVideo" autoplay muted playsinline></video>
+        </div>
       </div>
 
       <!-- Share info -->
@@ -763,15 +653,15 @@
         </div>
       </div>
 
-      <!-- Audio Player -->
+      <!-- Audio / Screen Player -->
       <div class="panel">
-        <div class="panel-title">🔊 Audio recibido</div>
+        <div class="panel-title">🔊 Transmisión recibida</div>
 
         <div class="audio-status" id="listenerAudioStatus">
           <div class="audio-icon" id="listenerIcon">⏳</div>
           <div class="audio-info">
             <div class="title" id="listenerAudioTitle">Esperando al admin...</div>
-            <div class="subtitle" id="listenerAudioSub">Cuando el admin inicie el audio, lo escucharás aquí</div>
+            <div class="subtitle" id="listenerAudioSub">Cuando el admin inicie, verás y escucharás aquí</div>
           </div>
           <div class="visualizer paused" id="listenerVisualizer">
             <div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -779,6 +669,8 @@
             <div class="bar"></div>
           </div>
         </div>
+
+        <!-- Screen video (added dynamically by JS) -->
 
         <div class="volume-control">
           <label>🔈 Volumen</label>
@@ -789,15 +681,16 @@
         <audio id="remoteAudio" autoplay style="display:none"></audio>
       </div>
 
-      <!-- Instructions for listener -->
+      <!-- Info -->
       <div class="panel">
         <div class="panel-title">ℹ️ Información</div>
         <div class="instructions">
           <ol>
-            <li>El admin controla qué audio escuchas</li>
-            <li>El audio llega en tiempo real vía WebRTC</li>
-            <li>Usa el control de volumen para ajustar</li>
-            <li>Si el audio se interrumpe, el admin lo reanudará</li>
+            <li>El admin controla qué ves y escuchas</li>
+            <li>Soporta audio, micrófono y compartir pantalla (video + audio)</li>
+            <li>Transmisión en tiempo real vía WebRTC P2P</li>
+            <li>Usa el control de volumen para ajustar el sonido</li>
+            <li>El botón ⛶ activa pantalla completa cuando hay video</li>
           </ol>
           <div class="note">⚡ Tecnología P2P — sin latencia de servidor de medios</div>
         </div>
@@ -812,7 +705,7 @@
 <div class="modal-overlay" id="createModal">
   <div class="modal">
     <h3>🎛️ Crear sala</h3>
-    <p class="subtitle">Serás el admin. Tú eliges el audio.</p>
+    <p class="subtitle">Serás el admin. Tú controlas el audio y la pantalla.</p>
     <div class="form-group">
       <label>Nombre de la sala</label>
       <input type="text" id="createRoomName" placeholder="Ej: Sala de música" maxlength="30">
