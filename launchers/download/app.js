@@ -1,19 +1,11 @@
 /*
-  SyncSound — Audio sharing via WebRTC + Firebase signaling
-  
-  Señalización: Firebase Realtime Database (gratis, sin cuenta requerida
-  para el usuario — usa el proyecto público de la app)
-  
-  Transporte de audio: WebRTC via PeerJS (peer-to-peer)
-  
-  Funciona entre DISTINTOS dispositivos y redes.
+  SyncSound — Audio + Screen sharing via WebRTC + Firebase signaling
+  Ahora con compartir pantalla (video + audio) como Discord
 */
 
-// ─── FIREBASE CONFIG (base de datos pública para señalización) ────────────────
 const FB_URL = 'https://syncsound-f06ec-default-rtdb.firebaseio.com';
 let useFirebase = true;
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
 const state = {
   role: null,
   roomCode: null,
@@ -23,12 +15,14 @@ const state = {
   peer: null,
   connections: {},
   audioStream: null,
+  screenStream: null,
   mediaSource: null,
   calls: {},
   remoteStream: null,
   participants: [],
   myPeerId: null,
   adminPeerId: null,
+  sharingScreen: false,
 };
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
@@ -192,9 +186,16 @@ function setupAdminListeners() {
           renderParticipants();
           updateListenerCount();
 
-          conn.send({ type: 'accepted', roomName: state.roomName });
+          // Notify listener: accepted + whether screen sharing is active
+          conn.send({
+            type: 'accepted',
+            roomName: state.roomName,
+            sharingScreen: state.sharingScreen,
+          });
 
-          if (state.audioStream) callListener(listenerId);
+          // If already streaming, call the new listener
+          const activeStream = state.screenStream || state.audioStream;
+          if (activeStream) callListener(listenerId, activeStream);
 
           toast(`${escHtml(data.name)} se unió 🎧`, 'success');
         }
@@ -218,18 +219,29 @@ function setupAdminListeners() {
   });
 }
 
-function callListener(peerId) {
-  if (!state.audioStream) return;
+function callListener(peerId, stream) {
+  if (!stream) return;
+  // Close existing call if any
+  if (state.calls[peerId]) {
+    try { state.calls[peerId].close(); } catch(e) {}
+  }
   try {
-    const call = state.peer.call(peerId, state.audioStream);
+    const call = state.peer.call(peerId, stream);
     state.calls[peerId] = call;
     call.on('error', (e) => console.warn('Call error:', e));
     call.on('close', () => delete state.calls[peerId]);
   } catch(e) { console.warn('Error calling listener:', e); }
 }
 
-function callAllListeners() {
-  Object.keys(state.connections).forEach(pid => callListener(pid));
+function callAllListeners(stream) {
+  Object.keys(state.connections).forEach(pid => callListener(pid, stream));
+}
+
+// Notify all listeners about stream type change via data channel
+function broadcastStreamType(type) {
+  Object.values(state.connections).forEach(conn => {
+    try { conn.send({ type: 'streamType', streamType: type }); } catch(e) {}
+  });
 }
 
 // ─── ADMIN: RENDER ────────────────────────────────────────────────────────────
@@ -287,7 +299,7 @@ async function shareTabAudio() {
     stream.getVideoTracks().forEach(t => { t.stop(); stream.removeTrack(t); });
 
     if (stream.getAudioTracks().length === 0) {
-      toast('⚠️ No se capturó audio. En el diálogo del navegador, activa "Compartir audio del sistema" o "Compartir audio de la pestaña".', 'error');
+      toast('⚠️ No se capturó audio. En el diálogo activa "Compartir audio del sistema".', 'error');
       return;
     }
 
@@ -314,12 +326,87 @@ async function shareMicAudio() {
   }
 }
 
-function setAudioStream(stream, source, label) {
-  if (state.audioStream) {
-    state.audioStream.getTracks().forEach(t => t.stop());
+// ─── ADMIN: SCREEN SHARE ──────────────────────────────────────────────────────
+async function shareScreen() {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        cursor: 'always',
+        frameRate: { ideal: 30, max: 60 },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+      },
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+        sampleRate: 44100,
+        channelCount: 2,
+      }
+    });
+
+    state.sharingScreen = true;
+    state.screenStream = stream;
+
+    // Stop previous audio-only stream if any
+    if (state.audioStream) {
+      state.audioStream.getTracks().forEach(t => t.stop());
+      state.audioStream = null;
+    }
+
+    // Stop existing calls and restart with new stream
     Object.values(state.calls).forEach(c => { try { c.close(); } catch(e){} });
     state.calls = {};
+
+    // Show local preview
+    const preview = document.getElementById('adminScreenPreview');
+    const previewVid = document.getElementById('adminPreviewVideo');
+    previewVid.srcObject = stream;
+    previewVid.play().catch(e => console.warn(e));
+    preview.style.display = 'block';
+
+    // Update UI
+    const hasAudio = stream.getAudioTracks().length > 0;
+    document.getElementById('adminAudioTitle').textContent = '🖥️ Pantalla compartida' + (hasAudio ? ' (con audio)' : ' (sin audio)');
+    document.getElementById('adminAudioSub').textContent = hasAudio
+      ? 'Video + audio de pantalla en vivo'
+      : 'Solo video. Activa "compartir audio de pestaña" para incluir audio.';
+    document.querySelector('#adminAudioStatus .audio-icon').textContent = '🖥️';
+    document.getElementById('adminVisualizer').classList.remove('paused');
+    document.getElementById('btnStopAudio').disabled = false;
+    document.getElementById('btnShareScreen').classList.add('active-source');
+
+    // When user stops from browser UI
+    stream.getVideoTracks()[0].onended = () => {
+      if (state.screenStream === stream) stopAudio();
+    };
+
+    callAllListeners(stream);
+    broadcastStreamType('screen');
+    toast('🖥️ Pantalla compartida — todos los oyentes ven tu pantalla', 'success');
+  } catch (err) {
+    if (err.name !== 'NotAllowedError' && err.name !== 'AbortError') {
+      toast('Error al compartir pantalla: ' + err.message, 'error');
+    }
   }
+}
+
+function setAudioStream(stream, source, label) {
+  // Stop screen share if active
+  if (state.screenStream) {
+    state.screenStream.getTracks().forEach(t => t.stop());
+    state.screenStream = null;
+    state.sharingScreen = false;
+    document.getElementById('adminScreenPreview').style.display = 'none';
+    document.getElementById('adminPreviewVideo').srcObject = null;
+    document.getElementById('btnShareScreen').classList.remove('active-source');
+  }
+
+  if (state.audioStream) {
+    state.audioStream.getTracks().forEach(t => t.stop());
+  }
+  Object.values(state.calls).forEach(c => { try { c.close(); } catch(e){} });
+  state.calls = {};
 
   state.audioStream = stream;
   state.mediaSource = source;
@@ -336,11 +423,20 @@ function setAudioStream(stream, source, label) {
   document.getElementById('adminVisualizer').classList.remove('paused');
   document.getElementById('btnStopAudio').disabled = false;
 
-  callAllListeners();
+  callAllListeners(stream);
+  broadcastStreamType('audio');
   toast('🔴 Audio en vivo — todos los oyentes escuchan', 'success');
 }
 
 function stopAudio() {
+  if (state.screenStream) {
+    state.screenStream.getTracks().forEach(t => t.stop());
+    state.screenStream = null;
+    state.sharingScreen = false;
+    document.getElementById('adminScreenPreview').style.display = 'none';
+    document.getElementById('adminPreviewVideo').srcObject = null;
+    document.getElementById('btnShareScreen').classList.remove('active-source');
+  }
   if (state.audioStream) {
     state.audioStream.getTracks().forEach(t => t.stop());
     state.audioStream = null;
@@ -354,7 +450,8 @@ function stopAudio() {
   document.getElementById('adminVisualizer').classList.add('paused');
   document.getElementById('btnStopAudio').disabled = true;
 
-  toast('Audio detenido');
+  broadcastStreamType('stopped');
+  toast('Transmisión detenida');
 }
 
 // ─── LISTENER: JOIN ───────────────────────────────────────────────────────────
@@ -419,12 +516,14 @@ async function joinRoom() {
 
     conn.on('data', (data) => {
       if (data.type === 'accepted') {
-        setupListenerAudio();
+        setupListenerAudio(data.sharingScreen);
         renderListenerScreen();
-        toast('¡Conectado! Esperando audio del admin...', 'success');
+        toast('¡Conectado! Esperando transmisión del admin...', 'success');
       } else if (data.type === 'rejected') {
         toast('Rechazado: ' + data.reason, 'error');
         leaveRoom();
+      } else if (data.type === 'streamType') {
+        handleStreamTypeChange(data.streamType);
       }
     });
 
@@ -441,34 +540,114 @@ async function joinRoom() {
   });
 }
 
-function setupListenerAudio() {
+function handleStreamTypeChange(streamType) {
+  if (streamType === 'screen') {
+    document.getElementById('listenerAudioTitle').textContent = '🖥️ Pantalla compartida';
+    document.getElementById('listenerAudioSub').textContent = 'El admin está compartiendo su pantalla';
+    document.getElementById('listenerIcon').textContent = '🖥️';
+  } else if (streamType === 'audio') {
+    document.getElementById('listenerAudioTitle').textContent = '🎶 Audio en vivo';
+    document.getElementById('listenerAudioSub').textContent = 'Recibiendo audio del admin en tiempo real';
+    document.getElementById('listenerIcon').textContent = '🔊';
+    // Hide screen if was showing
+    const screenContainer = document.getElementById('listenerScreenContainer');
+    if (screenContainer) screenContainer.style.display = 'none';
+  } else if (streamType === 'stopped') {
+    document.getElementById('listenerAudioTitle').textContent = 'Audio pausado';
+    document.getElementById('listenerAudioSub').textContent = 'El admin detuvo la transmisión';
+    document.getElementById('listenerIcon').textContent = '⏸️';
+    document.getElementById('listenerVisualizer').classList.add('paused');
+    const screenContainer = document.getElementById('listenerScreenContainer');
+    if (screenContainer) screenContainer.style.display = 'none';
+  }
+}
+
+function setupListenerAudio(sharingScreen) {
   state.peer.on('call', (call) => {
     call.answer();
 
     call.on('stream', (remoteStream) => {
       state.remoteStream = remoteStream;
-      const audio = document.getElementById('remoteAudio');
-      audio.srcObject = remoteStream;
-      audio.volume = document.getElementById('volumeSlider').value / 100;
+      const hasVideo = remoteStream.getVideoTracks().length > 0;
 
-      audio.play().catch(() => {
-        toast('👆 Toca la pantalla para activar el audio', 'info');
-        document.addEventListener('click', () => audio.play().catch(e => console.warn(e)), { once: true });
-      });
+      if (hasVideo) {
+        // Show video element
+        showRemoteScreen(remoteStream);
+      } else {
+        // Audio only
+        const audio = document.getElementById('remoteAudio');
+        audio.srcObject = remoteStream;
+        audio.volume = document.getElementById('volumeSlider').value / 100;
+        audio.play().catch(() => {
+          toast('👆 Toca la pantalla para activar el audio', 'info');
+          document.addEventListener('click', () => audio.play().catch(e => console.warn(e)), { once: true });
+        });
+        const screenContainer = document.getElementById('listenerScreenContainer');
+        if (screenContainer) screenContainer.style.display = 'none';
+      }
 
-      document.getElementById('listenerAudioTitle').textContent = '🎶 Audio en vivo';
-      document.getElementById('listenerAudioSub').textContent = 'Recibiendo audio del admin en tiempo real';
-      document.getElementById('listenerIcon').textContent = '🔊';
+      document.getElementById('listenerAudioTitle').textContent = hasVideo ? '🖥️ Pantalla compartida' : '🎶 Audio en vivo';
+      document.getElementById('listenerAudioSub').textContent = hasVideo
+        ? 'Recibiendo pantalla del admin en tiempo real'
+        : 'Recibiendo audio del admin en tiempo real';
+      document.getElementById('listenerIcon').textContent = hasVideo ? '🖥️' : '🔊';
       document.getElementById('listenerVisualizer').classList.remove('paused');
     });
 
     call.on('close', () => {
       document.getElementById('listenerAudioTitle').textContent = 'Audio pausado';
-      document.getElementById('listenerAudioSub').textContent = 'El admin detuvo el audio';
+      document.getElementById('listenerAudioSub').textContent = 'El admin detuvo la transmisión';
       document.getElementById('listenerIcon').textContent = '⏸️';
       document.getElementById('listenerVisualizer').classList.add('paused');
+      const screenContainer = document.getElementById('listenerScreenContainer');
+      if (screenContainer) screenContainer.style.display = 'none';
     });
   });
+}
+
+function showRemoteScreen(stream) {
+  let screenContainer = document.getElementById('listenerScreenContainer');
+
+  if (!screenContainer) {
+    // Create the screen container dynamically
+    screenContainer = document.createElement('div');
+    screenContainer.id = 'listenerScreenContainer';
+    screenContainer.className = 'screen-container';
+    screenContainer.innerHTML = `
+      <div class="screen-header">
+        <span class="screen-label">🖥️ Pantalla del admin</span>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Pantalla completa">⛶</button>
+      </div>
+      <video id="remoteScreenVideo" autoplay playsinline muted></video>
+    `;
+
+    // Insert after the audio-status div inside listener panel
+    const audioPanel = document.querySelector('#listenerScreen .panel');
+    audioPanel.appendChild(screenContainer);
+  }
+
+  screenContainer.style.display = 'block';
+  const vid = document.getElementById('remoteScreenVideo');
+  vid.srcObject = stream;
+  vid.play().catch(e => console.warn(e));
+
+  // Also play audio through the audio element (PeerJS merges tracks)
+  const audio = document.getElementById('remoteAudio');
+  audio.srcObject = stream;
+  audio.volume = document.getElementById('volumeSlider').value / 100;
+  audio.play().catch(() => {
+    document.addEventListener('click', () => audio.play().catch(e => console.warn(e)), { once: true });
+  });
+}
+
+function toggleFullscreen() {
+  const vid = document.getElementById('remoteScreenVideo');
+  if (!vid) return;
+  if (!document.fullscreenElement) {
+    vid.requestFullscreen().catch(e => toast('No se pudo activar pantalla completa', 'error'));
+  } else {
+    document.exitFullscreen();
+  }
 }
 
 function renderListenerScreen() {
@@ -489,6 +668,7 @@ function leaveRoom() {
   const code = state.roomCode;
 
   if (state.audioStream) state.audioStream.getTracks().forEach(t => t.stop());
+  if (state.screenStream) state.screenStream.getTracks().forEach(t => t.stop());
   Object.values(state.calls).forEach(c => { try { c.close(); } catch(e){} });
   Object.values(state.connections).forEach(c => { try { c.close(); } catch(e){} });
   if (state.peer) { try { state.peer.destroy(); } catch(e){} }
@@ -497,12 +677,16 @@ function leaveRoom() {
   Object.assign(state, {
     role: null, roomCode: null, roomPass: null, roomName: null,
     myName: null, peer: null, connections: {}, audioStream: null,
-    mediaSource: null, calls: {}, remoteStream: null,
-    participants: [], myPeerId: null, adminPeerId: null,
+    screenStream: null, mediaSource: null, calls: {}, remoteStream: null,
+    participants: [], myPeerId: null, adminPeerId: null, sharingScreen: false,
   });
 
   const audio = document.getElementById('remoteAudio');
   if (audio) audio.srcObject = null;
+
+  // Remove dynamic screen container if exists
+  const sc = document.getElementById('listenerScreenContainer');
+  if (sc) sc.remove();
 
   setStatus('Listo', false);
   showScreen('homeScreen');
