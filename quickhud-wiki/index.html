@@ -68,9 +68,9 @@
     }
 
     .brand img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
     }
 
@@ -218,18 +218,18 @@
       top: 50%;
       display: grid;
       place-items: center;
-      width: 142px;
-      height: 142px;
-      border-radius: 32px;
+      width: 230px;
+      height: 230px;
+      border-radius: 42px;
       transform: translate(-50%, -50%);
       background: rgba(255, 255, 255, 0.07);
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 22px 46px rgba(0, 0, 0, 0.25);
     }
 
     .logo-orb img {
-      width: 96px;
-      height: 96px;
-      border-radius: 22px;
+      width: 176px;
+      height: 176px;
+      border-radius: 34px;
     }
 
     .hud-pill {
@@ -626,7 +626,7 @@
 
   <header class="site-nav">
     <a class="brand" href="#top" aria-label="Inicio">
-      <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="Logo de QuickHud">
+      <img src="assets/quickhud-logo.webp" alt="Logo de QuickHud">
       <span>QuickHud Wiki</span>
     </a>
     <nav class="nav-links" aria-label="Navegacion principal">
@@ -645,7 +645,7 @@
         <div class="hero-content">
           <p class="kicker">Mod / Plugin</p>
           <h1 id="title">QuickHud</h1>
-          <p class="hero-copy" data-i18n="heroCopy">HUD personalizable y controlado por servidor para mostrar jugadores vivos, kills, temporizadores, coordenadas y equipos en Minecraft.</p>
+          <p class="hero-copy" data-i18n="heroCopy">HUD personalizable para Minecraft: muestra jugadores vivos, kills, temporizadores, coordenadas y equipos. Puede usarse en cliente, servidor o con ambos juntos.</p>
           <div class="hero-actions">
             <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
             <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
@@ -659,7 +659,7 @@
             <div class="hud-pill coords">XYZ 120 64 -32</div>
             <div class="hud-pill team">Team Red</div>
             <div class="logo-orb">
-              <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="">
+              <img src="assets/quickhud-logo.webp" alt="">
             </div>
           </div>
         </div>
@@ -674,8 +674,8 @@
           <span data-i18n="listedVersions">Versiones soportadas</span>
         </div>
         <div class="stat">
-          <strong>Client + Server</strong>
-          <span data-i18n="environment">Entorno soportado</span>
+          <strong data-i18n="environmentTitle">Cliente / Servidor</strong>
+          <span data-i18n="environment">Mod y plugin disponibles</span>
         </div>
         <div class="stat">
           <strong>SunnyAIM_</strong>
@@ -687,14 +687,14 @@
     <section id="info" class="section">
       <div class="section-head">
         <div>
-          <h2 data-i18n="infoTitle">Informacion Del Plugin</h2>
-          <p data-i18n="infoLead">HUD ligero para servidores que quieren mostrar informacion clara sin depender del chat.</p>
+          <h2 data-i18n="infoTitle">Informacion Del Mod</h2>
+          <p data-i18n="infoLead">HUD ligero para mostrar informacion clara en pantalla sin depender del chat.</p>
         </div>
       </div>
       <div class="grid">
         <article class="panel pad">
           <h3 data-i18n="whatTitle">Que muestra</h3>
-          <p data-i18n="whatText">QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos con informacion controlada desde el servidor.</p>
+          <p data-i18n="whatText">QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos.</p>
           <div class="chips">
             <span class="chip green">Players</span>
             <span class="chip green">Kills</span>
@@ -704,8 +704,8 @@
           </div>
         </article>
         <article class="panel pad">
-          <h3 data-i18n="controlTitle">Control servidor</h3>
-          <p data-i18n="controlText">El plugin controla el HUD en tiempo real. Con mod + plugin tienes control completo desde el servidor; el mod solo tambien puede usar HUD local.</p>
+          <h3 data-i18n="controlTitle">Cliente y servidor</h3>
+          <p data-i18n="controlText">El mod puede estar en cliente y servidor. Con el plugin QuickHudPL el servidor puede controlar el HUD para todos; usando solo el mod tambien puedes tener un HUD local.</p>
           <div class="chips">
             <span class="chip">all</span>
             <span class="chip">players</span>
@@ -717,7 +717,7 @@
         </article>
         <article class="panel pad">
           <h3>Loaders</h3>
-          <p data-i18n="loadersText">Descarga el archivo que coincida con tu version de Minecraft y plataforma. El plugin de servidor aparece como QuickHudPL.</p>
+          <p data-i18n="loadersText">Elige el archivo segun donde lo quieras usar: mod para Fabric, Forge o NeoForge; plugin QuickHudPL para Bukkit, Paper, Purpur o Spigot.</p>
           <div class="chips">
             <span class="chip">Fabric</span>
             <span class="chip">Forge</span>
@@ -836,16 +836,16 @@
       <div class="section-head">
         <div>
           <h2 data-i18n="tutorialTitle">Tutorial Rapido</h2>
-          <p data-i18n="tutorialLead">La ruta corta para probar QuickHud en servidor.</p>
+          <p data-i18n="tutorialLead">Guia simple para empezar como en la pagina del proyecto.</p>
         </div>
       </div>
       <ol class="steps">
-        <li data-i18n="step1">Instala el mod QuickHud en el cliente y el plugin QuickHudPL en el servidor si quieres control total.</li>
-        <li data-i18n="step2">Descarga el archivo correcto para tu loader: Fabric, Forge, NeoForge o plugin Bukkit/Paper/Purpur/Spigot.</li>
-        <li data-i18n="step3">Reinicia el cliente y el servidor para cargar el canal de comunicacion.</li>
-        <li data-i18n="step4">Prueba un elemento con <code>/hud show players top_left 1 @a</code>.</li>
-        <li data-i18n="step5">Inicia un timer con <code>/hud timer start 300 @a</code>.</li>
-        <li data-i18n="step6">Limpia la pantalla con <code>/hud reset @a</code>.</li>
+        <li data-i18n="step1">Descarga QuickHud para tu version de Minecraft y tu loader.</li>
+        <li data-i18n="step2">Si quieres control desde servidor, instala tambien QuickHudPL en tu servidor.</li>
+        <li data-i18n="step3">Entra al mundo o servidor y abre el chat de comandos.</li>
+        <li data-i18n="step4">Muestra un elemento con <code>/hud show players top_left 1 @a</code>.</li>
+        <li data-i18n="step5">Prueba el timer con <code>/hud timer start 300 @a</code>.</li>
+        <li data-i18n="step6">Si quieres volver a empezar, usa <code>/hud reset @a</code>.</li>
       </ol>
     </section>
 
@@ -878,20 +878,21 @@
         navCommands: "Comandos",
         navVersions: "Versiones",
         navTutorial: "Tutorial",
-        heroCopy: "HUD personalizable y controlado por servidor para mostrar jugadores vivos, kills, temporizadores, coordenadas y equipos en Minecraft.",
+        heroCopy: "HUD personalizable para Minecraft: muestra jugadores vivos, kills, temporizadores, coordenadas y equipos. Puede usarse en cliente, servidor o con ambos juntos.",
         seeCommands: "Ver comandos",
         quickInstall: "Instalacion rapida",
         latestVersion: "Version mas reciente",
         listedVersions: "Versiones soportadas",
-        environment: "Entorno soportado",
+        environmentTitle: "Cliente / Servidor",
+        environment: "Mod y plugin disponibles",
         creator: "Creador / soporte",
-        infoTitle: "Informacion Del Plugin",
-        infoLead: "HUD ligero para servidores que quieren mostrar informacion clara sin depender del chat.",
+        infoTitle: "Informacion Del Mod",
+        infoLead: "HUD ligero para mostrar informacion clara en pantalla sin depender del chat.",
         whatTitle: "Que muestra",
-        whatText: "QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos con informacion controlada desde el servidor.",
-        controlTitle: "Control servidor",
-        controlText: "El plugin controla el HUD en tiempo real. Con mod + plugin tienes control completo desde el servidor; el mod solo tambien puede usar HUD local.",
-        loadersText: "Descarga el archivo que coincida con tu version de Minecraft y plataforma. El plugin de servidor aparece como QuickHudPL.",
+        whatText: "QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos.",
+        controlTitle: "Cliente y servidor",
+        controlText: "El mod puede estar en cliente y servidor. Con el plugin QuickHudPL el servidor puede controlar el HUD para todos; usando solo el mod tambien puedes tener un HUD local.",
+        loadersText: "Elige el archivo segun donde lo quieras usar: mod para Fabric, Forge o NeoForge; plugin QuickHudPL para Bukkit, Paper, Purpur o Spigot.",
         commandsTitle: "Comandos",
         commandsLead: "Comandos principales para mostrar, ocultar, mover, escalar y actualizar elementos del HUD.",
         cmdShow: "Muestra un elemento del HUD para todos, un jugador o un equipo.",
@@ -907,13 +908,13 @@
         versionsTitle: "Versiones Y Loaders",
         versionsLead: "Compatibilidad indicada en Modrinth, revisada el 4 de mayo de 2026.",
         tutorialTitle: "Tutorial Rapido",
-        tutorialLead: "La ruta corta para probar QuickHud en servidor.",
-        step1: "Instala el mod QuickHud en el cliente y el plugin QuickHudPL en el servidor si quieres control total.",
-        step2: "Descarga el archivo correcto para tu loader: Fabric, Forge, NeoForge o plugin Bukkit/Paper/Purpur/Spigot.",
-        step3: "Reinicia el cliente y el servidor para cargar el canal de comunicacion.",
-        step4: 'Prueba un elemento con <code>/hud show players top_left 1 @a</code>.',
-        step5: 'Inicia un timer con <code>/hud timer start 300 @a</code>.',
-        step6: 'Limpia la pantalla con <code>/hud reset @a</code>.',
+        tutorialLead: "Guia simple para empezar como en la pagina del proyecto.",
+        step1: "Descarga QuickHud para tu version de Minecraft y tu loader.",
+        step2: "Si quieres control desde servidor, instala tambien QuickHudPL en tu servidor.",
+        step3: "Entra al mundo o servidor y abre el chat de comandos.",
+        step4: 'Muestra un elemento con <code>/hud show players top_left 1 @a</code>.',
+        step5: 'Prueba el timer con <code>/hud timer start 300 @a</code>.',
+        step6: 'Si quieres volver a empezar, usa <code>/hud reset @a</code>.',
         downloadTitle: "Descargas",
         downloadLead: "Accesos rapidos a las paginas principales del proyecto."
       },
@@ -922,20 +923,21 @@
         navCommands: "Commands",
         navVersions: "Versions",
         navTutorial: "Guide",
-        heroCopy: "A customizable server-controlled HUD for showing alive players, kills, timers, coordinates and teams in Minecraft.",
+        heroCopy: "A customizable Minecraft HUD for alive players, kills, timers, coordinates and teams. It can be used on the client, on the server, or with both together.",
         seeCommands: "View commands",
         quickInstall: "Quick install",
         latestVersion: "Latest version",
         listedVersions: "Supported versions",
-        environment: "Supported environment",
+        environmentTitle: "Client / Server",
+        environment: "Mod and plugin available",
         creator: "Creator / support",
-        infoTitle: "Plugin Info",
-        infoLead: "A lightweight HUD for servers that need clear information without relying on chat.",
+        infoTitle: "Mod Info",
+        infoLead: "A lightweight HUD for showing clear information on screen without relying on chat.",
         whatTitle: "What it shows",
-        whatText: "QuickHud can show alive player count, per-player kills, timers, XYZ coordinates and team lists with server-controlled information.",
-        controlTitle: "Server control",
-        controlText: "The plugin controls the HUD in real time. Mod + plugin gives full server-side control; the mod alone can also run a local HUD.",
-        loadersText: "Download the file that matches your Minecraft version and platform. The server plugin is listed as QuickHudPL.",
+        whatText: "QuickHud can show alive player count, per-player kills, timers, XYZ coordinates and team lists.",
+        controlTitle: "Client and server",
+        controlText: "The mod can run on the client and server. With the QuickHudPL plugin, the server can control the HUD for everyone; with only the mod, you can still use a local HUD.",
+        loadersText: "Choose the file based on where you want to use it: mod for Fabric, Forge or NeoForge; QuickHudPL plugin for Bukkit, Paper, Purpur or Spigot.",
         commandsTitle: "Commands",
         commandsLead: "Main commands for showing, hiding, moving, scaling and updating HUD elements.",
         cmdShow: "Shows a HUD element for everyone, a player or a team.",
@@ -951,13 +953,13 @@
         versionsTitle: "Versions And Loaders",
         versionsLead: "Compatibility shown on Modrinth, reviewed on May 4, 2026.",
         tutorialTitle: "Quick Guide",
-        tutorialLead: "The short path to test QuickHud on a server.",
-        step1: "Install the QuickHud mod on the client and QuickHudPL on the server if you want full control.",
-        step2: "Download the correct file for your loader: Fabric, Forge, NeoForge or Bukkit/Paper/Purpur/Spigot plugin.",
-        step3: "Restart the client and server so the communication channel loads.",
-        step4: 'Test an element with <code>/hud show players top_left 1 @a</code>.',
-        step5: 'Start a timer with <code>/hud timer start 300 @a</code>.',
-        step6: 'Clear the screen with <code>/hud reset @a</code>.',
+        tutorialLead: "A simple start guide closer to the project page.",
+        step1: "Download QuickHud for your Minecraft version and loader.",
+        step2: "If you want server control, also install QuickHudPL on your server.",
+        step3: "Join the world or server and open the command chat.",
+        step4: 'Show an element with <code>/hud show players top_left 1 @a</code>.',
+        step5: 'Try the timer with <code>/hud timer start 300 @a</code>.',
+        step6: 'To start fresh, use <code>/hud reset @a</code>.',
         downloadTitle: "Downloads",
         downloadLead: "Quick access to the main project pages."
       }
