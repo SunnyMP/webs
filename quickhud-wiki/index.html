@@ -205,53 +205,102 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 22px;
       background:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(135deg, #162537, #0b1118);
-      background-size: 34px 34px, 34px 34px, auto;
+        linear-gradient(180deg, rgba(112, 166, 236, 0.62) 0%, rgba(139, 194, 250, 0.44) 34%, transparent 35%),
+        linear-gradient(180deg, #79b1f0 0%, #9dccff 35%, #3f7c29 36%, #4e8f35 100%);
       box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
     }
 
     .logo-orb {
       position: absolute;
       left: 50%;
-      top: 50%;
+      top: 62%;
       display: grid;
       place-items: center;
-      width: 230px;
-      height: 230px;
-      border-radius: 42px;
+      width: 190px;
+      height: 190px;
+      border-radius: 38px;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.07);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 22px 46px rgba(0, 0, 0, 0.25);
+      background: rgba(7, 11, 16, 0.2);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 22px 46px rgba(0, 0, 0, 0.2);
     }
 
     .logo-orb img {
-      width: 176px;
-      height: 176px;
-      border-radius: 34px;
+      width: 148px;
+      height: 148px;
+      border-radius: 30px;
     }
 
-    .hud-pill {
+    .hud-stack {
       position: absolute;
+      left: 50%;
+      top: 16px;
+      display: grid;
+      gap: 7px;
+      justify-items: center;
+      transform: translateX(-50%);
+    }
+
+    .hud-bar,
+    .hud-name {
       display: inline-flex;
       align-items: center;
-      min-height: 34px;
-      padding: 0 12px;
+      justify-content: center;
+      gap: 9px;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 999px;
-      background: rgba(7, 11, 16, 0.78);
+      background: rgba(18, 24, 32, 0.88);
       color: var(--soft);
-      font-size: 13px;
-      font-weight: 900;
-      backdrop-filter: blur(10px);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
+      box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(8px);
     }
 
-    .hud-pill.players { left: 16px; top: 16px; }
-    .hud-pill.timer { left: 50%; top: 16px; transform: translateX(-50%); color: var(--amber); }
-    .hud-pill.kills { right: 16px; top: 16px; color: #ff9abf; }
-    .hud-pill.coords { left: 16px; bottom: 16px; color: var(--cyan); }
-    .hud-pill.team { right: 16px; bottom: 16px; color: #a7ffc8; }
+    .hud-bar {
+      min-height: 32px;
+      padding: 0 11px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .hud-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .hud-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 11px;
+    }
+
+    .hud-icon.red { color: #ff7c8f; }
+    .hud-icon.gold { color: #ffd15c; }
+    .hud-icon.blue { color: #8ad7ff; }
+
+    .hud-name {
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 4px;
+      color: #ffd15c;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .hud-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      background:
+        linear-gradient(90deg, #6a4526 0 45%, #f0c08b 46% 100%),
+        #f0c08b;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+    }
 
     .stats {
       display: grid;
@@ -626,7 +675,7 @@
 
   <header class="site-nav">
     <a class="brand" href="#top" aria-label="Inicio">
-      <img src="assets/quickhud-logo.webp" alt="Logo de QuickHud">
+      <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="Logo de QuickHud">
       <span>QuickHud Wiki</span>
     </a>
     <nav class="nav-links" aria-label="Navegacion principal">
@@ -653,13 +702,21 @@
         </div>
         <div class="hud-preview" aria-hidden="true">
           <div class="screen">
-            <div class="hud-pill players">Players: 12</div>
-            <div class="hud-pill timer">05:00</div>
-            <div class="hud-pill kills">Kills: 7</div>
-            <div class="hud-pill coords">XYZ 120 64 -32</div>
-            <div class="hud-pill team">Team Red</div>
+            <div class="hud-stack">
+              <div class="hud-bar">
+                <span class="hud-stat"><span class="hud-icon red">♟</span>1</span>
+                <span class="hud-stat"><span class="hud-icon red">☠</span>10</span>
+                <span class="hud-stat"><span class="hud-icon gold">☀</span>-73</span>
+                <span class="hud-stat"><span class="hud-icon blue">◎</span>80</span>
+                <span class="hud-stat">-19</span>
+              </div>
+              <div class="hud-name">
+                <span class="hud-avatar"></span>
+                <span>DummyAH</span>
+              </div>
+            </div>
             <div class="logo-orb">
-              <img src="assets/quickhud-logo.webp" alt="">
+              <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="">
             </div>
           </div>
         </div>
