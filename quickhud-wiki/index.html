@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickHud Wiki</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b10;
+      --surface: #101820;
+      --surface-2: #16222c;
+      --line: #243545;
+      --text: #f2f7fb;
+      --muted: #a8b7c5;
+      --soft: #d7e5ef;
+      --green: #18e07a;
+      --green-2: #0fb45e;
+      --cyan: #48d7ff;
+      --amber: #ffc857;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(24, 224, 122, 0.19), transparent 30rem),
+        radial-gradient(circle at 82% 8%, rgba(72, 215, 255, 0.18), transparent 32rem),
+        linear-gradient(180deg, #070b10 0%, #0b1118 48%, #070b10 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px max(20px, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(7, 11, 16, 0.84);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .brand span {
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--soft);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .button {
+      border: 1px solid rgba(24, 224, 122, 0.55);
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #031008;
+      box-shadow: 0 12px 30px rgba(24, 224, 122, 0.18);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 54px;
+    }
+
+    .hero {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+    }
+
+    .hero-stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      min-height: 390px;
+      background:
+        linear-gradient(90deg, rgba(7, 11, 16, 0.96), rgba(7, 11, 16, 0.72)),
+        radial-gradient(circle at 72% 36%, rgba(24, 224, 122, 0.25), transparent 20rem),
+        linear-gradient(135deg, #111a23, #07101a);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      padding: 42px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(46px, 8vw, 86px);
+      line-height: 0.95;
+    }
+
+    .hero-copy {
+      max-width: 590px;
+      margin: 18px 0 0;
+      color: var(--soft);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .hud-preview {
+      position: relative;
+      min-height: 360px;
+      padding: 34px;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      min-height: 315px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(135deg, #162537, #0b1118);
+      background-size: 34px 34px, 34px 34px, auto;
+      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
+    }
+
+    .logo-orb {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: grid;
+      place-items: center;
+      width: 142px;
+      height: 142px;
+      border-radius: 32px;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 22px 46px rgba(0, 0, 0, 0.25);
+    }
+
+    .logo-orb img {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+    }
+
+    .hud-pill {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(7, 11, 16, 0.78);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .hud-pill.players { left: 16px; top: 16px; }
+    .hud-pill.timer { left: 50%; top: 16px; transform: translateX(-50%); color: var(--amber); }
+    .hud-pill.kills { right: 16px; top: 16px; color: #ff9abf; }
+    .hud-pill.coords { left: 16px; bottom: 16px; color: var(--cyan); }
+    .hud-pill.team { right: 16px; bottom: 16px; color: #a7ffc8; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat {
+      padding: 18px 20px;
+      background: rgba(16, 24, 32, 0.96);
+    }
+
+    .stat strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 34px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 26px;
+    }
+
+    .section-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(22, 34, 44, 0.96), rgba(12, 19, 27, 0.96));
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+    }
+
+    .panel.pad {
+      padding: 20px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .chip.green {
+      border-color: rgba(24, 224, 122, 0.28);
+      background: rgba(24, 224, 122, 0.12);
+      color: #a7ffc8;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    .command {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: rgba(16, 24, 32, 0.84);
+    }
+
+    code {
+      display: inline;
+      padding: 3px 6px;
+      border: 1px solid rgba(72, 215, 255, 0.24);
+      border-radius: 7px;
+      background: #07111a;
+      color: #dff6ff;
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+
+    .command code {
+      display: block;
+      width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .command p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .versions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .version {
+      min-height: 120px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(16, 24, 32, 0.86);
+    }
+
+    .version strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .version span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(16, 24, 32, 0.86);
+      color: var(--muted);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(24, 224, 122, 0.14);
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quick-links a {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .lang-switch {
+      position: fixed;
+      right: 18px;
+      top: 78px;
+      z-index: 20;
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(7, 11, 16, 0.82);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+    }
+
+    .lang-switch button,
+    .social-toggle {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .lang-switch button {
+      width: 38px;
+      height: 34px;
+      border-radius: 999px;
+      background: transparent;
+      font-size: 20px;
+    }
+
+    .lang-switch button.active {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .social-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+    }
+
+    .social-toggle {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #031008;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 16px 38px rgba(24, 224, 122, 0.22);
+    }
+
+    .social-menu {
+      position: absolute;
+      right: 0;
+      bottom: 62px;
+      display: none;
+      min-width: 190px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(16, 24, 32, 0.96);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    }
+
+    .social-widget.open .social-menu {
+      display: block;
+    }
+
+    .social-menu a {
+      display: block;
+      padding: 13px 15px;
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .social-menu a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    @media (max-width: 980px) {
+      .site-nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .grid,
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .versions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .command {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 16px;
+      }
+
+      .hero {
+        border-radius: 20px;
+      }
+
+      .hero-content {
+        padding: 28px 22px;
+      }
+
+      .hud-preview {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 50px;
+      }
+
+      .grid,
+      .versions,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .lang-switch {
+        top: auto;
+        right: 12px;
+        bottom: 82px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-switch" aria-label="Cambiar idioma">
+    <button class="active" type="button" data-lang="es" aria-label="Español">🇪🇸</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+  </div>
+
+  <header class="site-nav">
+    <a class="brand" href="#top" aria-label="Inicio">
+      <img src="assets/quickhud-logo.webp" alt="Logo de QuickHud">
+      <span>QuickHud Wiki</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegacion principal">
+      <a href="#info" data-i18n="navInfo">Info</a>
+      <a href="#comandos" data-i18n="navCommands">Comandos</a>
+      <a href="#versiones" data-i18n="navVersions">Versiones</a>
+      <a href="#tutorial" data-i18n="navTutorial">Tutorial</a>
+      <a class="button" href="https://modrinth.com/plugin/quickhud">Modrinth</a>
+      <a class="button secondary" href="https://www.curseforge.com/minecraft/mc-mods/quickhud">CurseForge</a>
+    </nav>
+  </header>
+
+  <main id="top" class="page">
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-stage">
+        <div class="hero-content">
+          <p class="kicker">Mod / Plugin</p>
+          <h1 id="title">QuickHud</h1>
+          <p class="hero-copy" data-i18n="heroCopy">HUD personalizable y controlado por servidor para mostrar jugadores vivos, kills, temporizadores, coordenadas y equipos en Minecraft.</p>
+          <div class="hero-actions">
+            <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
+            <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
+          </div>
+        </div>
+        <div class="hud-preview" aria-hidden="true">
+          <div class="screen">
+            <div class="hud-pill players">Players: 12</div>
+            <div class="hud-pill timer">05:00</div>
+            <div class="hud-pill kills">Kills: 7</div>
+            <div class="hud-pill coords">XYZ 120 64 -32</div>
+            <div class="hud-pill team">Team Red</div>
+            <div class="logo-orb">
+              <img src="assets/quickhud-logo.webp" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>1.2</strong>
+          <span data-i18n="latestVersion">Version mas reciente</span>
+        </div>
+        <div class="stat">
+          <strong>1.20.1 - 1.21.11</strong>
+          <span data-i18n="listedVersions">Versiones soportadas</span>
+        </div>
+        <div class="stat">
+          <strong>Client + Server</strong>
+          <span data-i18n="environment">Entorno soportado</span>
+        </div>
+        <div class="stat">
+          <strong>SunnyAIM_</strong>
+          <span data-i18n="creator">Creador / soporte</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="info" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="infoTitle">Informacion Del Plugin</h2>
+          <p data-i18n="infoLead">HUD ligero para servidores que quieren mostrar informacion clara sin depender del chat.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3 data-i18n="whatTitle">Que muestra</h3>
+          <p data-i18n="whatText">QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos con informacion controlada desde el servidor.</p>
+          <div class="chips">
+            <span class="chip green">Players</span>
+            <span class="chip green">Kills</span>
+            <span class="chip green">Timer</span>
+            <span class="chip green">Coords</span>
+            <span class="chip green">Team</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3 data-i18n="controlTitle">Control servidor</h3>
+          <p data-i18n="controlText">El plugin controla el HUD en tiempo real. Con mod + plugin tienes control completo desde el servidor; el mod solo tambien puede usar HUD local.</p>
+          <div class="chips">
+            <span class="chip">all</span>
+            <span class="chip">players</span>
+            <span class="chip">kills</span>
+            <span class="chip">timer</span>
+            <span class="chip">coords</span>
+            <span class="chip">team</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3>Loaders</h3>
+          <p data-i18n="loadersText">Descarga el archivo que coincida con tu version de Minecraft y plataforma. El plugin de servidor aparece como QuickHudPL.</p>
+          <div class="chips">
+            <span class="chip">Fabric</span>
+            <span class="chip">Forge</span>
+            <span class="chip">NeoForge</span>
+            <span class="chip">Bukkit</span>
+            <span class="chip">Paper</span>
+            <span class="chip">Purpur</span>
+            <span class="chip">Spigot</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="comandos" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="commandsTitle">Comandos</h2>
+          <p data-i18n="commandsLead">Comandos principales para mostrar, ocultar, mover, escalar y actualizar elementos del HUD.</p>
+        </div>
+      </div>
+      <div class="feed">
+        <article class="command">
+          <code>/hud show &lt;element&gt; [position] [scale] [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdShow">Muestra un elemento del HUD para todos, un jugador o un equipo.</p>
+        </article>
+        <article class="command">
+          <code>/hud hide &lt;element&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdHide">Oculta un elemento especifico del HUD.</p>
+        </article>
+        <article class="command">
+          <code>/hud pos &lt;element|all&gt; &lt;position&gt;</code>
+          <p data-i18n="cmdPos">Cambia la posicion de un elemento o de todos.</p>
+        </article>
+        <article class="command">
+          <code>/hud scale &lt;element|all&gt; &lt;value&gt;</code>
+          <p data-i18n="cmdScale">Ajusta el tamaño visual de uno o todos los elementos.</p>
+        </article>
+        <article class="command">
+          <code>/hud kills set|add|reset &lt;amount&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdKills">Controla el contador de kills por jugador, selector o equipo.</p>
+        </article>
+        <article class="command">
+          <code>/hud timer start|pause|resume|reset &lt;seconds&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTimer">Maneja temporizadores para eventos, minijuegos o rondas.</p>
+        </article>
+        <article class="command">
+          <code>/hud text set &lt;position&gt; &lt;text&gt;</code>
+          <p data-i18n="cmdText">Muestra texto personalizado en una posicion del HUD.</p>
+        </article>
+        <article class="command">
+          <code>/hud reset [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdReset">Restablece el HUD del objetivo seleccionado.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="positionsTitle">Posiciones</h2>
+          <p data-i18n="positionsLead">Puntos disponibles para ubicar elementos en pantalla.</p>
+        </div>
+      </div>
+      <div class="panel pad">
+        <div class="chips">
+          <span class="chip green">top_left</span>
+          <span class="chip">top_center</span>
+          <span class="chip">top_right</span>
+          <span class="chip">mid_left</span>
+          <span class="chip green">mid_center</span>
+          <span class="chip">mid_right</span>
+          <span class="chip">bottom_left</span>
+          <span class="chip">bottom_center</span>
+          <span class="chip">bottom_right</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="versiones" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="versionsTitle">Versiones Y Loaders</h2>
+          <p data-i18n="versionsLead">Compatibilidad indicada en Modrinth, revisada el 4 de mayo de 2026.</p>
+        </div>
+      </div>
+      <div class="versions">
+        <article class="version">
+          <strong>1.21.11</strong>
+          <span>QuickHud 1.2</span>
+          <span>Fabric / NeoForge</span>
+        </article>
+        <article class="version">
+          <strong>1.21.4</strong>
+          <span>QuickHud 1.2</span>
+          <span>Fabric / NeoForge</span>
+        </article>
+        <article class="version">
+          <strong>1.21 - 1.21.1</strong>
+          <span>QuickHud 1.2</span>
+          <span>Fabric / NeoForge</span>
+        </article>
+        <article class="version">
+          <strong>1.20.1</strong>
+          <span>QuickHud 1.2</span>
+          <span>Fabric / Forge</span>
+        </article>
+        <article class="version">
+          <strong>Plugin</strong>
+          <span>QuickHudPL 1.2</span>
+          <span>Bukkit / Paper / Purpur / Spigot</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="tutorial" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="tutorialTitle">Tutorial Rapido</h2>
+          <p data-i18n="tutorialLead">La ruta corta para probar QuickHud en servidor.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li data-i18n="step1">Instala el mod QuickHud en el cliente y el plugin QuickHudPL en el servidor si quieres control total.</li>
+        <li data-i18n="step2">Descarga el archivo correcto para tu loader: Fabric, Forge, NeoForge o plugin Bukkit/Paper/Purpur/Spigot.</li>
+        <li data-i18n="step3">Reinicia el cliente y el servidor para cargar el canal de comunicacion.</li>
+        <li data-i18n="step4">Prueba un elemento con <code>/hud show players top_left 1 @a</code>.</li>
+        <li data-i18n="step5">Inicia un timer con <code>/hud timer start 300 @a</code>.</li>
+        <li data-i18n="step6">Limpia la pantalla con <code>/hud reset @a</code>.</li>
+      </ol>
+    </section>
+
+    <section id="links" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="downloadTitle">Descargas</h2>
+          <p data-i18n="downloadLead">Accesos rapidos a las paginas principales del proyecto.</p>
+        </div>
+      </div>
+      <div class="quick-links">
+        <a href="https://modrinth.com/plugin/quickhud">Modrinth</a>
+        <a href="https://www.curseforge.com/minecraft/mc-mods/quickhud">CurseForge</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="social-widget" id="socialWidget">
+    <div class="social-menu" aria-label="Redes sociales">
+      <a href="https://x.com/SunnyDeb_">X / Twitter</a>
+      <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+    </div>
+    <button class="social-toggle" type="button" aria-label="Abrir redes" aria-expanded="false">↗</button>
+  </div>
+
+  <script>
+    const translations = {
+      es: {
+        navInfo: "Info",
+        navCommands: "Comandos",
+        navVersions: "Versiones",
+        navTutorial: "Tutorial",
+        heroCopy: "HUD personalizable y controlado por servidor para mostrar jugadores vivos, kills, temporizadores, coordenadas y equipos en Minecraft.",
+        seeCommands: "Ver comandos",
+        quickInstall: "Instalacion rapida",
+        latestVersion: "Version mas reciente",
+        listedVersions: "Versiones soportadas",
+        environment: "Entorno soportado",
+        creator: "Creador / soporte",
+        infoTitle: "Informacion Del Plugin",
+        infoLead: "HUD ligero para servidores que quieren mostrar informacion clara sin depender del chat.",
+        whatTitle: "Que muestra",
+        whatText: "QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos con informacion controlada desde el servidor.",
+        controlTitle: "Control servidor",
+        controlText: "El plugin controla el HUD en tiempo real. Con mod + plugin tienes control completo desde el servidor; el mod solo tambien puede usar HUD local.",
+        loadersText: "Descarga el archivo que coincida con tu version de Minecraft y plataforma. El plugin de servidor aparece como QuickHudPL.",
+        commandsTitle: "Comandos",
+        commandsLead: "Comandos principales para mostrar, ocultar, mover, escalar y actualizar elementos del HUD.",
+        cmdShow: "Muestra un elemento del HUD para todos, un jugador o un equipo.",
+        cmdHide: "Oculta un elemento especifico del HUD.",
+        cmdPos: "Cambia la posicion de un elemento o de todos.",
+        cmdScale: "Ajusta el tamaño visual de uno o todos los elementos.",
+        cmdKills: "Controla el contador de kills por jugador, selector o equipo.",
+        cmdTimer: "Maneja temporizadores para eventos, minijuegos o rondas.",
+        cmdText: "Muestra texto personalizado en una posicion del HUD.",
+        cmdReset: "Restablece el HUD del objetivo seleccionado.",
+        positionsTitle: "Posiciones",
+        positionsLead: "Puntos disponibles para ubicar elementos en pantalla.",
+        versionsTitle: "Versiones Y Loaders",
+        versionsLead: "Compatibilidad indicada en Modrinth, revisada el 4 de mayo de 2026.",
+        tutorialTitle: "Tutorial Rapido",
+        tutorialLead: "La ruta corta para probar QuickHud en servidor.",
+        step1: "Instala el mod QuickHud en el cliente y el plugin QuickHudPL en el servidor si quieres control total.",
+        step2: "Descarga el archivo correcto para tu loader: Fabric, Forge, NeoForge o plugin Bukkit/Paper/Purpur/Spigot.",
+        step3: "Reinicia el cliente y el servidor para cargar el canal de comunicacion.",
+        step4: 'Prueba un elemento con <code>/hud show players top_left 1 @a</code>.',
+        step5: 'Inicia un timer con <code>/hud timer start 300 @a</code>.',
+        step6: 'Limpia la pantalla con <code>/hud reset @a</code>.',
+        downloadTitle: "Descargas",
+        downloadLead: "Accesos rapidos a las paginas principales del proyecto."
+      },
+      en: {
+        navInfo: "Info",
+        navCommands: "Commands",
+        navVersions: "Versions",
+        navTutorial: "Guide",
+        heroCopy: "A customizable server-controlled HUD for showing alive players, kills, timers, coordinates and teams in Minecraft.",
+        seeCommands: "View commands",
+        quickInstall: "Quick install",
+        latestVersion: "Latest version",
+        listedVersions: "Supported versions",
+        environment: "Supported environment",
+        creator: "Creator / support",
+        infoTitle: "Plugin Info",
+        infoLead: "A lightweight HUD for servers that need clear information without relying on chat.",
+        whatTitle: "What it shows",
+        whatText: "QuickHud can show alive player count, per-player kills, timers, XYZ coordinates and team lists with server-controlled information.",
+        controlTitle: "Server control",
+        controlText: "The plugin controls the HUD in real time. Mod + plugin gives full server-side control; the mod alone can also run a local HUD.",
+        loadersText: "Download the file that matches your Minecraft version and platform. The server plugin is listed as QuickHudPL.",
+        commandsTitle: "Commands",
+        commandsLead: "Main commands for showing, hiding, moving, scaling and updating HUD elements.",
+        cmdShow: "Shows a HUD element for everyone, a player or a team.",
+        cmdHide: "Hides a specific HUD element.",
+        cmdPos: "Changes the position of one element or all elements.",
+        cmdScale: "Adjusts the visual size of one or all elements.",
+        cmdKills: "Controls the kill counter by player, selector or team.",
+        cmdTimer: "Manages timers for events, minigames or rounds.",
+        cmdText: "Shows custom text at a HUD position.",
+        cmdReset: "Resets the HUD for the selected target.",
+        positionsTitle: "Positions",
+        positionsLead: "Available screen points for placing HUD elements.",
+        versionsTitle: "Versions And Loaders",
+        versionsLead: "Compatibility shown on Modrinth, reviewed on May 4, 2026.",
+        tutorialTitle: "Quick Guide",
+        tutorialLead: "The short path to test QuickHud on a server.",
+        step1: "Install the QuickHud mod on the client and QuickHudPL on the server if you want full control.",
+        step2: "Download the correct file for your loader: Fabric, Forge, NeoForge or Bukkit/Paper/Purpur/Spigot plugin.",
+        step3: "Restart the client and server so the communication channel loads.",
+        step4: 'Test an element with <code>/hud show players top_left 1 @a</code>.',
+        step5: 'Start a timer with <code>/hud timer start 300 @a</code>.',
+        step6: 'Clear the screen with <code>/hud reset @a</code>.',
+        downloadTitle: "Downloads",
+        downloadLead: "Quick access to the main project pages."
+      }
+    };
+
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const lang = button.dataset.lang;
+        document.documentElement.lang = lang;
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          const value = translations[lang][node.dataset.i18n];
+          if (value) node.innerHTML = value;
+        });
+        document.querySelectorAll("[data-lang]").forEach((item) => item.classList.toggle("active", item === button));
+      });
+    });
+
+    const socialWidget = document.getElementById("socialWidget");
+    const socialButton = socialWidget.querySelector(".social-toggle");
+    socialButton.addEventListener("click", () => {
+      const open = socialWidget.classList.toggle("open");
+      socialButton.setAttribute("aria-expanded", String(open));
+    });
+  </script>
+</body>
+</html>
