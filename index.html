@@ -12,35 +12,112 @@
     body {
       margin: 0;
       min-height: 100vh;
+      color: #fff8ff;
+      background:
+        linear-gradient(180deg, rgba(6, 5, 12, 0.48), rgba(6, 5, 12, 0.86)),
+        #08070d;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .nav {
+      width: min(980px, calc(100% - 28px));
+      min-height: 62px;
+      margin: 18px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(8, 7, 13, 0.7);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand,
+    .button {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff8ff;
+      text-decoration: none;
+      font-weight: 850;
+    }
+
+    .brand {
+      border-color: transparent;
+      background: transparent;
+      padding-left: 4px;
+    }
+
+    .logo-dot {
+      width: 38px;
+      height: 38px;
       display: grid;
       place-items: center;
-      background: #08070d;
-      color: #fff8ff;
-      font-family: Arial, Helvetica, sans-serif;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff7ce5, #ffe08a);
+      color: #130812;
+      font-weight: 950;
     }
 
     main {
-      width: min(900px, calc(100% - 32px));
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+      padding: 54px 18px;
+    }
+
+    .panel {
+      width: min(900px, 100%);
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(14, 10, 22, 0.68);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
       text-align: center;
+      backdrop-filter: blur(22px);
+    }
+
+    .kicker {
+      margin: 0 0 14px;
+      color: #ffe08a;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     h1 {
-      margin: 0 0 28px;
-      font-size: 44px;
+      margin: 0 0 24px;
+      font-size: 52px;
+      line-height: 1;
     }
 
     .cards {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
+      gap: 14px;
+      margin-top: 24px;
     }
 
     .card {
+      min-height: 230px;
       display: grid;
       place-items: center;
-      min-height: 240px;
-      padding: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      gap: 10px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.07);
       color: #fff8ff;
@@ -48,64 +125,27 @@
       transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
+    .card:hover,
+    .button:hover {
+      transform: translateY(-2px);
       border-color: rgba(255, 124, 229, 0.7);
       background: rgba(255, 255, 255, 0.12);
     }
 
     .card img {
-      width: 96px;
-      height: 96px;
+      width: 108px;
+      height: 108px;
       object-fit: contain;
-      margin-bottom: 16px;
     }
 
     .card strong {
-      display: block;
-      font-size: 28px;
+      font-size: 24px;
     }
 
     .card span {
-      display: block;
-      margin-top: 6px;
       color: rgba(255, 244, 255, 0.72);
-      font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     @media (max-width: 680px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 36px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>Sunny Wikis</h1>
-
-    <div class="cards">
-      <a class="card" href="https://jolty.us/animatedframes-wiki/">
-        <div>
-          <img src="https://cdn.modrinth.com/data/mAbDCyw6/74a82e58dea3dfe66207b816080cdd5dd7ec01b8_96.webp" alt="AnimatedFrames">
-          <strong>AnimatedFrames</strong>
-          <span>Abrir wiki</span>
-        </div>
-      </a>
-
-      <a class="card" href="https://jolty.us/quickhud-wiki/">
-        <div>
-          <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="QuickHud">
-          <strong>QuickHud</strong>
-          <span>Abrir wiki</span>
-        </div>
-      </a>
-    </div>
-  </main>
-</body>
-</html>
+      .nav {
