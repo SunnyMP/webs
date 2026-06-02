@@ -4,108 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sunny - Wikis</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: #08070d;
-      color: #fff8ff;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    main {
-      width: min(900px, calc(100% - 32px));
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0 0 28px;
-      font-size: 44px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .card {
-      display: grid;
-      place-items: center;
-      min-height: 240px;
-      padding: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.07);
-      color: #fff8ff;
-      text-decoration: none;
-      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(255, 124, 229, 0.7);
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .card img {
-      width: 96px;
-      height: 96px;
-      object-fit: contain;
-      margin-bottom: 16px;
-    }
-
-    .card strong {
-      display: block;
-      font-size: 28px;
-    }
-
-    .card span {
-      display: block;
-      margin-top: 6px;
-      color: rgba(255, 244, 255, 0.72);
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    @media (max-width: 680px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 36px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="weeb.css">
 </head>
 <body>
-  <main>
-    <h1>Sunny Wikis</h1>
-
-    <div class="cards">
-      <a class="card" href="https://jolty.us/animatedframes-wiki/">
-        <div>
-          <img src="https://cdn.modrinth.com/data/mAbDCyw6/74a82e58dea3dfe66207b816080cdd5dd7ec01b8_96.webp" alt="AnimatedFrames">
-          <strong>AnimatedFrames</strong>
-          <span>Abrir wiki</span>
-        </div>
+  <div class="wikis-page">
+    <header class="nav">
+      <a class="brand" href="index.html">
+        <img src="assets/S%20sunny.png" alt="">
+        <span>Sunny</span>
       </a>
+      <a class="nav-wiki" href="index.html">Portfolio</a>
+    </header>
 
-      <a class="card" href="https://jolty.us/quickhud-wiki/">
-        <div>
-          <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="QuickHud">
-          <strong>QuickHud</strong>
-          <span>Abrir wiki</span>
+    <main class="wiki-main">
+      <section class="wiki-panel glass-panel">
+        <p class="kicker">Wikis</p>
+        <h1>Documentacion</h1>
+        <div class="wiki-list">
+          <a class="wiki-card" href="https://jolty.us/animatedframes-wiki/">
+            <img src="assets/AnimatedFramesIcon512.png" alt="AnimatedFrames">
+            <strong>AnimatedFrames</strong>
+            <span>Abrir wiki</span>
+          </a>
+          <a class="wiki-card" href="https://jolty.us/quickhud-wiki/">
+            <img src="assets/QuickHudicon_mas_grande.png" alt="QuickHud">
+            <strong>QuickHud</strong>
+            <span>Abrir wiki</span>
+          </a>
         </div>
-      </a>
-    </div>
-  </main>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
