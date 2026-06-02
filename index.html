@@ -14,13 +14,19 @@
       min-height: 100vh;
       color: #fff8ff;
       background:
-        linear-gradient(180deg, rgba(6, 5, 12, 0.48), rgba(6, 5, 12, 0.86)),
+        radial-gradient(circle at 18% 12%, rgba(255, 124, 229, 0.22), transparent 30%),
+        radial-gradient(circle at 82% 18%, rgba(255, 224, 138, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(6, 5, 12, 0.5), rgba(6, 5, 12, 0.9)),
         #08070d;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     }
 
     a {
       color: inherit;
+    }
+
+    .wikis-page {
+      min-height: 100vh;
     }
 
     .nav {
@@ -39,7 +45,7 @@
     }
 
     .brand,
-    .button {
+    .nav-wiki {
       min-height: 38px;
       display: inline-flex;
       align-items: center;
@@ -52,6 +58,7 @@
       color: #fff8ff;
       text-decoration: none;
       font-weight: 850;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
     .brand {
@@ -60,7 +67,7 @@
       padding-left: 4px;
     }
 
-    .logo-dot {
+    .brand-logo {
       width: 38px;
       height: 38px;
       display: grid;
@@ -68,25 +75,30 @@
       border-radius: 8px;
       background: linear-gradient(135deg, #ff7ce5, #ffe08a);
       color: #130812;
+      font-size: 22px;
       font-weight: 950;
+      line-height: 1;
     }
 
-    main {
+    .wiki-main {
       min-height: calc(100vh - 80px);
       display: grid;
       place-items: center;
       padding: 54px 18px;
     }
 
-    .panel {
-      width: min(900px, 100%);
-      padding: 28px;
+    .glass-panel {
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       background: rgba(14, 10, 22, 0.68);
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
-      text-align: center;
       backdrop-filter: blur(22px);
+    }
+
+    .wiki-panel {
+      width: min(900px, 100%);
+      padding: 28px;
+      text-align: center;
     }
 
     .kicker {
@@ -104,14 +116,14 @@
       line-height: 1;
     }
 
-    .cards {
+    .wiki-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
       margin-top: 24px;
     }
 
-    .card {
+    .wiki-card {
       min-height: 230px;
       display: grid;
       place-items: center;
@@ -125,27 +137,71 @@
       transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
-    .card:hover,
-    .button:hover {
+    .wiki-card:hover,
+    .nav-wiki:hover {
       transform: translateY(-2px);
       border-color: rgba(255, 124, 229, 0.7);
       background: rgba(255, 255, 255, 0.12);
     }
 
-    .card img {
+    .wiki-card img {
       width: 108px;
       height: 108px;
       object-fit: contain;
     }
 
-    .card strong {
+    .wiki-card strong {
       font-size: 24px;
     }
 
-    .card span {
+    .wiki-card span {
       color: rgba(255, 244, 255, 0.72);
       font-weight: 800;
     }
 
     @media (max-width: 680px) {
       .nav {
+        width: min(100% - 20px, 980px);
+      }
+
+      .wiki-list {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wikis-page">
+    <header class="nav">
+      <a class="brand" href="./">
+        <span class="brand-logo">S</span>
+        <span>Sunny</span>
+      </a>
+      <a class="nav-wiki" href="portafolio/">Portfolio</a>
+    </header>
+
+    <main class="wiki-main">
+      <section class="wiki-panel glass-panel">
+        <p class="kicker">Wikis</p>
+        <h1>Documentacion</h1>
+        <div class="wiki-list">
+          <a class="wiki-card" href="https://jolty.us/animatedframes-wiki/">
+            <img src="https://cdn.modrinth.com/data/mAbDCyw6/74a82e58dea3dfe66207b816080cdd5dd7ec01b8_96.webp" alt="AnimatedFrames">
+            <strong>AnimatedFrames</strong>
+            <span>Abrir wiki</span>
+          </a>
+          <a class="wiki-card" href="https://jolty.us/quickhud-wiki/">
+            <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="QuickHud">
+            <strong>QuickHud</strong>
+            <span>Abrir wiki</span>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
