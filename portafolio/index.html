@@ -9,11 +9,12 @@
 </head>
 <body>
   <div class="video-bg" aria-hidden="true">
-    <video class="active" src="assets/bg-mitsuha-stars.mp4" autoplay muted playsinline loop preload="auto"></video>
-    <video src="assets/bg-rezero-scene.mp4" muted playsinline loop preload="auto"></video>
-    <video src="assets/bg-rezero-voice-ost.mp4" muted playsinline loop preload="auto"></video>
-    <video src="assets/bg-itadori-higurama.mp4" muted playsinline loop preload="auto"></video>
-    <video src="assets/bg-anime-scenery.mp4" muted playsinline loop preload="auto"></video>
+    <video src="assets/bg-mitsuha-stars.mp4" muted playsinline loop preload="none"></video>
+    <video src="assets/bg-rezero-scene.mp4" muted playsinline loop preload="none"></video>
+    <video src="assets/bg-rezero-voice-ost.mp4" muted playsinline loop preload="none"></video>
+    <video src="assets/bg-itadori-higurama.mp4" muted playsinline loop preload="none"></video>
+    <video src="assets/bg-anime-scenery.mp4" muted playsinline loop preload="none"></video>
+    <video src="assets/bg-huevoinfinito.mp4" muted playsinline loop preload="none"></video>
   </div>
   <div class="shade" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
@@ -254,70 +255,90 @@
   </div>
 
   <script>
+    const videoBg = document.querySelector(".video-bg");
     const videos = Array.from(document.querySelectorAll(".video-bg video"));
-    let currentVideo = Math.floor(Math.random() * videos.length);
-    let nextVideoTimer;
 
-    function prepareVideo(video) {
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.defaultPlaybackRate = 0.5;
-      video.playbackRate = 0.5;
-    }
+    // PC de gama baja: deshabilita video completamente
+    const isLowEnd =
+      (navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 2) ||
+      (navigator.deviceMemory != null && navigator.deviceMemory <= 2);
 
-    function playActiveVideo() {
-      videos.forEach((video, index) => {
-        prepareVideo(video);
-        if (index === currentVideo) {
-          video.classList.add("active");
-          video.play().catch(() => {});
+    if (isLowEnd) {
+      videoBg.style.display = "none";
+    } else {
+      let current = Math.floor(Math.random() * videos.length);
+      let switchTimer = null;
+      let preloadTimer = null;
+      let nextIndex = -1;
+
+      function setup(v) {
+        v.muted = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.defaultPlaybackRate = 0.5;
+        v.playbackRate = 0.5;
+      }
+
+      function loadAndPlay(v) {
+        setup(v);
+        if (v.preload === "none") {
+          v.preload = "auto";
+          v.load();
+        }
+        v.play().catch(() => {});
+        v.classList.add("active");
+      }
+
+      function unload(v) {
+        v.classList.remove("active");
+        setTimeout(() => {
+          v.pause();
+          v.preload = "none";
+          v.src = v.src; // libera buffer
+        }, 1600);
+      }
+
+      function pickNext() {
+        if (videos.length < 2) return current;
+        let n = current;
+        while (n === current) n = Math.floor(Math.random() * videos.length);
+        return n;
+      }
+
+      function scheduleSwitch() {
+        clearTimeout(switchTimer);
+        clearTimeout(preloadTimer);
+        const delay = 14000 + Math.floor(Math.random() * 12000);
+
+        // Precarga el siguiente ~5s antes de cambiar
+        preloadTimer = setTimeout(() => {
+          nextIndex = pickNext();
+          setup(videos[nextIndex]);
+          videos[nextIndex].preload = "auto";
+          videos[nextIndex].load();
+        }, Math.max(0, delay - 5000));
+
+        switchTimer = setTimeout(() => {
+          unload(videos[current]);
+          current = nextIndex >= 0 ? nextIndex : pickNext();
+          nextIndex = -1;
+          loadAndPlay(videos[current]);
+          scheduleSwitch();
+        }, delay);
+      }
+
+      // Pausa cuando la pestaña no está visible
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          videos[current].pause();
         } else {
-          video.classList.remove("active");
-          video.pause();
+          videos[current].play().catch(() => {});
         }
       });
+
+      loadAndPlay(videos[current]);
+      scheduleSwitch();
     }
-
-    function pickNextVideo() {
-      if (videos.length < 2) return currentVideo;
-      let next = currentVideo;
-      while (next === currentVideo) {
-        next = Math.floor(Math.random() * videos.length);
-      }
-      return next;
-    }
-
-    function randomDelay() {
-      return 14000 + Math.floor(Math.random() * 12000);
-    }
-
-    function scheduleNextVideo() {
-      window.clearTimeout(nextVideoTimer);
-      nextVideoTimer = window.setTimeout(() => {
-        videos[currentVideo].pause();
-        videos[currentVideo].classList.remove("active");
-        currentVideo = pickNextVideo();
-        playActiveVideo();
-        scheduleNextVideo();
-      }, randomDelay());
-    }
-
-    videos.forEach((video) => {
-      prepareVideo(video);
-      video.addEventListener("canplay", playActiveVideo, { once: true });
-    });
-
-    playActiveVideo();
-    scheduleNextVideo();
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        playActiveVideo();
-        scheduleNextVideo();
-      }
-    });
-    window.addEventListener("focus", playActiveVideo);
-    window.addEventListener("pointerdown", playActiveVideo);
   </script>
 </body>
 </html>
