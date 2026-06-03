@@ -56,8 +56,11 @@ video {
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  filter: saturate(1.08) contrast(0.96);
   transition: opacity 1400ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-bg { display: none; }
 }
 
 .video-bg video.active {
