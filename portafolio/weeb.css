@@ -701,3 +701,30 @@ h3 {
     grid-column: span 1;
   }
 }
+
+/* ─── Botón de idioma ──────────────────────────────────────────────────────── */
+.lang-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(14, 10, 22, 0.72);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  padding: 0;
+}
+
+.lang-btn:hover {
+  transform: scale(1.12);
+  border-color: rgba(255, 124, 229, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+}
