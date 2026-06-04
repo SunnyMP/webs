@@ -701,6 +701,220 @@ h3 {
   }
 }
 
+/* ─── Tabs ─────────────────────────────────────────────────────────────────── */
+.tab-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--text);
+}
+
+.tab-btn.active {
+  border-color: var(--pink);
+  background: rgba(255, 124, 229, 0.12);
+  color: var(--text);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  align-items: start;
+}
+
+/* ─── Collapsible eventos ───────────────────────────────────────────────────── */
+.collapsible-head {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapse-btn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 1rem;
+  transition: transform 0.22s ease, border-color 0.16s ease, color 0.16s ease;
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+  border-color: var(--pink);
+  color: var(--text);
+}
+
+.collapsible-body {
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+  max-height: 2000px;
+  opacity: 1;
+}
+
+.collapsible-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.collapse-btn.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* ─── Creadores ────────────────────────────────────────────────────────────── */
+.creators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.creator-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 20px 22px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  transition: border-color 0.18s ease, background 0.18s ease;
+  text-align: center;
+}
+
+.creator-card:hover {
+  border-color: rgba(255, 124, 229, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.creator-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--line);
+  transition: border-color 0.18s ease;
+}
+
+.creator-card:hover .creator-avatar {
+  border-color: var(--pink);
+}
+
+.creator-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.creator-role {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.creator-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.creator-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.creator-links a:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.creator-links a.yt   { border-color: rgba(255, 80,  80,  0.5); color: #ff7070; }
+.creator-links a.yt:hover { background: rgba(255, 80, 80, 0.15); border-color: #ff5050; }
+.creator-links a.x    { border-color: rgba(255, 255, 255, 0.3); }
+.creator-links a.kick { border-color: rgba(83, 252, 103, 0.4); color: #53fc67; }
+.creator-links a.kick:hover { background: rgba(83, 252, 103, 0.1); border-color: #53fc67; }
+.creator-links a.twitch { border-color: rgba(169, 112, 255, 0.5); color: #a970ff; }
+.creator-links a.twitch:hover { background: rgba(169, 112, 255, 0.15); border-color: #a970ff; }
+
+.creator-projects {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.creator-projects-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.creator-projects a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  color: var(--soft);
+  transition: background 0.16s ease, border-color 0.16s ease;
+  text-align: left;
+}
+
+.creator-projects a:hover {
+  background: rgba(255, 80, 80, 0.1);
+  border-color: rgba(255, 80, 80, 0.4);
+}
+
+.creator-projects a::before {
+  content: "▶";
+  font-size: 0.65rem;
+  color: #ff7070;
+  flex-shrink: 0;
+}
+
 /* ─── Botón de idioma ──────────────────────────────────────────────────────── */
 .lang-btn {
   position: fixed;
