@@ -737,14 +737,10 @@ h3 {
 
 .tab-panel.active {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
   padding: 16px;
   align-items: start;
-}
-
-#studios-panel.tab-panel.active {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* ─── Collapsible eventos ───────────────────────────────────────────────────── */
@@ -803,29 +799,12 @@ h3 {
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  min-height: 252px;
   padding: 28px 20px 22px;
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
   transition: border-color 0.18s ease, background 0.18s ease;
   text-align: center;
-}
-
-.creator-featured {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 112px minmax(180px, 0.8fr) minmax(280px, 1.4fr);
-  grid-template-areas:
-    "avatar name projects"
-    "avatar links projects"
-    "avatar role projects";
-  align-items: center;
-  column-gap: 22px;
-  row-gap: 10px;
-  min-height: 0;
-  padding: 22px;
-  text-align: left;
 }
 
 .creator-card:hover {
@@ -842,12 +821,6 @@ h3 {
   transition: border-color 0.18s ease;
 }
 
-.creator-featured .creator-avatar {
-  grid-area: avatar;
-  width: 104px;
-  height: 104px;
-}
-
 .creator-card:hover .creator-avatar {
   border-color: var(--pink);
 }
@@ -857,11 +830,6 @@ h3 {
   font-size: 1.05rem;
 }
 
-.creator-featured h3 {
-  grid-area: name;
-  font-size: 1.28rem;
-}
-
 .creator-role {
   margin: 0;
   font-size: 0.8rem;
@@ -869,20 +837,11 @@ h3 {
   line-height: 1.5;
 }
 
-.creator-featured .creator-role {
-  grid-area: role;
-}
-
 .creator-links {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
-}
-
-.creator-featured .creator-links {
-  grid-area: links;
-  justify-content: flex-start;
 }
 
 .creator-links a {
@@ -921,11 +880,6 @@ h3 {
   margin-top: 4px;
 }
 
-.creator-featured .creator-projects {
-  grid-area: projects;
-  margin-top: 0;
-}
-
 .creator-projects-label {
   font-size: 0.68rem;
   text-transform: uppercase;
@@ -962,49 +916,6 @@ h3 {
 }
 
 /* ─── Botón de idioma ──────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .tab-panel.active {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  #studios-panel.tab-panel.active {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .creator-featured {
-    grid-template-columns: 104px minmax(0, 1fr);
-    grid-template-areas:
-      "avatar name"
-      "avatar links"
-      "role role"
-      "projects projects";
-  }
-}
-
-@media (max-width: 620px) {
-  .tab-panel.active {
-    grid-template-columns: 1fr;
-    padding: 12px;
-  }
-
-  #studios-panel.tab-panel.active {
-    grid-template-columns: 1fr;
-  }
-
-  .creator-card,
-  .creator-featured {
-    display: flex;
-    align-items: center;
-    min-height: 0;
-    padding: 22px 16px;
-    text-align: center;
-  }
-
-  .creator-featured .creator-links {
-    justify-content: center;
-  }
-}
-
 .lang-btn {
   position: fixed;
   bottom: 20px;
