@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ODT Open Document Editor: editor local de documentos y PDF para Windows.">
+  <meta name="theme-color" content="#316fd3">
+  <title>ODT — Open Document Editor</title>
+  <link rel="icon" href="assets/odt-icon.png">
+  <style>
+    :root {
+      --blue: #316fd3;
+      --blue-dark: #2459ad;
+      --blue-soft: #edf4ff;
+      --ink: #17233a;
+      --muted: #647087;
+      --line: #e1e6ee;
+      --surface: #f6f8fb;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--white); font-family: Aptos, Calibri, "Segoe UI", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+    header { position: sticky; z-index: 20; top: 0; border-bottom: 1px solid rgba(225,230,238,.9); background: rgba(255,255,255,.94); backdrop-filter: blur(14px); }
+    nav { height: 72px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; }
+    .brand img { width: 38px; height: 38px; border-radius: 9px; }
+    .brand span { display: grid; line-height: 1; }
+    .brand strong { font-size: 16px; letter-spacing: .04em; }
+    .brand small { margin-top: 5px; color: var(--muted); font-size: 10px; }
+    .nav-links { display: flex; gap: 30px; color: #526078; font-size: 13px; }
+    .nav-links a:hover { color: var(--blue); }
+    .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; padding: 0 20px; border: 1px solid var(--blue); border-radius: 9px; color: var(--white); background: var(--blue); box-shadow: 0 8px 20px rgba(49,111,211,.18); font-size: 13px; font-weight: 750; transition: .18s ease; }
+    .button:hover { border-color: var(--blue-dark); background: var(--blue-dark); transform: translateY(-1px); }
+    .button-small { min-height: 40px; padding-inline: 17px; }
+    .button-secondary { border-color: var(--line); color: var(--ink); background: var(--white); box-shadow: none; }
+    .button-secondary:hover { border-color: #bdc8d9; color: var(--blue); background: var(--surface); }
+    .hero { min-height: 650px; display: grid; grid-template-columns: .92fr 1.08fr; align-items: center; gap: 70px; padding-block: 74px 82px; overflow: hidden; }
+    .badge, .label { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+    .badge { display: inline-flex; padding: 8px 11px; border-radius: 999px; background: var(--blue-soft); letter-spacing: .05em; text-transform: none; }
+    h1 { max-width: 600px; margin: 22px 0 0; font-size: clamp(48px,5.2vw,70px); line-height: 1.02; letter-spacing: -.052em; }
+    .hero-copy > p { max-width: 550px; margin: 24px 0 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+    .actions { display: flex; gap: 11px; margin-top: 30px; }
+    .notes { display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 17px; color: #8490a4; font-size: 11px; }
+    .notes span::before { content: "✓"; margin-right: 5px; color: var(--blue); font-weight: 800; }
+    .product { width: 660px; overflow: hidden; border: 1px solid #d8e0ec; border-radius: 14px; background: #eef2f7; box-shadow: 0 28px 70px rgba(27,46,78,.17); }
+    .window-bar, .file-bar, .tool-bar, .status-bar { display: flex; align-items: center; }
+    .window-bar { height: 42px; justify-content: space-between; padding: 0 14px; color: white; background: var(--blue); font-size: 10px; }
+    .window-brand { display: flex; align-items: center; gap: 7px; }
+    .window-brand img { width: 24px; height: 24px; border-radius: 5px; }
+    .file-bar { height: 38px; gap: 22px; padding: 0 17px; border-bottom: 1px solid var(--line); color: #55627a; background: white; font-size: 9px; }
+    .tool-bar { height: 45px; gap: 14px; padding: 0 17px; border-bottom: 1px solid var(--line); color: #3f4d66; background: white; font-size: 10px; }
+    .select { min-width: 98px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px; }
+    .editor-area { min-height: 390px; display: grid; place-items: center; padding: 28px; }
+    .page { width: 72%; min-height: 340px; padding: 42px 44px; background: white; box-shadow: 0 7px 24px rgba(25,43,73,.1); }
+    .page small { color: var(--blue); font-size: 7px; font-weight: 800; letter-spacing: .14em; }
+    .page h2 { margin: 13px 0; font-size: 26px; letter-spacing: -.03em; }
+    .page p { color: #6a768b; font-size: 10px; line-height: 1.7; }
+    .line { width: 68%; height: 6px; margin-top: 9px; border-radius: 4px; background: #dbe2ec; }
+    .line.wide { width: 100%; }
+    .line.short { width: 42%; }
+    .doc-row { display: grid; grid-template-columns: 95px 1fr; gap: 18px; align-items: center; margin-top: 27px; }
+    .image { height: 74px; border-radius: 6px; background: var(--blue-soft); }
+    .status-bar { height: 26px; justify-content: space-between; padding: 0 13px; color: #7d899d; background: white; font-size: 8px; }
+    .benefits { border-block: 1px solid var(--line); background: var(--surface); }
+    .benefits .container { min-height: 74px; display: grid; grid-template-columns: repeat(3,1fr); align-items: center; }
+    .benefits span { color: var(--muted); font-size: 12px; text-align: center; }
+    .benefits b { margin-right: 6px; color: var(--ink); }
+    .section { padding-block: 105px; }
+    .title { max-width: 670px; margin-bottom: 46px; }
+    .title h2, .formats h2, .privacy h2, .download h2 { margin: 12px 0 0; font-size: clamp(36px,4vw,52px); line-height: 1.06; letter-spacing: -.043em; }
+    .title p, .privacy p { margin: 17px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+    .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .card { min-height: 235px; padding: 28px; border: 1px solid var(--line); border-radius: 13px; }
+    .icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; color: var(--blue); background: var(--blue-soft); font-size: 15px; font-weight: 800; }
+    .card h3 { margin: 43px 0 11px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .formats { padding-block: 90px; color: white; background: #18263e; }
+    .formats-inner { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; align-items: center; }
+    .formats .label { color: #91b7f2; }
+    .formats h2 { max-width: 490px; font-size: 42px; }
+    .format-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .format-list span { min-width: 76px; padding: 14px 16px; border: 1px solid #3a4961; border-radius: 8px; color: #c5cfde; text-align: center; font-size: 11px; font-weight: 800; }
+    .format-list span:nth-child(-n+2) { border-color: #5e8bd4; color: white; background: #2c5fae; }
+    .privacy { display: grid; grid-template-columns: 1.15fr .85fr; gap: 100px; align-items: center; padding-block: 100px; }
+    .privacy-points { display: grid; gap: 10px; }
+    .privacy-points span { padding: 15px 18px; border: 1px solid #d8e4f6; border-radius: 9px; color: #42516a; background: #f6f9fe; font-size: 13px; }
+    .download { min-height: 225px; display: flex; align-items: center; justify-content: space-between; gap: 35px; margin-bottom: 75px; padding: 46px 55px; border-radius: 17px; color: white; background: var(--blue); }
+    .download .label { color: #d8e6fb; }
+    .download h2 { margin-top: 9px; font-size: 41px; }
+    .download p { margin: 12px 0 0; color: #dbe7fa; font-size: 13px; }
+    .button-light { flex: 0 0 auto; border-color: white; color: var(--blue); background: white; box-shadow: none; }
+    footer { min-height: 110px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    footer p { margin: 0; }
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; gap: 50px; }
+      .product { width: 100%; }
+      .formats-inner, .privacy { grid-template-columns: 1fr; gap: 40px; }
+    }
+    @media (max-width: 680px) {
+      .container { width: min(100% - 28px,1120px); }
+      nav { height: 66px; }
+      .nav-links { display: none; }
+      .hero { min-height: auto; padding-block: 52px 64px; }
+      h1 { font-size: 46px; }
+      .hero-copy > p { font-size: 15px; }
+      .actions { align-items: stretch; flex-direction: column; }
+      .notes { display: grid; }
+      .tool-bar { overflow: hidden; }
+      .editor-area { min-height: 330px; padding: 20px; }
+      .page { width: 88%; min-height: 290px; padding: 34px 28px; }
+      .benefits .container { grid-template-columns: 1fr; gap: 12px; padding-block: 22px; }
+      .section { padding-block: 75px; }
+      .features { grid-template-columns: 1fr; }
+      .formats { padding-block: 70px; }
+      .format-list span { flex: 1 0 28%; }
+      .privacy { padding-block: 75px; }
+      .download { align-items: stretch; flex-direction: column; margin-bottom: 50px; padding: 38px 25px; }
+      footer { min-height: 170px; align-items: flex-start; flex-direction: column; justify-content: center; gap: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="container" aria-label="Navegación principal">
+      <a class="brand" href="#inicio">
+        <img src="assets/odt-icon.png" alt="">
+        <span><strong>ODT</strong><small>Open Document Editor</small></span>
+      </a>
+      <div class="nav-links">
+        <a href="#funciones">Funciones</a>
+        <a href="#formatos">Formatos</a>
+        <a href="#privacidad">Privacidad</a>
+      </div>
+      <a class="button button-small" href="https://github.com/SunnyMP/odt-open-document-editor/releases/download/v0.0.1/ODT.Open.Document.Editor.Setup.0.0.1.exe">Descargar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container" id="inicio">
+      <div class="hero-copy">
+        <span class="badge">Versión 0.0.1 · Windows</span>
+        <h1>Un editor claro para todos tus documentos.</h1>
+        <p>Escribe, abre y exporta documentos desde una aplicación de escritorio rápida, privada y fácil de usar.</p>
+        <div class="actions">
+          <a class="button" href="https://github.com/SunnyMP/odt-open-document-editor/releases/download/v0.0.1/ODT.Open.Document.Editor.Setup.0.0.1.exe">Descargar para Windows <span>↓</span></a>
+          <a class="button button-secondary" href="https://github.com/SunnyMP/odt-open-document-editor">Ver proyecto <span>↗</span></a>
+        </div>
+        <div class="notes"><span>Windows 10 y 11</span><span>No requiere Node.js</span><span>Instalador completo</span></div>
+      </div>
+
+      <div class="product" aria-label="Vista previa de ODT">
+        <div class="window-bar"><div class="window-brand"><img src="assets/odt-icon.png" alt=""><b>ODT</b></div><span>—　□　×</span></div>
+        <div class="file-bar"><b>Nuevo</b><span>Abrir</span><span>Guardar</span><span>Imprimir</span></div>
+        <div class="tool-bar"><span class="select">Texto normal⌄</span><span class="select">Aptos⌄</span><b>B</b><i>I</i><u>U</u><span>≡</span><span>☷</span></div>
+        <div class="editor-area">
+          <article class="page">
+            <small>DOCUMENTO NUEVO</small>
+            <h2>Ideas que toman forma.</h2>
+            <p>Escribe con comodidad y aplica el formato que necesitas sin perder de vista tu documento.</p>
+            <div class="line wide"></div><div class="line"></div>
+            <div class="doc-row"><div class="image"></div><div><div class="line wide"></div><div class="line wide"></div><div class="line short"></div></div></div>
+          </article>
+        </div>
+        <div class="status-bar"><span>Listo</span><span>42 palabras　100%　Guardado</span></div>
+      </div>
+    </section>
+
+    <section class="benefits"><div class="container"><span><b>Local</b> Tus archivos quedan en tu equipo</span><span><b>Simple</b> Instala y empieza a escribir</span><span><b>Flexible</b> Abre y exporta varios formatos</span></div></section>
+
+    <section class="section container" id="funciones">
+      <div class="title"><span class="label">Funciones principales</span><h2>Todo lo esencial, sin complicaciones.</h2><p>Una experiencia directa para escribir, revisar y compartir documentos.</p></div>
+      <div class="features">
+        <article class="card"><span class="icon">Aa</span><h3>Edición completa</h3><p>Títulos, fuentes, tamaños, colores, listas, tablas, imágenes y enlaces desde una interfaz familiar.</p></article>
+        <article class="card"><span class="icon">▧</span><h3>Documentos y PDF</h3><p>Abre los formatos más usados, consulta archivos PDF y trabaja con varios documentos en pestañas.</p></article>
+        <article class="card"><span class="icon">↗</span><h3>Guarda como quieras</h3><p>Exporta a DOCX, PDF, HTML, Markdown o TXT, y utiliza la impresión nativa de Windows.</p></article>
+      </div>
+    </section>
+
+    <section class="formats" id="formatos">
+      <div class="container formats-inner">
+        <div><span class="label">Compatibilidad</span><h2>Tus archivos habituales, en un solo lugar.</h2></div>
+        <div class="format-list"><span>DOCX</span><span>PDF</span><span>HTML</span><span>RTF</span><span>TXT</span><span>MD</span><span>CSV</span><span>JSON</span><span>XML</span><span>YAML</span></div>
+      </div>
+    </section>
+
+    <section class="privacy container" id="privacidad">
+      <div><span class="label">Privacidad</span><h2>Tus documentos son tuyos.</h2><p>ODT funciona en tu computadora. No requiere una cuenta, no abre servidores y no envía tus documentos a servicios externos.</p></div>
+      <div class="privacy-points"><span>✓ Sin registro</span><span>✓ Sin servidores locales</span><span>✓ Sin dependencias externas</span></div>
+    </section>
+
+    <section class="download container">
+      <div><span class="label">ODT 0.0.1</span><h2>Listo para escribir.</h2><p>Descarga el instalador para Windows. Todo lo necesario viene incluido.</p></div>
+      <a class="button button-light" href="https://github.com/SunnyMP/odt-open-document-editor/releases/download/v0.0.1/ODT.Open.Document.Editor.Setup.0.0.1.exe">Descargar instalador <span>↓</span></a>
+    </section>
+  </main>
+
+  <footer class="container">
+    <a class="brand" href="#inicio"><img src="assets/odt-icon.png" alt=""><span><strong>ODT</strong><small>Open Document Editor</small></span></a>
+    <p>Diseñado y desarrollado por Sunny.</p>
+    <span>Versión 0.0.1</span>
+  </footer>
+</body>
+</html>
