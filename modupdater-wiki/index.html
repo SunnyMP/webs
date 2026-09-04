@@ -137,8 +137,8 @@
     .hero-stage {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-      min-height: 390px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.7fr);
+      min-height: 300px;
       background:
         linear-gradient(90deg, rgba(13, 9, 4, 0.96), rgba(13, 9, 4, 0.72)),
         radial-gradient(circle at 72% 36%, rgba(255, 138, 61, 0.25), transparent 20rem),
@@ -196,15 +196,19 @@
 
     .hud-preview {
       position: relative;
-      min-height: 360px;
-      padding: 34px;
+      min-height: 260px;
+      padding: 30px;
+      display: grid;
+      place-items: center;
     }
 
     .screen {
       position: relative;
-      height: 100%;
-      min-height: 315px;
+      width: 220px;
+      height: 220px;
       overflow: hidden;
+      display: grid;
+      place-items: center;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 22px;
       background: #1f1409;
@@ -213,10 +217,9 @@
 
     .hud-capture {
       display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 315px;
-      object-fit: cover;
+      width: 76%;
+      height: 76%;
+      object-fit: contain;
     }
 
     .stats {
@@ -539,6 +542,7 @@
       <a href="#comandos">Comandos</a>
       <a href="#seguridad">Seguridad</a>
       <a href="#links">Links</a>
+      <a class="button" href="https://modrinth.com/mod/mod-updater">Modrinth</a>
     </nav>
   </header>
 
