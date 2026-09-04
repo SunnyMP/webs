@@ -131,22 +131,34 @@
       box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
     }
 
-    .hero-stage {
+    .hero-media {
       position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-      min-height: 390px;
+      min-height: 330px;
+      background: #101820;
+    }
+
+    .hero-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
       background:
-        linear-gradient(90deg, rgba(7, 11, 16, 0.96), rgba(7, 11, 16, 0.72)),
-        radial-gradient(circle at 72% 36%, rgba(24, 224, 122, 0.25), transparent 20rem),
-        linear-gradient(135deg, #111a23, #07101a);
+        linear-gradient(90deg, rgba(7, 11, 16, 0.94) 0%, rgba(7, 11, 16, 0.68) 48%, rgba(7, 11, 16, 0.14) 100%),
+        linear-gradient(180deg, transparent 55%, rgba(7, 11, 16, 0.82) 100%);
     }
 
     .hero-content {
       position: relative;
       z-index: 1;
       max-width: 650px;
-      padding: 42px;
+      padding: 40px;
     }
 
     .kicker {
@@ -189,31 +201,6 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 24px;
-    }
-
-    .hud-preview {
-      position: relative;
-      min-height: 360px;
-      padding: 34px;
-    }
-
-    .screen {
-      position: relative;
-      height: 100%;
-      min-height: 315px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 22px;
-      background: #101820;
-      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
-    }
-
-    .hud-capture {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 315px;
-      object-fit: cover;
     }
 
     .stats {
@@ -522,10 +509,6 @@
         justify-content: flex-start;
       }
 
-      .hero-stage {
-        grid-template-columns: 1fr;
-      }
-
       .grid,
       .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -550,12 +533,12 @@
         border-radius: 20px;
       }
 
-      .hero-content {
-        padding: 28px 22px;
+      .hero-media {
+        min-height: 420px;
       }
 
-      .hud-preview {
-        padding: 18px;
+      .hero-content {
+        padding: 28px 22px;
       }
 
       h1 {
@@ -605,7 +588,8 @@
 
   <main id="top" class="page">
     <section class="hero" aria-labelledby="title">
-      <div class="hero-stage">
+      <div class="hero-media">
+        <img src="assets/quickhud-preview.png" alt="Vista previa de QuickHud en Minecraft">
         <div class="hero-content">
           <p class="kicker">Mod / Plugin</p>
           <h1 id="title">QuickHud</h1>
@@ -613,11 +597,6 @@
           <div class="hero-actions">
             <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
             <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
-          </div>
-        </div>
-        <div class="hud-preview" aria-hidden="true">
-          <div class="screen">
-            <img class="hud-capture" src="assets/quickhud-preview.png" alt="Vista previa de QuickHud en Minecraft">
           </div>
         </div>
       </div>
