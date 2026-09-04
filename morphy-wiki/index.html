@@ -133,15 +133,27 @@
       box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
     }
 
-    .hero-stage {
+    .hero-media {
       position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.7fr);
-      min-height: 300px;
+      min-height: 330px;
+      background: #120c1f;
+    }
+
+    .hero-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
       background:
-        linear-gradient(90deg, rgba(7, 5, 16, 0.96), rgba(7, 5, 16, 0.72)),
-        radial-gradient(circle at 72% 36%, rgba(176, 107, 255, 0.25), transparent 20rem),
-        linear-gradient(135deg, #1a1128, #0a071a);
+        linear-gradient(90deg, rgba(7, 5, 16, 0.94) 0%, rgba(7, 5, 16, 0.68) 48%, rgba(7, 5, 16, 0.14) 100%),
+        linear-gradient(180deg, transparent 55%, rgba(7, 5, 16, 0.82) 100%);
     }
 
     .hero-content {
@@ -193,33 +205,6 @@
       margin-top: 24px;
     }
 
-    .hud-preview {
-      position: relative;
-      min-height: 260px;
-      padding: 30px;
-      display: grid;
-      place-items: center;
-    }
-
-    .screen {
-      position: relative;
-      width: 220px;
-      height: 220px;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 22px;
-      background: #120c1f;
-      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
-    }
-
-    .hud-capture {
-      display: block;
-      width: 76%;
-      height: 76%;
-      object-fit: contain;
-    }
 
     .stats {
       display: grid;
@@ -527,10 +512,6 @@
         justify-content: flex-start;
       }
 
-      .hero-stage {
-        grid-template-columns: 1fr;
-      }
-
       .grid,
       .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -555,12 +536,12 @@
         border-radius: 20px;
       }
 
-      .hero-content {
-        padding: 28px 22px;
+      .hero-media {
+        min-height: 420px;
       }
 
-      .hud-preview {
-        padding: 18px;
+      .hero-content {
+        padding: 28px 22px;
       }
 
       h1 {
@@ -609,7 +590,8 @@
 
   <main id="top" class="page">
     <section class="hero" aria-labelledby="title">
-      <div class="hero-stage">
+      <div class="hero-media">
+        <img src="assets/morphy-banner.png" alt="Banner de Morphy">
         <div class="hero-content">
           <p class="kicker">Mod</p>
           <h1 id="title">Morphy</h1>
@@ -617,11 +599,6 @@
           <div class="hero-actions">
             <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
             <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
-          </div>
-        </div>
-        <div class="hud-preview" aria-hidden="true">
-          <div class="screen">
-            <img class="hud-capture" src="assets/morphy-icon.png" alt="Logo de Morphy">
           </div>
         </div>
       </div>
