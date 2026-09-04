@@ -3,22 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AnimatedFrames Wiki</title>
+  <meta name="description" content="Guia oficial de Morphy: convierte en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo.">
+  <title>Morphy Wiki</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #080c13;
-      --surface: #111821;
-      --surface-2: #17212d;
-      --surface-3: #1d2a38;
-      --line: #273544;
-      --text: #f2f6fb;
-      --muted: #a8b3c2;
-      --soft: #d7e1ec;
-      --green: #1bd96a;
-      --green-2: #0fad57;
-      --blue: #53b7ff;
-      --pink: #ff80c7;
+      --bg: #070510;
+      --surface: #120c1f;
+      --surface-2: #191029;
+      --line: #2c2140;
+      --text: #f4f0fb;
+      --muted: #b6acc9;
+      --soft: #e2d9f2;
+      --green: #b06bff;
+      --green-2: #8b3fd1;
+      --cyan: #ff8a4c;
       --amber: #ffc857;
       --radius: 18px;
     }
@@ -34,9 +33,9 @@
     body {
       margin: 0;
       background:
-        radial-gradient(circle at 14% 0%, rgba(27, 217, 106, 0.18), transparent 30rem),
-        radial-gradient(circle at 84% 8%, rgba(83, 183, 255, 0.16), transparent 32rem),
-        linear-gradient(180deg, #080c13 0%, #0d1219 42%, #090d14 100%);
+        radial-gradient(circle at 16% 0%, rgba(176, 107, 255, 0.19), transparent 30rem),
+        radial-gradient(circle at 82% 8%, rgba(255, 138, 76, 0.16), transparent 32rem),
+        linear-gradient(180deg, #070510 0%, #0b0818 48%, #070510 100%);
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       line-height: 1.55;
@@ -57,7 +56,7 @@
       gap: 18px;
       padding: 12px max(20px, calc((100vw - 1180px) / 2));
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(8, 12, 19, 0.84);
+      background: rgba(7, 5, 16, 0.84);
       backdrop-filter: blur(16px);
     }
 
@@ -67,13 +66,13 @@
       gap: 10px;
       min-width: 0;
       font-weight: 800;
-      letter-spacing: 0;
     }
 
     .brand img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
     }
 
@@ -99,7 +98,7 @@
       border-radius: 999px;
       color: var(--soft);
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .nav-links a:hover {
@@ -107,10 +106,17 @@
     }
 
     .button {
-      border: 1px solid rgba(27, 217, 106, 0.55);
+      border: 1px solid rgba(176, 107, 255, 0.55);
       background: linear-gradient(180deg, var(--green), var(--green-2));
-      color: #031008;
-      box-shadow: 0 12px 30px rgba(27, 217, 106, 0.18);
+      color: #0e0518;
+      box-shadow: 0 12px 30px rgba(176, 107, 255, 0.18);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      box-shadow: none;
     }
 
     .page {
@@ -127,34 +133,22 @@
       box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
     }
 
-    .hero-media {
+    .hero-stage {
       position: relative;
-      min-height: 330px;
-      background: #101822;
-    }
-
-    .hero-media img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .hero-media::after {
-      content: "";
-      position: absolute;
-      inset: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      min-height: 390px;
       background:
-        linear-gradient(90deg, rgba(8, 12, 19, 0.94) 0%, rgba(8, 12, 19, 0.68) 48%, rgba(8, 12, 19, 0.14) 100%),
-        linear-gradient(180deg, transparent 55%, rgba(8, 12, 19, 0.82) 100%);
+        linear-gradient(90deg, rgba(7, 5, 16, 0.96), rgba(7, 5, 16, 0.72)),
+        radial-gradient(circle at 72% 36%, rgba(176, 107, 255, 0.25), transparent 20rem),
+        linear-gradient(135deg, #1a1128, #0a071a);
     }
 
     .hero-content {
       position: relative;
       z-index: 1;
       max-width: 650px;
-      padding: 40px;
+      padding: 42px;
     }
 
     .kicker {
@@ -164,7 +158,7 @@
       margin: 0 0 14px;
       color: var(--green);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
@@ -181,13 +175,12 @@
     h1 {
       margin: 0;
       color: #fff;
-      font-size: clamp(42px, 8vw, 82px);
+      font-size: clamp(46px, 8vw, 86px);
       line-height: 0.95;
-      letter-spacing: 0;
     }
 
     .hero-copy {
-      max-width: 560px;
+      max-width: 590px;
       margin: 18px 0 0;
       color: var(--soft);
       font-size: 18px;
@@ -200,11 +193,29 @@
       margin-top: 24px;
     }
 
-    .button.secondary {
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      box-shadow: none;
+    .hud-preview {
+      position: relative;
+      min-height: 360px;
+      padding: 34px;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      min-height: 315px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      background: #120c1f;
+      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
+    }
+
+    .hud-capture {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
     }
 
     .stats {
@@ -217,7 +228,7 @@
 
     .stat {
       padding: 18px 20px;
-      background: rgba(17, 24, 33, 0.96);
+      background: rgba(18, 12, 31, 0.96);
     }
 
     .stat strong {
@@ -247,11 +258,9 @@
       margin: 0;
       color: #fff;
       font-size: 26px;
-      letter-spacing: 0;
     }
 
-    .section-head p,
-    .section > p {
+    .section-head p {
       margin: 4px 0 0;
       color: var(--muted);
     }
@@ -265,7 +274,7 @@
     .panel {
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(23, 33, 45, 0.96), rgba(15, 22, 31, 0.96));
+      background: linear-gradient(180deg, rgba(25, 16, 41, 0.96), rgba(14, 9, 24, 0.96));
       box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
     }
 
@@ -301,13 +310,13 @@
       background: rgba(255, 255, 255, 0.06);
       color: var(--soft);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .chip.green {
-      border-color: rgba(27, 217, 106, 0.28);
-      background: rgba(27, 217, 106, 0.12);
-      color: #a7ffc8;
+      border-color: rgba(176, 107, 255, 0.28);
+      background: rgba(176, 107, 255, 0.12);
+      color: #ddc4ff;
     }
 
     .feed {
@@ -317,21 +326,21 @@
 
     .command {
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
       gap: 12px;
       padding: 16px;
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: var(--radius);
-      background: rgba(17, 24, 33, 0.82);
+      background: rgba(18, 12, 31, 0.84);
     }
 
     code {
       display: inline;
       padding: 3px 6px;
-      border: 1px solid rgba(83, 183, 255, 0.24);
+      border: 1px solid rgba(255, 138, 76, 0.24);
       border-radius: 7px;
-      background: #07111d;
-      color: #dff1ff;
+      background: #150c22;
+      color: #ffe4d1;
       font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
       font-size: 0.92em;
     }
@@ -349,16 +358,16 @@
 
     .versions {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
     }
 
     .version {
-      min-height: 112px;
+      min-height: 120px;
       padding: 14px;
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: 16px;
-      background: rgba(17, 24, 33, 0.86);
+      background: rgba(18, 12, 31, 0.86);
     }
 
     .version strong {
@@ -392,7 +401,8 @@
       padding: 14px;
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: 16px;
-      background: rgba(17, 24, 33, 0.86);
+      background: rgba(18, 12, 31, 0.86);
+      color: var(--muted);
     }
 
     .steps li::before {
@@ -402,7 +412,7 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: rgba(27, 217, 106, 0.14);
+      background: rgba(176, 107, 255, 0.14);
       color: var(--green);
       font-weight: 900;
     }
@@ -432,7 +442,7 @@
       padding: 6px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 999px;
-      background: rgba(8, 12, 19, 0.82);
+      background: rgba(7, 5, 16, 0.82);
       backdrop-filter: blur(14px);
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
     }
@@ -470,10 +480,10 @@
       height: 52px;
       border-radius: 50%;
       background: linear-gradient(180deg, var(--green), var(--green-2));
-      color: #031008;
+      color: #0e0518;
       font-size: 24px;
       font-weight: 900;
-      box-shadow: 0 16px 38px rgba(27, 217, 106, 0.22);
+      box-shadow: 0 16px 38px rgba(176, 107, 255, 0.22);
     }
 
     .social-menu {
@@ -485,7 +495,7 @@
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
-      background: rgba(17, 24, 33, 0.96);
+      background: rgba(18, 12, 31, 0.96);
       box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
     }
 
@@ -504,7 +514,7 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 980px) {
       .site-nav {
         align-items: flex-start;
         flex-direction: column;
@@ -514,10 +524,17 @@
         justify-content: flex-start;
       }
 
+      .hero-stage {
+        grid-template-columns: 1fr;
+      }
+
       .grid,
-      .versions,
       .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .versions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .command {
@@ -525,7 +542,7 @@
       }
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 640px) {
       .page {
         width: min(100% - 24px, 1180px);
         padding-top: 16px;
@@ -535,16 +552,16 @@
         border-radius: 20px;
       }
 
-      .hero-media {
-        min-height: 420px;
-      }
-
       .hero-content {
         padding: 28px 22px;
       }
 
+      .hud-preview {
+        padding: 18px;
+      }
+
       h1 {
-        font-size: 46px;
+        font-size: 50px;
       }
 
       .grid,
@@ -567,7 +584,7 @@
   </style>
   <link rel="stylesheet" href="../wiki-theme.css">
 </head>
-<body class="wiki-animatedframes">
+<body class="wiki-morphy">
   <div class="lang-switch" aria-label="Cambiar idioma">
     <button class="active" type="button" data-lang="es" aria-label="Español">🇪🇸</button>
     <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
@@ -575,48 +592,51 @@
 
   <header class="site-nav">
     <a class="brand" href="#top" aria-label="Inicio">
-      <img src="assets/animatedframes-icon.png" alt="Logo de AnimatedFrames">
-      <span data-i18n="brand">AnimatedFrames Wiki</span>
+      <img src="assets/morphy-icon.png" alt="Logo de Morphy">
+      <span>Morphy Wiki</span>
     </a>
     <nav class="nav-links" aria-label="Navegacion principal">
       <a href="#info" data-i18n="navInfo">Info</a>
       <a href="#comandos" data-i18n="navCommands">Comandos</a>
       <a href="#versiones" data-i18n="navVersions">Versiones</a>
       <a href="#tutorial" data-i18n="navTutorial">Tutorial</a>
-      <a class="button" href="https://modrinth.com/plugin/animated-frames">Modrinth</a>
-      <a class="button secondary" href="https://www.curseforge.com/minecraft/mc-mods/animated-frames">CurseForge</a>
+      <a class="button" href="https://modrinth.com/mod/morphy">Modrinth</a>
     </nav>
   </header>
 
   <main id="top" class="page">
     <section class="hero" aria-labelledby="title">
-      <div class="hero-media">
-        <img src="https://i.postimg.cc/TYS0qHpC/Animated-Frames-Baner.png" alt="Banner de AnimatedFrames">
+      <div class="hero-stage">
         <div class="hero-content">
-          <p class="kicker" data-i18n="kicker">Mod / Plugin</p>
-          <h1 id="title">AnimatedFrames</h1>
-          <p class="hero-copy" data-i18n="heroCopy">Muestra GIF, PNG, JPG, JPEG y MP4 en pantalla dentro de Minecraft usando comandos simples para eventos, servidores, anuncios y escenas.</p>
+          <p class="kicker">Mod</p>
+          <h1 id="title">Morphy</h1>
+          <p class="hero-copy" data-i18n="heroCopy">Conviertete en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo: modelos, tamaños y hitboxes sincronizados en tiempo real.</p>
           <div class="hero-actions">
             <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
             <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
           </div>
         </div>
+        <div class="hud-preview" aria-hidden="true">
+          <div class="screen">
+            <img class="hud-capture" src="assets/morphy-banner.png" alt="Arte de Morphy">
+          </div>
+        </div>
       </div>
       <div class="stats">
         <div class="stat">
-          <strong>1.6.2</strong>
-          <span data-i18n="latestVersion">Version mas reciente</span>
-        </div>
-        <div class="stat">
-          <strong>1.20.1, 1.21, 1.21.1, 1.21.4</strong>
+          <strong>1.21.1</strong>
           <span data-i18n="listedVersions">Versiones soportadas</span>
         </div>
         <div class="stat">
-          <strong>Watermedia</strong>
-          <span data-i18n="dependency">Dependencia principal</span>
+          <strong>1.20.1</strong>
+          <span data-i18n="listedVersions2">Tambien disponible</span>
         </div>
         <div class="stat">
-          <strong>SunnyAim_</strong>
+          <strong data-i18n="environmentTitle">Fabric / Forge / NeoForge</strong>
+          <span data-i18n="environment">Loaders soportados</span>
+        </div>
+        <div class="stat">
+          <strong>SunnyAIM_</strong>
           <span data-i18n="creator">Creador / soporte</span>
         </div>
       </div>
@@ -625,38 +645,39 @@
     <section id="info" class="section">
       <div class="section-head">
         <div>
-          <h2>Informacion Del Mod</h2>
-          <p data-i18n="infoLead">Todo lo basico para saber que hace, donde van los archivos y que necesita cada jugador.</p>
+          <img class="section-ribbon" src="assets/section-subtitle.png" alt="Mod">
+          <h2 class="sr-only" data-i18n="infoTitle">Informacion Del Mod</h2>
+          <p data-i18n="infoLead">Sistema de transformacion: convierte tu personaje en mobs o bloques con una GUI simple de buscar y previsualizar.</p>
         </div>
       </div>
       <div class="grid">
         <article class="panel pad">
           <h3 data-i18n="whatTitle">Que hace</h3>
-          <p data-i18n="whatText">AnimatedFrames permite reproducir imagenes, GIFs y videos MP4 como overlays en pantalla. Es ideal para eventos, intros, avisos, pantallas de rol y contenido decorativo.</p>
+          <p data-i18n="whatText">Morphy te permite transformarte en casi cualquier mob o bloque del juego, con modelo, tamaño y hitbox sincronizados para todos los jugadores.</p>
           <div class="chips">
-            <span class="chip green">GIF</span>
-            <span class="chip green">PNG</span>
-            <span class="chip green">JPG</span>
-            <span class="chip green">JPEG</span>
-            <span class="chip green">MP4</span>
+            <span class="chip green">Mobs</span>
+            <span class="chip green">Bloques</span>
+            <span class="chip green">Hitbox</span>
+            <span class="chip green">Sync</span>
           </div>
         </article>
         <article class="panel pad">
-          <h3 data-i18n="folderTitle">Carpeta local</h3>
-          <p data-i18n="folderText">Los medios se cargan desde la carpeta del cliente. Cada jugador que deba ver el contenido necesita tener el archivo en su propia instalacion.</p>
-          <p><code>.minecraft/config/animatedframes/media/</code></p>
+          <h3 data-i18n="controlTitle">Menu con vista previa</h3>
+          <p data-i18n="controlText">El menu en pantalla permite buscar y explorar cada morph disponible con una previsualizacion en vivo antes de aplicarlo.</p>
+          <div class="chips">
+            <span class="chip">Buscar</span>
+            <span class="chip">Explorar</span>
+            <span class="chip">Preview</span>
+          </div>
         </article>
         <article class="panel pad">
-          <h3>Loaders</h3>
-          <p data-i18n="loadersText">El proyecto lista soporte para mod y plugin segun plataforma. Descarga siempre el archivo que coincida con tu Minecraft y loader.</p>
+          <h3 data-i18n="loadersTitle">Compatibilidad</h3>
+          <p data-i18n="loadersText">Funciona con entidades modeadas ademas del contenido vanilla, y esta disponible para Fabric, Forge y NeoForge.</p>
           <div class="chips">
             <span class="chip">Fabric</span>
             <span class="chip">Forge</span>
             <span class="chip">NeoForge</span>
-            <span class="chip">Bukkit</span>
-            <span class="chip">Paper</span>
-            <span class="chip">Purpur</span>
-            <span class="chip">Spigot</span>
+            <span class="chip">Modded</span>
           </div>
         </article>
       </div>
@@ -666,58 +687,27 @@
       <div class="section-head">
         <div>
           <img class="section-ribbon" src="assets/section-commands.png" alt="Comandos">
-          <h2 class="sr-only">Comandos</h2>
-          <p data-i18n="commandsLead">Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos.</p>
+          <h2 class="sr-only" data-i18n="commandsTitle">Comandos</h2>
+          <p data-i18n="commandsLead">Comandos principales para abrir el menu y aplicar, quitar o restablecer tu morph.</p>
         </div>
       </div>
       <div class="feed">
         <article class="command">
-          <code>/mediac show &lt;name&gt; [duration] [position] [scale] [volume]</code>
-          <p data-i18n="cmdShow">Muestra un archivo solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code></p>
+          <code>/morph menu</code>
+          <p data-i18n="cmdMenu">Abre el menu grafico para buscar y previsualizar morphs disponibles.</p>
         </article>
         <article class="command">
-          <code>/mediac stop</code>
-          <p data-i18n="cmdStop">Detiene el medio actual del cliente.</p>
+          <code>/morph set &lt;mob_o_bloque&gt;</code>
+          <p data-i18n="cmdSet">Aplica el morph indicado directamente por comando.</p>
         </article>
         <article class="command">
-          <code>/mediac list</code>
-          <p data-i18n="cmdList">Lista los archivos disponibles en tu carpeta local.</p>
+          <code>/morph clear</code>
+          <p data-i18n="cmdClear">Quita el morph actual.</p>
         </article>
         <article class="command">
-          <code>/mediac lang &lt;en|es&gt;</code>
-          <p data-i18n="cmdLang">Cambia el idioma de los mensajes del mod.</p>
+          <code>/morph normal</code>
+          <p data-i18n="cmdNormal">Vuelve a tu forma de jugador normal.</p>
         </article>
-        <article class="command">
-          <code>/medias show &lt;player|@a&gt; &lt;name&gt; [duration] [position] [scale] [volume]</code>
-          <p data-i18n="cmdServerShow">Envia un medio a jugadores seleccionados. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code></p>
-        </article>
-        <article class="command">
-          <code>/medias stop &lt;player|@a&gt;</code>
-          <p data-i18n="cmdServerStop">Detiene el medio para jugadores seleccionados.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <h2>Posiciones</h2>
-          <p data-i18n="positionsLead">Opciones soportadas para ubicar el medio en pantalla.</p>
-        </div>
-      </div>
-      <div class="panel pad">
-        <div class="chips">
-          <span class="chip green">center</span>
-          <span class="chip">topleft</span>
-          <span class="chip">topright</span>
-          <span class="chip">bottomleft</span>
-          <span class="chip">bottomright</span>
-          <span class="chip">topcenter</span>
-          <span class="chip">bottomcenter</span>
-          <span class="chip">leftcenter</span>
-          <span class="chip">rightcenter</span>
-          <span class="chip green">fullscreen</span>
-        </div>
       </div>
     </section>
 
@@ -725,29 +715,19 @@
       <div class="section-head">
         <div>
           <h2 data-i18n="versionsTitle">Versiones Y Loaders</h2>
-          <p data-i18n="versionsLead">Compatibilidad indicada en las paginas publicas del proyecto, revisada el 4 de mayo de 2026.</p>
+          <p data-i18n="versionsLead">Compatibilidad indicada en Modrinth.</p>
         </div>
       </div>
       <div class="versions">
         <article class="version">
-          <strong>1.21.4</strong>
-          <span>AnimatedFrames 1.6.2</span>
-          <span>Fabric / NeoForge</span>
-        </article>
-        <article class="version">
           <strong>1.21.1</strong>
-          <span>AnimatedFrames 1.6.2</span>
-          <span>Fabric / NeoForge</span>
-        </article>
-        <article class="version">
-          <strong>1.21</strong>
-          <span>AnimatedFrames 1.6.2</span>
-          <span>Fabric / NeoForge</span>
+          <span>Morphy</span>
+          <span>Fabric / Forge / NeoForge</span>
         </article>
         <article class="version">
           <strong>1.20.1</strong>
-          <span>AnimatedFrames 1.6.2</span>
-          <span>Fabric / Forge</span>
+          <span>Morphy</span>
+          <span>Fabric / Forge / NeoForge</span>
         </article>
       </div>
     </section>
@@ -756,16 +736,15 @@
       <div class="section-head">
         <div>
           <h2 data-i18n="tutorialTitle">Tutorial Rapido</h2>
-          <p data-i18n="tutorialLead">La ruta corta para probarlo sin perderse.</p>
+          <p data-i18n="tutorialLead">Guia simple para empezar como en la pagina del proyecto.</p>
         </div>
       </div>
       <ol class="steps">
-        <li data-i18n="step1">Instala AnimatedFrames y Watermedia para tu version de Minecraft y loader.</li>
-        <li data-i18n="step2">Abre <code>.minecraft/config/animatedframes/media/</code>.</li>
-        <li data-i18n="step3">Copia tus archivos <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code>.</li>
-        <li data-i18n="step4">Comprueba la lista con <code>/mediac list</code>.</li>
-        <li data-i18n="step5">Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.</li>
-        <li data-i18n="step6">Para enviarlo a jugadores usa <code>/medias show @a sunny.gif 15 center 1.0 80</code>.</li>
+        <li data-i18n="step1">Descarga Morphy para tu version de Minecraft y tu loader.</li>
+        <li data-i18n="step2">Entra al mundo o servidor y abre el chat de comandos.</li>
+        <li data-i18n="step3">Abre el menu con <code>/morph menu</code> y busca el mob o bloque que quieras.</li>
+        <li data-i18n="step4">O aplica un morph directo con <code>/morph set zombie</code>.</li>
+        <li data-i18n="step5">Vuelve a tu forma normal con <code>/morph normal</code> o quita el morph con <code>/morph clear</code>.</li>
       </ol>
     </section>
 
@@ -778,8 +757,8 @@
         </div>
       </div>
       <div class="quick-links">
-        <a href="https://modrinth.com/plugin/animated-frames">Modrinth</a>
-        <a href="https://www.curseforge.com/minecraft/mc-mods/animated-frames">CurseForge</a>
+        <a href="https://modrinth.com/mod/morphy">Modrinth</a>
+        <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
       </div>
     </section>
   </main>
@@ -795,84 +774,80 @@
   <script>
     const translations = {
       es: {
-        brand: "AnimatedFrames Wiki",
         navInfo: "Info",
         navCommands: "Comandos",
         navVersions: "Versiones",
         navTutorial: "Tutorial",
-        kicker: "Mod / Plugin",
-        heroCopy: "Muestra GIF, PNG, JPG, JPEG y MP4 en pantalla dentro de Minecraft usando comandos simples para eventos, servidores, anuncios y escenas.",
+        heroCopy: "Convierte en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo: modelos, tamaños y hitboxes sincronizados en tiempo real.",
         seeCommands: "Ver comandos",
         quickInstall: "Instalacion rapida",
-        latestVersion: "Version mas reciente",
         listedVersions: "Versiones soportadas",
-        dependency: "Dependencia principal",
+        listedVersions2: "Tambien disponible",
+        environmentTitle: "Fabric / Forge / NeoForge",
+        environment: "Loaders soportados",
         creator: "Creador / soporte",
-        infoLead: "Todo lo basico para saber que hace, donde van los archivos y que necesita cada jugador.",
+        infoTitle: "Informacion Del Mod",
+        infoLead: "Sistema de transformacion: convierte tu personaje en mobs o bloques con una GUI simple de buscar y previsualizar.",
         whatTitle: "Que hace",
-        whatText: "AnimatedFrames permite reproducir imagenes, GIFs y videos MP4 como overlays en pantalla. Es ideal para eventos, intros, avisos, pantallas de rol y contenido decorativo.",
-        folderTitle: "Carpeta local",
-        folderText: "Los medios se cargan desde la carpeta del cliente. Cada jugador que deba ver el contenido necesita tener el archivo en su propia instalacion.",
-        loadersText: "El proyecto lista soporte para mod y plugin segun plataforma. Descarga siempre el archivo que coincida con tu Minecraft y loader.",
-        commandsLead: "Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos.",
-        cmdShow: 'Muestra un archivo solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
-        cmdStop: "Detiene el medio actual del cliente.",
-        cmdList: "Lista los archivos disponibles en tu carpeta local.",
-        cmdLang: "Cambia el idioma de los mensajes del mod.",
-        cmdServerShow: 'Envia un medio a jugadores seleccionados. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
-        cmdServerStop: "Detiene el medio para jugadores seleccionados.",
-        positionsLead: "Opciones soportadas para ubicar el medio en pantalla.",
+        whatText: "Morphy te permite transformarte en casi cualquier mob o bloque del juego, con modelo, tamaño y hitbox sincronizados para todos los jugadores.",
+        controlTitle: "Menu con vista previa",
+        controlText: "El menu en pantalla permite buscar y explorar cada morph disponible con una previsualizacion en vivo antes de aplicarlo.",
+        loadersTitle: "Compatibilidad",
+        loadersText: "Funciona con entidades modeadas ademas del contenido vanilla, y esta disponible para Fabric, Forge y NeoForge.",
+        commandsTitle: "Comandos",
+        commandsLead: "Comandos principales para abrir el menu y aplicar, quitar o restablecer tu morph.",
+        cmdMenu: "Abre el menu grafico para buscar y previsualizar morphs disponibles.",
+        cmdSet: "Aplica el morph indicado directamente por comando.",
+        cmdClear: "Quita el morph actual.",
+        cmdNormal: "Vuelve a tu forma de jugador normal.",
         versionsTitle: "Versiones Y Loaders",
-        versionsLead: "Compatibilidad indicada en las paginas publicas del proyecto, revisada el 4 de mayo de 2026.",
+        versionsLead: "Compatibilidad indicada en Modrinth.",
         tutorialTitle: "Tutorial Rapido",
-        tutorialLead: "La ruta corta para probarlo sin perderse.",
-        step1: "Instala AnimatedFrames y Watermedia para tu version de Minecraft y loader.",
-        step2: 'Abre <code>.minecraft/config/animatedframes/media/</code>.',
-        step3: 'Copia tus archivos <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code>.',
-        step4: 'Comprueba la lista con <code>/mediac list</code>.',
-        step5: 'Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
-        step6: 'Para enviarlo a jugadores usa <code>/medias show @a sunny.gif 15 center 1.0 80</code>.',
+        tutorialLead: "Guia simple para empezar como en la pagina del proyecto.",
+        step1: "Descarga Morphy para tu version de Minecraft y tu loader.",
+        step2: "Entra al mundo o servidor y abre el chat de comandos.",
+        step3: 'Abre el menu con <code>/morph menu</code> y busca el mob o bloque que quieras.',
+        step4: 'O aplica un morph directo con <code>/morph set zombie</code>.',
+        step5: 'Vuelve a tu forma normal con <code>/morph normal</code> o quita el morph con <code>/morph clear</code>.',
         downloadTitle: "Descargas",
         downloadLead: "Accesos rapidos a las paginas principales del proyecto."
       },
       en: {
-        brand: "AnimatedFrames Wiki",
         navInfo: "Info",
         navCommands: "Commands",
         navVersions: "Versions",
         navTutorial: "Guide",
-        kicker: "Mod / Plugin",
-        heroCopy: "Show GIF, PNG, JPG, JPEG and MP4 media on screen inside Minecraft with simple commands for events, servers, announcements and scenes.",
+        heroCopy: "Become almost any mob or block in Minecraft with a simple and intuitive morph system: synchronized models, sizes and hitboxes in real time.",
         seeCommands: "View commands",
         quickInstall: "Quick install",
-        latestVersion: "Latest version",
         listedVersions: "Supported versions",
-        dependency: "Main dependency",
+        listedVersions2: "Also available",
+        environmentTitle: "Fabric / Forge / NeoForge",
+        environment: "Supported loaders",
         creator: "Creator / support",
-        infoLead: "The essentials: what it does, where files go and what each player needs.",
+        infoTitle: "Mod Info",
+        infoLead: "A transformation system: turn your character into mobs or blocks with a simple search-and-preview GUI.",
         whatTitle: "What it does",
-        whatText: "AnimatedFrames plays images, GIFs and MP4 videos as screen overlays. It is useful for events, intros, alerts, roleplay screens and decorative content.",
-        folderTitle: "Local folder",
-        folderText: "Media loads from the client folder. Every player who needs to see the content must have the file in their own installation.",
-        loadersText: "The project lists mod and plugin support depending on platform. Always download the file that matches your Minecraft version and loader.",
-        commandsLead: "Client commands show media only for you. Server commands send media to selected players and require permissions.",
-        cmdShow: 'Shows a file only for you. Example: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
-        cmdStop: "Stops the current client media.",
-        cmdList: "Lists available files in your local folder.",
-        cmdLang: "Changes the mod message language.",
-        cmdServerShow: 'Sends media to selected players. Example: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
-        cmdServerStop: "Stops media for selected players.",
-        positionsLead: "Supported options for placing media on screen.",
+        whatText: "Morphy lets you transform into almost any mob or block in the game, with model, size and hitbox synced for every player.",
+        controlTitle: "Menu with live preview",
+        controlText: "The on-screen menu lets you search and browse every available morph with a live preview before applying it.",
+        loadersTitle: "Compatibility",
+        loadersText: "Works with modded entities on top of vanilla content, and is available for Fabric, Forge and NeoForge.",
+        commandsTitle: "Commands",
+        commandsLead: "Main commands to open the menu and apply, clear or reset your morph.",
+        cmdMenu: "Opens the graphical menu to search and preview available morphs.",
+        cmdSet: "Applies the given morph directly through the command.",
+        cmdClear: "Clears your current morph.",
+        cmdNormal: "Returns you to your normal player form.",
         versionsTitle: "Versions And Loaders",
-        versionsLead: "Compatibility shown on the public project pages, reviewed on May 4, 2026.",
+        versionsLead: "Compatibility as listed on Modrinth.",
         tutorialTitle: "Quick Guide",
-        tutorialLead: "The short path to test it without getting lost.",
-        step1: "Install AnimatedFrames and Watermedia for your Minecraft version and loader.",
-        step2: 'Open <code>.minecraft/config/animatedframes/media/</code>.',
-        step3: 'Copy your <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> or <code>.mp4</code> files.',
-        step4: 'Check the list with <code>/mediac list</code>.',
-        step5: 'Show something locally with <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
-        step6: 'To send it to players, use <code>/medias show @a sunny.gif 15 center 1.0 80</code>.',
+        tutorialLead: "A simple start guide closer to the project page.",
+        step1: "Download Morphy for your Minecraft version and loader.",
+        step2: "Join the world or server and open the command chat.",
+        step3: 'Open the menu with <code>/morph menu</code> and look for the mob or block you want.',
+        step4: 'Or apply a morph directly with <code>/morph set zombie</code>.',
+        step5: 'Return to normal with <code>/morph normal</code> or clear it with <code>/morph clear</code>.',
         downloadTitle: "Downloads",
         downloadLead: "Quick access to the main project pages."
       }

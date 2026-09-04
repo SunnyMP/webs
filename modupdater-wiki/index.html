@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0c">
+  <meta name="description" content="Guia oficial de Mod Updater 1.0 para Minecraft Forge 1.20.1.">
+  <title>Mod Updater Wiki</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d0904;
+      --surface: #1f1409;
+      --surface-2: #291a0b;
+      --line: #402a12;
+      --text: #fbf3ea;
+      --muted: #cdb9a3;
+      --soft: #f0ddc9;
+      --green: #ff8a3d;
+      --green-2: #cf5f12;
+      --cyan: #ffc857;
+      --amber: #ffc857;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(255, 138, 61, 0.19), transparent 30rem),
+        radial-gradient(circle at 82% 8%, rgba(255, 200, 87, 0.16), transparent 32rem),
+        linear-gradient(180deg, #0d0904 0%, #140d06 48%, #0d0904 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px max(20px, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(13, 9, 4, 0.84);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .brand span {
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--soft);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .button {
+      border: 1px solid rgba(255, 138, 61, 0.55);
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #1a0f04;
+      box-shadow: 0 12px 30px rgba(255, 138, 61, 0.18);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 54px;
+    }
+
+    .hero {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+    }
+
+    .hero-stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      min-height: 390px;
+      background:
+        linear-gradient(90deg, rgba(13, 9, 4, 0.96), rgba(13, 9, 4, 0.72)),
+        radial-gradient(circle at 72% 36%, rgba(255, 138, 61, 0.25), transparent 20rem),
+        linear-gradient(135deg, #271a0c, #140d06);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      padding: 42px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(46px, 8vw, 86px);
+      line-height: 0.95;
+    }
+
+    .hero-copy {
+      max-width: 590px;
+      margin: 18px 0 0;
+      color: var(--soft);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .hud-preview {
+      position: relative;
+      min-height: 360px;
+      padding: 34px;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      min-height: 315px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      background: #1f1409;
+      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
+    }
+
+    .hud-capture {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat {
+      padding: 18px 20px;
+      background: rgba(31, 20, 9, 0.96);
+    }
+
+    .stat strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 34px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 26px;
+    }
+
+    .section-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(41, 26, 11, 0.96), rgba(20, 13, 6, 0.96));
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+    }
+
+    .panel.pad {
+      padding: 20px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .chip.green {
+      border-color: rgba(255, 138, 61, 0.28);
+      background: rgba(255, 138, 61, 0.12);
+      color: #ffd9b0;
+    }
+
+    .chip.red {
+      border-color: rgba(255, 93, 93, 0.32);
+      background: rgba(255, 93, 93, 0.14);
+      color: #ffc4c4;
+    }
+
+    .chip.yellow {
+      border-color: rgba(255, 200, 87, 0.32);
+      background: rgba(255, 200, 87, 0.14);
+      color: #ffe9b0;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    .command {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: rgba(31, 20, 9, 0.84);
+    }
+
+    code {
+      display: inline;
+      padding: 3px 6px;
+      border: 1px solid rgba(255, 200, 87, 0.24);
+      border-radius: 7px;
+      background: #221507;
+      color: #ffe4b3;
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+
+    .command code {
+      display: block;
+      width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .command p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(31, 20, 9, 0.86);
+      color: var(--muted);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 138, 61, 0.14);
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quick-links a {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .social-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+    }
+
+    .social-toggle {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #1a0f04;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 16px 38px rgba(255, 138, 61, 0.22);
+      border: 0;
+      cursor: pointer;
+    }
+
+    .social-menu {
+      position: absolute;
+      right: 0;
+      bottom: 62px;
+      display: none;
+      min-width: 190px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(31, 20, 9, 0.96);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    }
+
+    .social-widget.open .social-menu {
+      display: block;
+    }
+
+    .social-menu a {
+      display: block;
+      padding: 13px 15px;
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .social-menu a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    @media (max-width: 980px) {
+      .site-nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .grid,
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .command {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 16px;
+      }
+
+      .hero {
+        border-radius: 20px;
+      }
+
+      .hero-content {
+        padding: 28px 22px;
+      }
+
+      .hud-preview {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 50px;
+      }
+
+      .grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="../wiki-theme.css">
+</head>
+<body class="wiki-modupdater">
+  <header class="site-nav">
+    <a class="brand" href="#top" aria-label="Inicio">
+      <img src="assets/modupdater-icon.png" alt="Logo de Mod Updater">
+      <span>Mod Updater Wiki</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegacion principal">
+      <a href="#info">Info</a>
+      <a href="#instalacion">Instalacion</a>
+      <a href="#comandos">Comandos</a>
+      <a href="#seguridad">Seguridad</a>
+      <a href="#links">Links</a>
+    </nav>
+  </header>
+
+  <main id="top" class="page">
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-stage">
+        <div class="hero-content">
+          <p class="kicker">Mod</p>
+          <h1 id="title">Mod Updater</h1>
+          <p class="hero-copy">Tu modpack, siempre en la version correcta. Mod Updater permite que un servidor publique cambios y los entregue directamente a sus jugadores: el cliente muestra que cambia, descarga cada archivo con progreso real y aplica la version de forma segura.</p>
+          <div class="hero-actions">
+            <a class="button" href="#comandos">Ver comandos</a>
+            <a class="button secondary" href="#instalacion">Instalacion rapida</a>
+          </div>
+        </div>
+        <div class="hud-preview" aria-hidden="true">
+          <div class="screen">
+            <img class="hud-capture" src="assets/modupdater-banner.png" alt="Arte de Mod Updater">
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version estable</span>
+        </div>
+        <div class="stat">
+          <strong>Forge 1.20.1</strong>
+          <span>Plataforma</span>
+        </div>
+        <div class="stat">
+          <strong>Cliente / Servidor</strong>
+          <span>Sin hosting externo</span>
+        </div>
+        <div class="stat">
+          <strong>SunnyAIM_</strong>
+          <span>Creador / soporte</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="info" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-subtitle.png" alt="Mod">
+          <h2 class="sr-only">Informacion Del Mod</h2>
+          <p>Un servidor publica cambios y los jugadores los reciben en el acto, con manifiestos firmados y descargas verificadas.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3>Que hace</h3>
+          <p>El servidor es la fuente de las publicaciones: agrega, reemplaza o quita mods desde <code>staging</code> y publica una version con un solo comando.</p>
+          <div class="chips">
+            <span class="chip green">Preparar</span>
+            <span class="chip green">Revisar</span>
+            <span class="chip green">Publicar</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3>Instalacion identica</h3>
+          <p>El mismo JAR va en el servidor y en cada cliente. El servidor crea su carpeta de trabajo, manifiesto inicial y claves de firma al primer arranque.</p>
+          <div class="chips">
+            <span class="chip">JAR</span>
+            <span class="chip">Servidor</span>
+            <span class="chip">Staging</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3>Seguridad e integridad</h3>
+          <p>Firma verificable, hash SHA-256 por archivo y rollback automatico si algo falla a mitad de instalacion.</p>
+          <div class="chips">
+            <span class="chip">Firma</span>
+            <span class="chip">SHA-256</span>
+            <span class="chip">Rollback</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="instalacion" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Instalacion</h2>
+          <p>El mismo JAR debe estar en el servidor y en cada cliente. El servidor se convierte en la fuente de las publicaciones.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li>Copia <code>mod_updater-1.0.jar</code> dentro de <code>mods/</code> en el servidor y en el modpack de los jugadores.</li>
+        <li>Inicia el servidor: se crea <code>mod-updater/</code>, sus carpetas de trabajo, el manifiesto inicial en version 0 y las claves de firma.</li>
+        <li>Prepara la publicacion usando <code>mod-updater/staging/</code> como el estado final que quieres distribuir. Puedes agregar, reemplazar o quitar archivos administrados.</li>
+      </ol>
+    </section>
+
+    <section id="publicar" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Publicar Una Version</h2>
+          <p>Flujo del administrador para preparar, revisar y publicar cambios.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3>01 · Preparar</h3>
+          <p>Deja en staging exactamente los archivos que debe administrar la nueva version. Nuevo = alta, cambiado = reemplazo, retirado = eliminacion.</p>
+        </article>
+        <article class="panel pad">
+          <h3>02 · Revisar</h3>
+          <p>Usa la pantalla de Administracion o <code>/modupdater preview</code>. Se detectan cambios, lados de los mods y dependencias obligatorias.</p>
+        </article>
+        <article class="panel pad">
+          <h3>03 · Publicar</h3>
+          <p>Indica numero, obligatoriedad y notas. Una publicacion sin cambios se rechaza. Los jugadores conectados reciben el manifiesto al instante.</p>
+        </article>
+      </div>
+      <p style="margin-top:16px">Si cambian mods del servidor, los OP reciben un recordatorio para reiniciarlo. Ese aviso operativo nunca se muestra a jugadores normales.</p>
+    </section>
+
+    <section id="jugadores" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Que Ocurre Para El Jugador</h2>
+          <p>La obligatoriedad decide si puede posponer la version. El contenido decide si Minecraft necesita reiniciarse.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <span class="chip green">● Al dia</span>
+          <h3 style="margin-top:10px">Sin pendientes</h3>
+          <p>El icono indica que no hay nada pendiente y la version instalada coincide con la publicacion.</p>
+        </article>
+        <article class="panel pad">
+          <span class="chip yellow">● Opcional</span>
+          <h3 style="margin-top:10px">Actualizacion opcional</h3>
+          <p>Puede abrirla desde el icono, leer las notas y descargarla cuando quiera. Si modifica un JAR, igual necesitara reiniciar.</p>
+        </article>
+        <article class="panel pad">
+          <span class="chip red">● Obligatoria</span>
+          <h3 style="margin-top:10px">Actualizacion obligatoria</h3>
+          <p>La pantalla se abre automaticamente. Mientras actualiza, su sesion queda pausada en un estado seguro hasta finalizar.</p>
+        </article>
+      </div>
+      <p style="margin-top:16px">Hasta cuatro archivos se descargan en paralelo, con porcentaje total, bytes, archivo actual y progreso individual. Las descargas parciales pueden continuar desde su ultimo punto valido. Los cambios permitidos en caliente se aplican al terminar; mods y operaciones delicadas muestran <em>Reiniciar Minecraft</em>.</p>
+    </section>
+
+    <section id="comandos" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-commands.png" alt="Comandos">
+          <h2 class="sr-only">Comandos</h2>
+          <p>Comandos de nivel OP 2 para administrar y publicar versiones.</p>
+        </div>
+      </div>
+      <div class="feed">
+        <article class="command">
+          <code>/modupdater menu</code>
+          <p>Abre Actualizacion y, para administradores, la pestaña Administrar.</p>
+        </article>
+        <article class="command">
+          <code>/modupdater preview</code>
+          <p>Analiza staging y muestra cambios y dependencias sin publicar.</p>
+        </article>
+        <article class="command">
+          <code>/modupdater publish &lt;version&gt; &lt;true|false&gt; [notas]</code>
+          <p>Publica una version obligatoria (<code>true</code>) u opcional (<code>false</code>).</p>
+        </article>
+        <article class="command">
+          <code>/modupdater dependencies</code>
+          <p>Comprueba las dependencias obligatorias disponibles y faltantes.</p>
+        </article>
+        <article class="command">
+          <code>/modupdater dependencies copy</code>
+          <p>Copia al pack las dependencias compatibles que ya existen localmente.</p>
+        </article>
+        <article class="command">
+          <code>/modupdater reset confirm</code>
+          <p>Reinicia el estado de publicacion a version 0. Usalo unicamente para comenzar una instalacion nueva.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="archivos" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Archivos, Eliminaciones Y Lados</h2>
+          <p>Para retirar de los clientes algo ya publicado, eliminalo de staging, ejecuta la vista previa y publica otra version.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3><code>CLIENT</code></h3>
+          <p>Contenido o dependencia exclusiva del cliente. No se carga en el servidor.</p>
+        </article>
+        <article class="panel pad">
+          <h3><code>SERVER</code></h3>
+          <p>Mod que solamente debe cargarse en el servidor.</p>
+        </article>
+        <article class="panel pad">
+          <h3><code>BOTH</code></h3>
+          <p>Mod requerido en ambos lados, cliente y servidor.</p>
+        </article>
+      </div>
+      <p style="margin-top:16px">La clasificacion automatica usa los metadatos del mod. Los casos especiales pueden definirse por mod ID o nombre de archivo en <code>mod-updater/mod-sides.json</code>. Las dependencias exclusivamente cliente pueden guardarse en <code>mod-updater/client-mods/</code>.</p>
+    </section>
+
+    <section id="seguridad" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Diseñado Para No Dejar Instalaciones A Medias</h2>
+          <p>Integridad de punta a punta en cada actualizacion.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3>Firma</h3>
+          <p>El cliente verifica la firma del manifiesto y conserva la identidad de la clave del servidor.</p>
+        </article>
+        <article class="panel pad">
+          <h3>SHA-256</h3>
+          <p>Cada descarga debe coincidir en ruta, operacion, tamaño y hash antes de entrar en el plan.</p>
+        </article>
+        <article class="panel pad">
+          <h3>Rollback</h3>
+          <p>El instalador guarda los archivos anteriores y revierte las operaciones completadas si algo falla.</p>
+        </article>
+      </div>
+      <p style="margin-top:16px">Tambien se bloquean rutas absolutas, traversal, destinos fuera de la instancia y solicitudes excesivas. Mod Updater no intenta reemplazar su propio JAR.</p>
+    </section>
+
+    <section id="problemas" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Problemas Frecuentes</h2>
+          <p>Respuestas rapidas a los casos mas comunes.</p>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr">
+        <article class="panel pad">
+          <h3>La publicacion no aparece en el cliente</h3>
+          <p>Comprueba que cliente y servidor usan la misma version del mod, que el jugador termino el login de Forge y que la publicacion contiene cambios reales. Ejecuta <code>/modupdater preview</code> antes de publicar.</p>
+        </article>
+        <article class="panel pad">
+          <h3>La misma version vuelve a solicitarse</h3>
+          <p>Revisa <code>.minecraft/mod-updater/installer.log</code>. Si habia que reiniciar, Minecraft debe cerrarse completamente para que el instalador aplique el plan y guarde el manifiesto instalado.</p>
+        </article>
+        <article class="panel pad">
+          <h3>Un mod eliminado vuelve a staging</h3>
+          <p>Staging tambien refleja los mods administrados del servidor. Si el JAR todavia existe o cambio dentro de <code>server/mods</code>, puede importarse nuevamente. Retiralo del estado deseado y del servidor cuando corresponda, publica y reinicia.</p>
+        </article>
+        <article class="panel pad">
+          <h3>Falta una dependencia</h3>
+          <p>Ejecuta <code>/modupdater dependencies</code>. El sistema no descarga codigo de Internet: debes colocar la dependencia correcta localmente o usar <code>dependencies copy</code> si ya esta disponible.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="links" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-links.png" alt="Links">
+          <h2 class="sr-only">Links</h2>
+          <p>Canales oficiales de soporte y novedades de Mod Updater.</p>
+        </div>
+      </div>
+      <div class="quick-links">
+        <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+        <a href="https://x.com/SunnyDeb_">X / Twitter</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="social-widget" id="socialWidget">
+    <div class="social-menu" aria-label="Redes sociales">
+      <a href="https://x.com/SunnyDeb_">X / Twitter</a>
+      <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+    </div>
+    <button class="social-toggle" type="button" aria-label="Abrir redes" aria-expanded="false">↗</button>
+  </div>
+
+  <script>
+    const socialWidget = document.getElementById("socialWidget");
+    const socialButton = socialWidget.querySelector(".social-toggle");
+    socialButton.addEventListener("click", () => {
+      const open = socialWidget.classList.toggle("open");
+      socialButton.setAttribute("aria-expanded", String(open));
+    });
+  </script>
+</body>
+</html>

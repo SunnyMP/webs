@@ -580,8 +580,9 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../wiki-theme.css">
 </head>
-<body>
+<body class="wiki-quickhud">
   <div class="lang-switch" aria-label="Cambiar idioma">
     <button class="active" type="button" data-lang="es" aria-label="Español">🇪🇸</button>
     <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
@@ -589,7 +590,7 @@
 
   <header class="site-nav">
     <a class="brand" href="#top" aria-label="Inicio">
-      <img src="https://cdn.modrinth.com/data/5PKXNBei/4e4de8a229acf646d5ea5a88e4ee101ad631a60d_96.webp" alt="Logo de QuickHud">
+      <img src="assets/quickhud-icon.png" alt="Logo de QuickHud">
       <span>QuickHud Wiki</span>
     </a>
     <nav class="nav-links" aria-label="Navegacion principal">
@@ -690,7 +691,8 @@
     <section id="comandos" class="section">
       <div class="section-head">
         <div>
-          <h2 data-i18n="commandsTitle">Comandos</h2>
+          <img class="section-ribbon" src="assets/section-commands.png" alt="Comandos">
+          <h2 class="sr-only" data-i18n="commandsTitle">Comandos</h2>
           <p data-i18n="commandsLead">Comandos principales para mostrar, ocultar, mover, escalar y actualizar elementos del HUD.</p>
         </div>
       </div>
@@ -808,7 +810,8 @@
     <section id="links" class="section">
       <div class="section-head">
         <div>
-          <h2 data-i18n="downloadTitle">Descargas</h2>
+          <img class="section-ribbon" src="assets/section-links.png" alt="Links">
+          <h2 class="sr-only" data-i18n="downloadTitle">Descargas</h2>
           <p data-i18n="downloadLead">Accesos rapidos a las paginas principales del proyecto.</p>
         </div>
       </div>
