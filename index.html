@@ -120,12 +120,13 @@
       display: grid;
       place-items: center;
       gap: 10px;
-      padding: 22px;
+      padding: 22px 14px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.07);
       color: #fff8ff;
       text-decoration: none;
+      text-align: center;
       transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
@@ -137,13 +138,18 @@
     }
 
     .wiki-card img {
-      width: 108px;
-      height: 108px;
+      width: 88px;
+      height: 88px;
       object-fit: contain;
     }
 
     .wiki-card strong {
-      font-size: 24px;
+      width: 100%;
+      font-size: 20px;
+      line-height: 1.15;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: break-word;
     }
 
     .wiki-card span {
@@ -181,22 +187,22 @@
         <p class="kicker">Wikis</p>
         <h1>Documentacion</h1>
         <div class="wiki-list">
-          <a class="wiki-card" href="https://jolty.us/animatedframes-wiki/">
+          <a class="wiki-card" href="https://jolty.us/animatedframes-wiki/" target="_blank" rel="noopener">
             <img src="animatedframes-wiki/assets/animatedframes-icon.png" alt="AnimatedFrames">
             <strong>AnimatedFrames</strong>
             <span>Abrir wiki</span>
           </a>
-          <a class="wiki-card" href="https://jolty.us/quickhud-wiki/">
+          <a class="wiki-card" href="https://jolty.us/quickhud-wiki/" target="_blank" rel="noopener">
             <img src="quickhud-wiki/assets/quickhud-icon.png" alt="QuickHud">
             <strong>QuickHud</strong>
             <span>Abrir wiki</span>
           </a>
-          <a class="wiki-card" href="modupdater-wiki/">
+          <a class="wiki-card" href="modupdater-wiki/" target="_blank" rel="noopener">
             <img src="modupdater-wiki/assets/modupdater-icon.png" alt="Mod Updater">
             <strong>Mod Updater</strong>
             <span>Abrir wiki</span>
           </a>
-          <a class="wiki-card" href="morphy-wiki/">
+          <a class="wiki-card" href="morphy-wiki/" target="_blank" rel="noopener">
             <img src="morphy-wiki/assets/morphy-icon.png" alt="Morphy">
             <strong>Morphy</strong>
             <span>Abrir wiki</span>
