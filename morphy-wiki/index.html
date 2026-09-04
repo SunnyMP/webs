@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Guia oficial de Morphy: convierte en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo.">
+  <title>Morphy Wiki</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070510;
+      --surface: #120c1f;
+      --surface-2: #191029;
+      --line: #2c2140;
+      --text: #f4f0fb;
+      --muted: #b6acc9;
+      --soft: #e2d9f2;
+      --green: #b06bff;
+      --green-2: #8b3fd1;
+      --cyan: #ff8a4c;
+      --amber: #ffc857;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(176, 107, 255, 0.19), transparent 30rem),
+        radial-gradient(circle at 82% 8%, rgba(255, 138, 76, 0.16), transparent 32rem),
+        linear-gradient(180deg, #070510 0%, #0b0818 48%, #070510 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px max(20px, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(7, 5, 16, 0.84);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .brand span {
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--soft);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .button {
+      border: 1px solid rgba(176, 107, 255, 0.55);
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #0e0518;
+      box-shadow: 0 12px 30px rgba(176, 107, 255, 0.18);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 54px;
+    }
+
+    .hero {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+    }
+
+    .hero-stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      min-height: 390px;
+      background:
+        linear-gradient(90deg, rgba(7, 5, 16, 0.96), rgba(7, 5, 16, 0.72)),
+        radial-gradient(circle at 72% 36%, rgba(176, 107, 255, 0.25), transparent 20rem),
+        linear-gradient(135deg, #1a1128, #0a071a);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      padding: 42px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(46px, 8vw, 86px);
+      line-height: 0.95;
+    }
+
+    .hero-copy {
+      max-width: 590px;
+      margin: 18px 0 0;
+      color: var(--soft);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .hud-preview {
+      position: relative;
+      min-height: 360px;
+      padding: 34px;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      min-height: 315px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      background: #120c1f;
+      box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.34), 0 22px 44px rgba(0, 0, 0, 0.26);
+    }
+
+    .hud-capture {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat {
+      padding: 18px 20px;
+      background: rgba(18, 12, 31, 0.96);
+    }
+
+    .stat strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 34px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 26px;
+    }
+
+    .section-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(25, 16, 41, 0.96), rgba(14, 9, 24, 0.96));
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+    }
+
+    .panel.pad {
+      padding: 20px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .chip.green {
+      border-color: rgba(176, 107, 255, 0.28);
+      background: rgba(176, 107, 255, 0.12);
+      color: #ddc4ff;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    .command {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius);
+      background: rgba(18, 12, 31, 0.84);
+    }
+
+    code {
+      display: inline;
+      padding: 3px 6px;
+      border: 1px solid rgba(255, 138, 76, 0.24);
+      border-radius: 7px;
+      background: #150c22;
+      color: #ffe4d1;
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+
+    .command code {
+      display: block;
+      width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .command p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .versions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .version {
+      min-height: 120px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(18, 12, 31, 0.86);
+    }
+
+    .version strong {
+      display: block;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .version span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(18, 12, 31, 0.86);
+      color: var(--muted);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(176, 107, 255, 0.14);
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quick-links a {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .lang-switch {
+      position: fixed;
+      right: 18px;
+      top: 78px;
+      z-index: 20;
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(7, 5, 16, 0.82);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+    }
+
+    .lang-switch button,
+    .social-toggle {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .lang-switch button {
+      width: 38px;
+      height: 34px;
+      border-radius: 999px;
+      background: transparent;
+      font-size: 20px;
+    }
+
+    .lang-switch button.active {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .social-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+    }
+
+    .social-toggle {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--green), var(--green-2));
+      color: #0e0518;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 16px 38px rgba(176, 107, 255, 0.22);
+    }
+
+    .social-menu {
+      position: absolute;
+      right: 0;
+      bottom: 62px;
+      display: none;
+      min-width: 190px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(18, 12, 31, 0.96);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    }
+
+    .social-widget.open .social-menu {
+      display: block;
+    }
+
+    .social-menu a {
+      display: block;
+      padding: 13px 15px;
+      color: var(--soft);
+      font-weight: 800;
+    }
+
+    .social-menu a:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    @media (max-width: 980px) {
+      .site-nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .grid,
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .versions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .command {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 16px;
+      }
+
+      .hero {
+        border-radius: 20px;
+      }
+
+      .hero-content {
+        padding: 28px 22px;
+      }
+
+      .hud-preview {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 50px;
+      }
+
+      .grid,
+      .versions,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .lang-switch {
+        top: auto;
+        right: 12px;
+        bottom: 82px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="../wiki-theme.css">
+</head>
+<body class="wiki-morphy">
+  <div class="lang-switch" aria-label="Cambiar idioma">
+    <button class="active" type="button" data-lang="es" aria-label="Español">🇪🇸</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+  </div>
+
+  <header class="site-nav">
+    <a class="brand" href="#top" aria-label="Inicio">
+      <img src="assets/morphy-icon.png" alt="Logo de Morphy">
+      <span>Morphy Wiki</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegacion principal">
+      <a href="#info" data-i18n="navInfo">Info</a>
+      <a href="#comandos" data-i18n="navCommands">Comandos</a>
+      <a href="#versiones" data-i18n="navVersions">Versiones</a>
+      <a href="#tutorial" data-i18n="navTutorial">Tutorial</a>
+      <a class="button" href="https://modrinth.com/mod/morphy">Modrinth</a>
+    </nav>
+  </header>
+
+  <main id="top" class="page">
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-stage">
+        <div class="hero-content">
+          <p class="kicker">Mod</p>
+          <h1 id="title">Morphy</h1>
+          <p class="hero-copy" data-i18n="heroCopy">Conviertete en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo: modelos, tamaños y hitboxes sincronizados en tiempo real.</p>
+          <div class="hero-actions">
+            <a class="button" href="#comandos" data-i18n="seeCommands">Ver comandos</a>
+            <a class="button secondary" href="#tutorial" data-i18n="quickInstall">Instalacion rapida</a>
+          </div>
+        </div>
+        <div class="hud-preview" aria-hidden="true">
+          <div class="screen">
+            <img class="hud-capture" src="assets/morphy-banner.png" alt="Arte de Morphy">
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>1.21.1</strong>
+          <span data-i18n="listedVersions">Versiones soportadas</span>
+        </div>
+        <div class="stat">
+          <strong>1.20.1</strong>
+          <span data-i18n="listedVersions2">Tambien disponible</span>
+        </div>
+        <div class="stat">
+          <strong data-i18n="environmentTitle">Fabric / Forge / NeoForge</strong>
+          <span data-i18n="environment">Loaders soportados</span>
+        </div>
+        <div class="stat">
+          <strong>SunnyAIM_</strong>
+          <span data-i18n="creator">Creador / soporte</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="info" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-subtitle.png" alt="Mod">
+          <h2 class="sr-only" data-i18n="infoTitle">Informacion Del Mod</h2>
+          <p data-i18n="infoLead">Sistema de transformacion: convierte tu personaje en mobs o bloques con una GUI simple de buscar y previsualizar.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3 data-i18n="whatTitle">Que hace</h3>
+          <p data-i18n="whatText">Morphy te permite transformarte en casi cualquier mob o bloque del juego, con modelo, tamaño y hitbox sincronizados para todos los jugadores.</p>
+          <div class="chips">
+            <span class="chip green">Mobs</span>
+            <span class="chip green">Bloques</span>
+            <span class="chip green">Hitbox</span>
+            <span class="chip green">Sync</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3 data-i18n="controlTitle">Menu con vista previa</h3>
+          <p data-i18n="controlText">El menu en pantalla permite buscar y explorar cada morph disponible con una previsualizacion en vivo antes de aplicarlo.</p>
+          <div class="chips">
+            <span class="chip">Buscar</span>
+            <span class="chip">Explorar</span>
+            <span class="chip">Preview</span>
+          </div>
+        </article>
+        <article class="panel pad">
+          <h3 data-i18n="loadersTitle">Compatibilidad</h3>
+          <p data-i18n="loadersText">Funciona con entidades modeadas ademas del contenido vanilla, y esta disponible para Fabric, Forge y NeoForge.</p>
+          <div class="chips">
+            <span class="chip">Fabric</span>
+            <span class="chip">Forge</span>
+            <span class="chip">NeoForge</span>
+            <span class="chip">Modded</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="comandos" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-commands.png" alt="Comandos">
+          <h2 class="sr-only" data-i18n="commandsTitle">Comandos</h2>
+          <p data-i18n="commandsLead">Comandos principales para abrir el menu y aplicar, quitar o restablecer tu morph.</p>
+        </div>
+      </div>
+      <div class="feed">
+        <article class="command">
+          <code>/morph menu</code>
+          <p data-i18n="cmdMenu">Abre el menu grafico para buscar y previsualizar morphs disponibles.</p>
+        </article>
+        <article class="command">
+          <code>/morph set &lt;mob_o_bloque&gt;</code>
+          <p data-i18n="cmdSet">Aplica el morph indicado directamente por comando.</p>
+        </article>
+        <article class="command">
+          <code>/morph clear</code>
+          <p data-i18n="cmdClear">Quita el morph actual.</p>
+        </article>
+        <article class="command">
+          <code>/morph normal</code>
+          <p data-i18n="cmdNormal">Vuelve a tu forma de jugador normal.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="versiones" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="versionsTitle">Versiones Y Loaders</h2>
+          <p data-i18n="versionsLead">Compatibilidad indicada en Modrinth.</p>
+        </div>
+      </div>
+      <div class="versions">
+        <article class="version">
+          <strong>1.21.1</strong>
+          <span>Morphy</span>
+          <span>Fabric / Forge / NeoForge</span>
+        </article>
+        <article class="version">
+          <strong>1.20.1</strong>
+          <span>Morphy</span>
+          <span>Fabric / Forge / NeoForge</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="tutorial" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="tutorialTitle">Tutorial Rapido</h2>
+          <p data-i18n="tutorialLead">Guia simple para empezar como en la pagina del proyecto.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li data-i18n="step1">Descarga Morphy para tu version de Minecraft y tu loader.</li>
+        <li data-i18n="step2">Entra al mundo o servidor y abre el chat de comandos.</li>
+        <li data-i18n="step3">Abre el menu con <code>/morph menu</code> y busca el mob o bloque que quieras.</li>
+        <li data-i18n="step4">O aplica un morph directo con <code>/morph set zombie</code>.</li>
+        <li data-i18n="step5">Vuelve a tu forma normal con <code>/morph normal</code> o quita el morph con <code>/morph clear</code>.</li>
+      </ol>
+    </section>
+
+    <section id="links" class="section">
+      <div class="section-head">
+        <div>
+          <img class="section-ribbon" src="assets/section-links.png" alt="Links">
+          <h2 class="sr-only" data-i18n="downloadTitle">Descargas</h2>
+          <p data-i18n="downloadLead">Accesos rapidos a las paginas principales del proyecto.</p>
+        </div>
+      </div>
+      <div class="quick-links">
+        <a href="https://modrinth.com/mod/morphy">Modrinth</a>
+        <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="social-widget" id="socialWidget">
+    <div class="social-menu" aria-label="Redes sociales">
+      <a href="https://x.com/SunnyDeb_">X / Twitter</a>
+      <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+    </div>
+    <button class="social-toggle" type="button" aria-label="Abrir redes" aria-expanded="false">↗</button>
+  </div>
+
+  <script>
+    const translations = {
+      es: {
+        navInfo: "Info",
+        navCommands: "Comandos",
+        navVersions: "Versiones",
+        navTutorial: "Tutorial",
+        heroCopy: "Convierte en casi cualquier mob o bloque de Minecraft con un sistema de morph simple e intuitivo: modelos, tamaños y hitboxes sincronizados en tiempo real.",
+        seeCommands: "Ver comandos",
+        quickInstall: "Instalacion rapida",
+        listedVersions: "Versiones soportadas",
+        listedVersions2: "Tambien disponible",
+        environmentTitle: "Fabric / Forge / NeoForge",
+        environment: "Loaders soportados",
+        creator: "Creador / soporte",
+        infoTitle: "Informacion Del Mod",
+        infoLead: "Sistema de transformacion: convierte tu personaje en mobs o bloques con una GUI simple de buscar y previsualizar.",
+        whatTitle: "Que hace",
+        whatText: "Morphy te permite transformarte en casi cualquier mob o bloque del juego, con modelo, tamaño y hitbox sincronizados para todos los jugadores.",
+        controlTitle: "Menu con vista previa",
+        controlText: "El menu en pantalla permite buscar y explorar cada morph disponible con una previsualizacion en vivo antes de aplicarlo.",
+        loadersTitle: "Compatibilidad",
+        loadersText: "Funciona con entidades modeadas ademas del contenido vanilla, y esta disponible para Fabric, Forge y NeoForge.",
+        commandsTitle: "Comandos",
+        commandsLead: "Comandos principales para abrir el menu y aplicar, quitar o restablecer tu morph.",
+        cmdMenu: "Abre el menu grafico para buscar y previsualizar morphs disponibles.",
+        cmdSet: "Aplica el morph indicado directamente por comando.",
+        cmdClear: "Quita el morph actual.",
+        cmdNormal: "Vuelve a tu forma de jugador normal.",
+        versionsTitle: "Versiones Y Loaders",
+        versionsLead: "Compatibilidad indicada en Modrinth.",
+        tutorialTitle: "Tutorial Rapido",
+        tutorialLead: "Guia simple para empezar como en la pagina del proyecto.",
+        step1: "Descarga Morphy para tu version de Minecraft y tu loader.",
+        step2: "Entra al mundo o servidor y abre el chat de comandos.",
+        step3: 'Abre el menu con <code>/morph menu</code> y busca el mob o bloque que quieras.',
+        step4: 'O aplica un morph directo con <code>/morph set zombie</code>.',
+        step5: 'Vuelve a tu forma normal con <code>/morph normal</code> o quita el morph con <code>/morph clear</code>.',
+        downloadTitle: "Descargas",
+        downloadLead: "Accesos rapidos a las paginas principales del proyecto."
+      },
+      en: {
+        navInfo: "Info",
+        navCommands: "Commands",
+        navVersions: "Versions",
+        navTutorial: "Guide",
+        heroCopy: "Become almost any mob or block in Minecraft with a simple and intuitive morph system: synchronized models, sizes and hitboxes in real time.",
+        seeCommands: "View commands",
+        quickInstall: "Quick install",
+        listedVersions: "Supported versions",
+        listedVersions2: "Also available",
+        environmentTitle: "Fabric / Forge / NeoForge",
+        environment: "Supported loaders",
+        creator: "Creator / support",
+        infoTitle: "Mod Info",
+        infoLead: "A transformation system: turn your character into mobs or blocks with a simple search-and-preview GUI.",
+        whatTitle: "What it does",
+        whatText: "Morphy lets you transform into almost any mob or block in the game, with model, size and hitbox synced for every player.",
+        controlTitle: "Menu with live preview",
+        controlText: "The on-screen menu lets you search and browse every available morph with a live preview before applying it.",
+        loadersTitle: "Compatibility",
+        loadersText: "Works with modded entities on top of vanilla content, and is available for Fabric, Forge and NeoForge.",
+        commandsTitle: "Commands",
+        commandsLead: "Main commands to open the menu and apply, clear or reset your morph.",
+        cmdMenu: "Opens the graphical menu to search and preview available morphs.",
+        cmdSet: "Applies the given morph directly through the command.",
+        cmdClear: "Clears your current morph.",
+        cmdNormal: "Returns you to your normal player form.",
+        versionsTitle: "Versions And Loaders",
+        versionsLead: "Compatibility as listed on Modrinth.",
+        tutorialTitle: "Quick Guide",
+        tutorialLead: "A simple start guide closer to the project page.",
+        step1: "Download Morphy for your Minecraft version and loader.",
+        step2: "Join the world or server and open the command chat.",
+        step3: 'Open the menu with <code>/morph menu</code> and look for the mob or block you want.',
+        step4: 'Or apply a morph directly with <code>/morph set zombie</code>.',
+        step5: 'Return to normal with <code>/morph normal</code> or clear it with <code>/morph clear</code>.',
+        downloadTitle: "Downloads",
+        downloadLead: "Quick access to the main project pages."
+      }
+    };
+
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const lang = button.dataset.lang;
+        document.documentElement.lang = lang;
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          const value = translations[lang][node.dataset.i18n];
+          if (value) node.innerHTML = value;
+        });
+        document.querySelectorAll("[data-lang]").forEach((item) => item.classList.toggle("active", item === button));
+      });
+    });
+
+    const socialWidget = document.getElementById("socialWidget");
+    const socialButton = socialWidget.querySelector(".social-toggle");
+    socialButton.addEventListener("click", () => {
+      const open = socialWidget.classList.toggle("open");
+      socialButton.setAttribute("aria-expanded", String(open));
+    });
+  </script>
+</body>
+</html>
