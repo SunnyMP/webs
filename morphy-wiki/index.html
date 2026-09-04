@@ -136,8 +136,8 @@
     .hero-stage {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-      min-height: 390px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.7fr);
+      min-height: 300px;
       background:
         linear-gradient(90deg, rgba(7, 5, 16, 0.96), rgba(7, 5, 16, 0.72)),
         radial-gradient(circle at 72% 36%, rgba(176, 107, 255, 0.25), transparent 20rem),
@@ -195,15 +195,19 @@
 
     .hud-preview {
       position: relative;
-      min-height: 360px;
-      padding: 34px;
+      min-height: 260px;
+      padding: 30px;
+      display: grid;
+      place-items: center;
     }
 
     .screen {
       position: relative;
-      height: 100%;
-      min-height: 315px;
+      width: 220px;
+      height: 220px;
       overflow: hidden;
+      display: grid;
+      place-items: center;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 22px;
       background: #120c1f;
@@ -212,10 +216,9 @@
 
     .hud-capture {
       display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 315px;
-      object-fit: cover;
+      width: 76%;
+      height: 76%;
+      object-fit: contain;
     }
 
     .stats {
@@ -618,7 +621,7 @@
         </div>
         <div class="hud-preview" aria-hidden="true">
           <div class="screen">
-            <img class="hud-capture" src="assets/morphy-banner.png" alt="Arte de Morphy">
+            <img class="hud-capture" src="assets/morphy-icon.png" alt="Logo de Morphy">
           </div>
         </div>
       </div>
@@ -645,7 +648,7 @@
     <section id="info" class="section">
       <div class="section-head">
         <div>
-          <img class="section-ribbon" src="assets/section-subtitle.png" alt="Mod">
+          <div class="ribbon-text">&gt;&gt; INFO &lt;&lt;</div>
           <h2 class="sr-only" data-i18n="infoTitle">Informacion Del Mod</h2>
           <p data-i18n="infoLead">Sistema de transformacion: convierte tu personaje en mobs o bloques con una GUI simple de buscar y previsualizar.</p>
         </div>
