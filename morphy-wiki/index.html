@@ -333,7 +333,7 @@
       font-size: 0.92em;
     }
 
-    .command code {
+    .command > code {
       display: block;
       width: 100%;
       overflow-wrap: anywhere;
@@ -677,18 +677,27 @@
           <p data-i18n="cmdMenu">Abre el menu grafico para buscar y previsualizar morphs disponibles.</p>
         </article>
         <article class="command">
-          <code>/morph set &lt;mob_o_bloque&gt;</code>
-          <p data-i18n="cmdSet">Aplica el morph indicado directamente por comando.</p>
+          <code>/morph menu mobs</code>
+          <p data-i18n="cmdMenuMobs">Abre el menu filtrado solo en mobs.</p>
         </article>
         <article class="command">
-          <code>/morph clear</code>
-          <p data-i18n="cmdClear">Quita el morph actual.</p>
+          <code>/morph menu blocks</code>
+          <p data-i18n="cmdMenuBlocks">Abre el menu filtrado solo en bloques.</p>
+        </article>
+        <article class="command">
+          <code>/morph set &lt;mob_o_bloque&gt; [objetivos]</code>
+          <p data-i18n="cmdSet">Aplica el morph indicado directamente por comando, a vos o a los objetivos indicados.</p>
+        </article>
+        <article class="command">
+          <code>/morph clear [objetivos]</code>
+          <p data-i18n="cmdClear">Quita el morph actual, tuyo o de los objetivos indicados.</p>
         </article>
         <article class="command">
           <code>/morph normal</code>
           <p data-i18n="cmdNormal">Vuelve a tu forma de jugador normal.</p>
         </article>
       </div>
+      <p style="margin-top:16px" data-i18n="cmdNote">Tecla <strong>M</strong> para abrir el menu de morph. Los comandos de servidor requieren OP; en un mundo de un jugador funcionan con trampas activadas.</p>
     </section>
 
     <section id="versiones" class="section">
@@ -777,9 +786,12 @@
         commandsTitle: "Comandos",
         commandsLead: "Comandos principales para abrir el menu y aplicar, quitar o restablecer tu morph.",
         cmdMenu: "Abre el menu grafico para buscar y previsualizar morphs disponibles.",
-        cmdSet: "Aplica el morph indicado directamente por comando.",
-        cmdClear: "Quita el morph actual.",
+        cmdMenuMobs: "Abre el menu filtrado solo en mobs.",
+        cmdMenuBlocks: "Abre el menu filtrado solo en bloques.",
+        cmdSet: "Aplica el morph indicado directamente por comando, a vos o a los objetivos indicados.",
+        cmdClear: "Quita el morph actual, tuyo o de los objetivos indicados.",
         cmdNormal: "Vuelve a tu forma de jugador normal.",
+        cmdNote: 'Tecla <strong>M</strong> para abrir el menu de morph. Los comandos de servidor requieren OP; en un mundo de un jugador funcionan con trampas activadas.',
         versionsTitle: "Versiones Y Loaders",
         versionsLead: "Compatibilidad indicada en Modrinth.",
         tutorialTitle: "Tutorial Rapido",
@@ -816,9 +828,12 @@
         commandsTitle: "Commands",
         commandsLead: "Main commands to open the menu and apply, clear or reset your morph.",
         cmdMenu: "Opens the graphical menu to search and preview available morphs.",
-        cmdSet: "Applies the given morph directly through the command.",
-        cmdClear: "Clears your current morph.",
+        cmdMenuMobs: "Opens the menu filtered to mobs only.",
+        cmdMenuBlocks: "Opens the menu filtered to blocks only.",
+        cmdSet: "Applies the given morph directly through the command, to yourself or the given targets.",
+        cmdClear: "Clears the current morph, yours or the given targets'.",
         cmdNormal: "Returns you to your normal player form.",
+        cmdNote: 'Press <strong>M</strong> to open the morph menu. Server commands require OP; singleplayer works with cheats enabled.',
         versionsTitle: "Versions And Loaders",
         versionsLead: "Compatibility as listed on Modrinth.",
         tutorialTitle: "Quick Guide",

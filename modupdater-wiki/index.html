@@ -345,7 +345,7 @@
       font-size: 0.92em;
     }
 
-    .command code {
+    .command > code {
       display: block;
       width: 100%;
       overflow-wrap: anywhere;
@@ -542,16 +542,16 @@
       </div>
       <div class="stats">
         <div class="stat">
-          <strong>1.0</strong>
-          <span>Version estable</span>
+          <strong>1.20.1</strong>
+          <span>Minecraft</span>
         </div>
         <div class="stat">
-          <strong>Forge 1.20.1</strong>
-          <span>Plataforma</span>
+          <strong>Forge 47+</strong>
+          <span>Loader</span>
         </div>
         <div class="stat">
-          <strong>Cliente / Servidor</strong>
-          <span>Sin hosting externo</span>
+          <strong>Servidor + Clientes</strong>
+          <span>Instalacion requerida</span>
         </div>
         <div class="stat">
           <strong>SunnyAIM_</strong>
@@ -565,13 +565,13 @@
         <div>
           <div class="ribbon-text">Info</div>
           <h2 class="sr-only">Informacion Del Mod</h2>
-          <p>Un servidor publica cambios y los jugadores los reciben en el acto, con manifiestos firmados y descargas verificadas.</p>
+          <p>Prepara una actualizacion en el servidor, revisala y publicala. Los jugadores la reciben dentro de Minecraft.</p>
         </div>
       </div>
       <div class="grid">
         <article class="panel pad">
           <h3>Que hace</h3>
-          <p>El servidor es la fuente de las publicaciones: agrega, reemplaza o quita mods desde <code>staging</code> y publica una version con un solo comando.</p>
+          <p>Agrega, actualiza y quita archivos del cliente sin que los jugadores reinstalen todo el modpack. Ven la version, el changelog, los archivos cambiados y el progreso de descarga.</p>
           <div class="chips">
             <span class="chip green">Preparar</span>
             <span class="chip green">Revisar</span>
@@ -579,21 +579,22 @@
           </div>
         </article>
         <article class="panel pad">
-          <h3>Instalacion identica</h3>
-          <p>El mismo JAR va en el servidor y en cada cliente. El servidor crea su carpeta de trabajo, manifiesto inicial y claves de firma al primer arranque.</p>
+          <h3>Requisitos</h3>
+          <p>Minecraft 1.20.1 con Forge 47+, instalado en el servidor y en cada cliente. La administracion requiere permisos de OP.</p>
           <div class="chips">
-            <span class="chip">JAR</span>
-            <span class="chip">Servidor</span>
-            <span class="chip">Staging</span>
+            <span class="chip">1.20.1</span>
+            <span class="chip">Forge 47+</span>
+            <span class="chip">OP</span>
           </div>
         </article>
         <article class="panel pad">
-          <h3>Seguridad e integridad</h3>
-          <p>Firma verificable, hash SHA-256 por archivo y rollback automatico si algo falla a mitad de instalacion.</p>
+          <h3>Archivos gestionados</h3>
+          <p>Mod Updater puede gestionar mods, config, resourcepacks y shaderpacks. Solo toca lo que administra; el resto de tu instalacion queda intacto.</p>
           <div class="chips">
-            <span class="chip">Firma</span>
-            <span class="chip">SHA-256</span>
-            <span class="chip">Rollback</span>
+            <span class="chip">mods/</span>
+            <span class="chip">config/</span>
+            <span class="chip">resourcepacks/</span>
+            <span class="chip">shaderpacks/</span>
           </div>
         </article>
       </div>
@@ -603,14 +604,23 @@
       <div class="section-head">
         <div>
           <h2>Instalacion</h2>
-          <p>El mismo JAR debe estar en el servidor y en cada cliente. El servidor se convierte en la fuente de las publicaciones.</p>
+          <p>Se requiere en el servidor y en cada cliente.</p>
         </div>
       </div>
+      <h3 style="margin:0 0 10px">Servidor</h3>
       <ol class="steps">
-        <li><span>Copia <code>mod_updater-1.0.jar</code> dentro de <code>mods/</code> en el servidor y en el modpack de los jugadores.</span></li>
-        <li><span>Inicia el servidor: se crea <code>mod-updater/</code>, sus carpetas de trabajo, el manifiesto inicial en version 0 y las claves de firma.</span></li>
-        <li><span>Prepara la publicacion usando <code>mod-updater/staging/</code> como el estado final que quieres distribuir. Puedes agregar, reemplazar o quitar archivos administrados.</span></li>
+        <li><span>Instala Forge para Minecraft 1.20.1.</span></li>
+        <li><span>Coloca el JAR de Mod Updater dentro de la carpeta <code>mods</code> del servidor.</span></li>
+        <li><span>Inicia el servidor una vez para que Mod Updater cree sus archivos y carpetas.</span></li>
+        <li><span>Detén el servidor antes de preparar tu primera actualizacion.</span></li>
       </ol>
+      <h3 style="margin:26px 0 10px">Cliente</h3>
+      <ol class="steps">
+        <li><span>Instala Forge para Minecraft 1.20.1.</span></li>
+        <li><span>Coloca el mismo JAR de Mod Updater dentro de la carpeta <code>mods</code> del cliente.</span></li>
+        <li><span>Inicia Minecraft y unite al servidor.</span></li>
+      </ol>
+      <p style="margin-top:16px"><strong>Nota:</strong> Mod Updater no actualiza su propio JAR activo. No coloques el actualizador dentro de staging.</p>
     </section>
 
     <section id="publicar" class="section">
@@ -623,18 +633,19 @@
       <div class="grid">
         <article class="panel pad">
           <h3>01 · Preparar</h3>
-          <p>Deja en staging exactamente los archivos que debe administrar la nueva version. Nuevo = alta, cambiado = reemplazo, retirado = eliminacion.</p>
+          <p>Pon en <code>mod-updater/staging/</code> los archivos que quieres en la proxima version, con la misma estructura de carpetas. Agregar, reemplazar o quitar un archivo de staging define el cambio.</p>
         </article>
         <article class="panel pad">
           <h3>02 · Revisar</h3>
-          <p>Usa la pantalla de Administracion o <code>/modupdater preview</code>. Se detectan cambios, lados de los mods y dependencias obligatorias.</p>
+          <p>Ejecuta <code>/modupdater preview</code> para ver archivos nuevos, actualizados y eliminados, problemas de dependencias y si el servidor necesita reiniciarse.</p>
         </article>
         <article class="panel pad">
           <h3>03 · Publicar</h3>
-          <p>Indica numero, obligatoriedad y notas. Una publicacion sin cambios se rechaza. Los jugadores conectados reciben el manifiesto al instante.</p>
+          <p>Desde el menu de administracion o con <code>/modupdater publish</code>, indica version, si es obligatoria y el changelog. Sin cambios reales, no se crea una publicacion vacia.</p>
         </article>
       </div>
-      <p style="margin-top:16px">Si cambian mods del servidor, los OP reciben un recordatorio para reiniciarlo. Ese aviso operativo nunca se muestra a jugadores normales.</p>
+      <p style="margin-top:16px">Antes de publicar, <code>/modupdater dependencies</code> revisa los metadatos de los mods locales y busca dependencias obligatorias faltantes; nunca las descarga de Internet. Si ya la tenes local, <code>/modupdater dependencies copy</code> la copia al pack.</p>
+      <p style="margin-top:10px">Si cambian mods del servidor, los OP reciben un recordatorio para reiniciarlo. Ese aviso operativo nunca se muestra a jugadores normales.</p>
     </section>
 
     <section id="jugadores" class="section">
@@ -653,15 +664,15 @@
         <article class="panel pad">
           <span class="chip yellow">● Opcional</span>
           <h3 style="margin-top:10px">Actualizacion opcional</h3>
-          <p>Puede abrirla desde el icono, leer las notas y descargarla cuando quiera. Si modifica un JAR, igual necesitara reiniciar.</p>
+          <p>El jugador ve su version, la disponible, el changelog y los archivos agregados, actualizados y eliminados, y presiona Descargar Actualizacion cuando quiera.</p>
         </article>
         <article class="panel pad">
           <span class="chip red">● Obligatoria</span>
           <h3 style="margin-top:10px">Actualizacion obligatoria</h3>
-          <p>La pantalla se abre automaticamente. Mientras actualiza, su sesion queda pausada en un estado seguro hasta finalizar.</p>
+          <p>Se abre automaticamente. Hasta instalarla, el servidor puede impedir que el jugador participe con normalidad para evitar problemas de compatibilidad.</p>
         </article>
       </div>
-      <p style="margin-top:16px">Hasta cuatro archivos se descargan en paralelo, con porcentaje total, bytes, archivo actual y progreso individual. Las descargas parciales pueden continuar desde su ultimo punto valido. Los cambios permitidos en caliente se aplican al terminar; mods y operaciones delicadas muestran <em>Reiniciar Minecraft</em>.</p>
+      <p style="margin-top:16px">Los archivos se transfieren en partes, varios pueden descargarse a la vez y las descargas interrumpidas se pueden retomar. Cada archivo se verifica contra su tamaño y hash SHA-256 esperados antes de instalarse.</p>
     </section>
 
     <section id="comandos" class="section">
@@ -703,76 +714,67 @@
     <section id="archivos" class="section">
       <div class="section-head">
         <div>
-          <h2>Archivos, Eliminaciones Y Lados</h2>
-          <p>Para retirar de los clientes algo ya publicado, eliminalo de staging, ejecuta la vista previa y publica otra version.</p>
+          <h2>Quitar Archivos Publicados</h2>
+          <p>Mod Updater solo elimina archivos que pertenecen a su estado de publicacion.</p>
         </div>
       </div>
+      <ol class="steps">
+        <li><span>Quitalo de <code>mod-updater/staging</code>.</span></li>
+        <li><span>Ejecuta <code>/modupdater preview</code>.</span></li>
+        <li><span>Comprueba que aparezca como eliminado.</span></li>
+        <li><span>Publica una nueva version.</span></li>
+        <li><span>Los jugadores descargan y aplican la actualizacion.</span></li>
+      </ol>
+      <p style="margin-top:16px">Si el archivo esta en uso, Minecraft va a necesitar reiniciarse para poder eliminarlo.</p>
+
+      <h3 style="margin:26px 0 10px">Lados De Los Mods</h3>
       <div class="grid">
         <article class="panel pad">
           <h3><code>CLIENT</code></h3>
-          <p>Contenido o dependencia exclusiva del cliente. No se carga en el servidor.</p>
+          <p>Se envia a los jugadores pero no se instala en la carpeta <code>mods</code> del servidor.</p>
         </article>
         <article class="panel pad">
           <h3><code>SERVER</code></h3>
-          <p>Mod que solamente debe cargarse en el servidor.</p>
+          <p>Instalado en el servidor pero no se envia a los jugadores.</p>
         </article>
         <article class="panel pad">
           <h3><code>BOTH</code></h3>
-          <p>Mod requerido en ambos lados, cliente y servidor.</p>
+          <p>Usado tanto por el servidor como por los jugadores.</p>
         </article>
       </div>
-      <p style="margin-top:16px">La clasificacion automatica usa los metadatos del mod. Los casos especiales pueden definirse por mod ID o nombre de archivo en <code>mod-updater/mod-sides.json</code>. Las dependencias exclusivamente cliente pueden guardarse en <code>mod-updater/client-mods/</code>.</p>
+      <p style="margin-top:16px">Mod Updater intenta detectar el lado correcto usando los metadatos y dependencias del mod. Los casos especiales se configuran en <code>mod-sides.json</code>, y las dependencias exclusivamente de cliente ya conocidas pueden colocarse en <code>mod-updater/client-mods/</code>. Si una actualizacion cambia mods <code>SERVER</code> o <code>BOTH</code>, los operadores reciben un aviso para reiniciar; los jugadores normales no lo ven.</p>
     </section>
 
     <section id="seguridad" class="section">
       <div class="section-head">
         <div>
           <h2>Diseñado Para No Dejar Instalaciones A Medias</h2>
-          <p>Integridad de punta a punta en cada actualizacion.</p>
+          <p>Algunos cambios se aplican sin reiniciar Minecraft. Si la actualizacion cambia mods activos, reemplaza archivos bloqueados o elimina archivos en uso, se ofrece la opcion de <em>Reiniciar Minecraft</em>.</p>
         </div>
       </div>
       <div class="grid">
         <article class="panel pad">
-          <h3>Firma</h3>
-          <p>El cliente verifica la firma del manifiesto y conserva la identidad de la clave del servidor.</p>
+          <h3>Firmado</h3>
+          <p>Los manifiestos de actualizacion estan firmados criptograficamente.</p>
         </article>
         <article class="panel pad">
           <h3>SHA-256</h3>
-          <p>Cada descarga debe coincidir en ruta, operacion, tamaño y hash antes de entrar en el plan.</p>
+          <p>Cada archivo descargado se verifica contra su tamaño y hash SHA-256 esperados.</p>
         </article>
         <article class="panel pad">
           <h3>Rollback</h3>
-          <p>El instalador guarda los archivos anteriores y revierte las operaciones completadas si algo falla.</p>
+          <p>Si la instalacion falla, se restauran automaticamente los archivos anteriores.</p>
         </article>
       </div>
-      <p style="margin-top:16px">Tambien se bloquean rutas absolutas, traversal, destinos fuera de la instancia y solicitudes excesivas. Mod Updater no intenta reemplazar su propio JAR.</p>
-    </section>
-
-    <section id="problemas" class="section">
-      <div class="section-head">
-        <div>
-          <h2>Problemas Frecuentes</h2>
-          <p>Respuestas rapidas a los casos mas comunes.</p>
-        </div>
-      </div>
-      <div class="grid" style="grid-template-columns:1fr">
-        <article class="panel pad">
-          <h3>La publicacion no aparece en el cliente</h3>
-          <p>Comprueba que cliente y servidor usan la misma version del mod, que el jugador termino el login de Forge y que la publicacion contiene cambios reales. Ejecuta <code>/modupdater preview</code> antes de publicar.</p>
-        </article>
-        <article class="panel pad">
-          <h3>La misma version vuelve a solicitarse</h3>
-          <p>Revisa <code>.minecraft/mod-updater/installer.log</code>. Si habia que reiniciar, Minecraft debe cerrarse completamente para que el instalador aplique el plan y guarde el manifiesto instalado.</p>
-        </article>
-        <article class="panel pad">
-          <h3>Un mod eliminado vuelve a staging</h3>
-          <p>Staging tambien refleja los mods administrados del servidor. Si el JAR todavia existe o cambio dentro de <code>server/mods</code>, puede importarse nuevamente. Retiralo del estado deseado y del servidor cuando corresponda, publica y reinicia.</p>
-        </article>
-        <article class="panel pad">
-          <h3>Falta una dependencia</h3>
-          <p>Ejecuta <code>/modupdater dependencies</code>. El sistema no descarga codigo de Internet: debes colocar la dependencia correcta localmente o usar <code>dependencies copy</code> si ya esta disponible.</p>
-        </article>
-      </div>
+      <ol class="steps" style="margin-top:16px">
+        <li><span>Se preparan los archivos descargados.</span></li>
+        <li><span>Minecraft se cierra.</span></li>
+        <li><span>El instalador comprueba la actualizacion.</span></li>
+        <li><span>Se respaldan los archivos existentes.</span></li>
+        <li><span>Se instalan los archivos nuevos.</span></li>
+        <li><span>Si algo falla, se restauran los archivos anteriores.</span></li>
+      </ol>
+      <p style="margin-top:16px">Una vez instalada correctamente, la nueva version queda guardada como instalada y no se vuelve a pedir a menos que los archivos gestionados dejen de coincidir. Una actualizacion opcional igual puede requerir reinicio: opcional solo significa que el jugador elige cuando instalarla.</p>
     </section>
 
     <section id="links" class="section">
