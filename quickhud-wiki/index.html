@@ -330,7 +330,7 @@
       font-size: 0.92em;
     }
 
-    .command code {
+    .command > code {
       display: block;
       width: 100%;
       overflow-wrap: anywhere;
@@ -641,7 +641,7 @@
         </article>
         <article class="panel pad">
           <h3 data-i18n="controlTitle">Cliente y servidor</h3>
-          <p data-i18n="controlText">El mod puede estar en cliente y servidor. Con el plugin QuickHudPL el servidor puede controlar el HUD para todos; usando solo el mod tambien puedes tener un HUD local.</p>
+          <p data-i18n="controlText">Mod + plugin: control total desde el servidor. Solo el mod: HUD local, con kills detectados por chat. Solo el plugin: los jugadores igual necesitan el mod instalado.</p>
           <div class="chips">
             <span class="chip">all</span>
             <span class="chip">players</span>
@@ -693,16 +693,44 @@
           <p data-i18n="cmdScale">Ajusta el tamaño visual de uno o todos los elementos.</p>
         </article>
         <article class="command">
-          <code>/hud kills set|add|reset &lt;amount&gt; [@a|player|team &lt;name&gt;]</code>
-          <p data-i18n="cmdKills">Controla el contador de kills por jugador, selector o equipo.</p>
+          <code>/hud kills set &lt;amount&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdKills">Define el contador de kills por jugador, selector o equipo.</p>
         </article>
         <article class="command">
-          <code>/hud timer start|pause|resume|reset &lt;seconds&gt; [@a|player|team &lt;name&gt;]</code>
-          <p data-i18n="cmdTimer">Maneja temporizadores para eventos, minijuegos o rondas.</p>
+          <code>/hud kills add &lt;amount&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdKillsAdd">Suma kills al contador de un objetivo.</p>
+        </article>
+        <article class="command">
+          <code>/hud kills reset [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdKillsReset">Reinicia el contador de kills de un objetivo.</p>
+        </article>
+        <article class="command">
+          <code>/hud kills get [player]</code>
+          <p data-i18n="cmdKillsGet">Consulta el contador de kills de un jugador.</p>
+        </article>
+        <article class="command">
+          <code>/hud timer start &lt;seconds&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTimer">Inicia un temporizador para eventos, minijuegos o rondas.</p>
+        </article>
+        <article class="command">
+          <code>/hud timer pause [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTimerPause">Pausa el temporizador de un objetivo.</p>
+        </article>
+        <article class="command">
+          <code>/hud timer resume [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTimerResume">Reanuda el temporizador pausado.</p>
+        </article>
+        <article class="command">
+          <code>/hud timer reset [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTimerReset">Reinicia el temporizador a cero.</p>
         </article>
         <article class="command">
           <code>/hud text set &lt;position&gt; &lt;text&gt;</code>
           <p data-i18n="cmdText">Muestra texto personalizado en una posicion del HUD.</p>
+        </article>
+        <article class="command">
+          <code>/hud text clear &lt;position|all&gt; [@a|player|team &lt;name&gt;]</code>
+          <p data-i18n="cmdTextClear">Quita el texto personalizado de una posicion o de todas.</p>
         </article>
         <article class="command">
           <code>/hud reset [@a|player|team &lt;name&gt;]</code>
@@ -829,7 +857,7 @@
         whatTitle: "Que muestra",
         whatText: "QuickHud puede mostrar contador de jugadores vivos, kills por jugador, timer, coordenadas XYZ y lista de equipos.",
         controlTitle: "Cliente y servidor",
-        controlText: "El mod puede estar en cliente y servidor. Con el plugin QuickHudPL el servidor puede controlar el HUD para todos; usando solo el mod tambien puedes tener un HUD local.",
+        controlText: "Mod + plugin: control total desde el servidor. Solo el mod: HUD local, con kills detectados por chat. Solo el plugin: los jugadores igual necesitan el mod instalado.",
         loadersText: "Elige el archivo segun donde lo quieras usar: mod para Fabric, Forge o NeoForge; plugin QuickHudPL para Bukkit, Paper, Purpur o Spigot.",
         commandsTitle: "Comandos",
         commandsLead: "Comandos principales para mostrar, ocultar, mover, escalar y actualizar elementos del HUD.",
@@ -837,9 +865,16 @@
         cmdHide: "Oculta un elemento especifico del HUD.",
         cmdPos: "Cambia la posicion de un elemento o de todos.",
         cmdScale: "Ajusta el tamaño visual de uno o todos los elementos.",
-        cmdKills: "Controla el contador de kills por jugador, selector o equipo.",
-        cmdTimer: "Maneja temporizadores para eventos, minijuegos o rondas.",
+        cmdKills: "Define el contador de kills por jugador, selector o equipo.",
+        cmdKillsAdd: "Suma kills al contador de un objetivo.",
+        cmdKillsReset: "Reinicia el contador de kills de un objetivo.",
+        cmdKillsGet: "Consulta el contador de kills de un jugador.",
+        cmdTimer: "Inicia un temporizador para eventos, minijuegos o rondas.",
+        cmdTimerPause: "Pausa el temporizador de un objetivo.",
+        cmdTimerResume: "Reanuda el temporizador pausado.",
+        cmdTimerReset: "Reinicia el temporizador a cero.",
         cmdText: "Muestra texto personalizado en una posicion del HUD.",
+        cmdTextClear: "Quita el texto personalizado de una posicion o de todas.",
         cmdReset: "Restablece el HUD del objetivo seleccionado.",
         positionsTitle: "Posiciones",
         positionsLead: "Puntos disponibles para ubicar elementos en pantalla.",
@@ -874,7 +909,7 @@
         whatTitle: "What it shows",
         whatText: "QuickHud can show alive player count, per-player kills, timers, XYZ coordinates and team lists.",
         controlTitle: "Client and server",
-        controlText: "The mod can run on the client and server. With the QuickHudPL plugin, the server can control the HUD for everyone; with only the mod, you can still use a local HUD.",
+        controlText: "Mod + plugin: full server-side control. Mod only: local HUD, kills detected via chat. Plugin only: players still need the mod installed.",
         loadersText: "Choose the file based on where you want to use it: mod for Fabric, Forge or NeoForge; QuickHudPL plugin for Bukkit, Paper, Purpur or Spigot.",
         commandsTitle: "Commands",
         commandsLead: "Main commands for showing, hiding, moving, scaling and updating HUD elements.",
@@ -882,9 +917,16 @@
         cmdHide: "Hides a specific HUD element.",
         cmdPos: "Changes the position of one element or all elements.",
         cmdScale: "Adjusts the visual size of one or all elements.",
-        cmdKills: "Controls the kill counter by player, selector or team.",
-        cmdTimer: "Manages timers for events, minigames or rounds.",
+        cmdKills: "Sets the kill counter for a player, selector or team.",
+        cmdKillsAdd: "Adds kills to a target's counter.",
+        cmdKillsReset: "Resets a target's kill counter.",
+        cmdKillsGet: "Checks a player's kill counter.",
+        cmdTimer: "Starts a timer for events, minigames or rounds.",
+        cmdTimerPause: "Pauses a target's timer.",
+        cmdTimerResume: "Resumes a paused timer.",
+        cmdTimerReset: "Resets the timer to zero.",
         cmdText: "Shows custom text at a HUD position.",
+        cmdTextClear: "Clears custom text from a position or all of them.",
         cmdReset: "Resets the HUD for the selected target.",
         positionsTitle: "Positions",
         positionsLead: "Available screen points for placing HUD elements.",
