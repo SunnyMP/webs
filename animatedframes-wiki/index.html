@@ -284,6 +284,30 @@
       color: var(--muted);
     }
 
+    .whats-new {
+      border: 1px solid rgba(27, 217, 106, 0.3);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(27, 217, 106, 0.12), rgba(15, 22, 31, 0.96));
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+      padding: 20px 22px;
+    }
+
+    .whats-new h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .whats-new ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--soft);
+    }
+
+    .whats-new li {
+      margin: 6px 0;
+    }
+
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -310,6 +334,12 @@
       color: #a7ffc8;
     }
 
+    .chip.amber {
+      border-color: rgba(255, 200, 87, 0.32);
+      background: rgba(255, 200, 87, 0.14);
+      color: #ffe9b0;
+    }
+
     .feed {
       display: grid;
       gap: 12px;
@@ -323,6 +353,10 @@
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: var(--radius);
       background: rgba(17, 24, 33, 0.82);
+    }
+
+    .command.is-new {
+      border-color: rgba(27, 217, 106, 0.4);
     }
 
     code {
@@ -579,8 +613,11 @@
       <span data-i18n="brand">AnimatedFrames Wiki</span>
     </a>
     <nav class="nav-links" aria-label="Navegacion principal">
+      <a href="#novedades" data-i18n="navNew">Novedades</a>
       <a href="#info" data-i18n="navInfo">Info</a>
       <a href="#comandos" data-i18n="navCommands">Comandos</a>
+      <a href="#archivos" data-i18n="navFiles">Archivos</a>
+      <a href="#plugin" data-i18n="navPlugin">Plugin</a>
       <a href="#versiones" data-i18n="navVersions">Versiones</a>
       <a href="#tutorial" data-i18n="navTutorial">Tutorial</a>
       <a class="button" href="https://modrinth.com/plugin/animated-frames">Modrinth</a>
@@ -604,7 +641,7 @@
       </div>
       <div class="stats">
         <div class="stat">
-          <strong>1.6.2</strong>
+          <strong>1.7</strong>
           <span data-i18n="latestVersion">Version mas reciente</span>
         </div>
         <div class="stat">
@@ -619,6 +656,23 @@
           <strong>SunnyAim_</strong>
           <span data-i18n="creator">Creador / soporte</span>
         </div>
+      </div>
+    </section>
+
+    <section id="novedades" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="whatsNewTitle">Novedades En 1.7</h2>
+          <p data-i18n="whatsNewLead">Los cambios principales de esta version.</p>
+        </div>
+      </div>
+      <div class="whats-new">
+        <h3 data-i18n="whatsNewHeading">Que cambio</h3>
+        <ul>
+          <li data-i18n="new1"><code>/medias show</code> ahora <strong>transfiere el archivo desde el servidor</strong> a los jugadores: ya no necesitan tenerlo instalado antes.</li>
+          <li data-i18n="new2">Nuevo comando <code>/medias showlocal</code>: mantiene el comportamiento anterior de <code>/medias show</code>, usando el archivo que cada jugador ya tiene en su carpeta local.</li>
+          <li data-i18n="new3">Nuevos comandos <code>/medias list</code> y <code>/medias help</code> en el lado servidor.</li>
+        </ul>
       </div>
     </section>
 
@@ -642,9 +696,8 @@
           </div>
         </article>
         <article class="panel pad">
-          <h3 data-i18n="folderTitle">Carpeta local</h3>
-          <p data-i18n="folderText">Los medios se cargan desde la carpeta del cliente. Cada jugador que deba ver el contenido necesita tener el archivo en su propia instalacion.</p>
-          <p><code>.minecraft/config/animatedframes/media/</code></p>
+          <h3 data-i18n="importantTitle">Importante</h3>
+          <p data-i18n="importantText">Los jugadores siempre necesitan el mod de cliente y Watermedia. Con <code>/medias show</code> el archivo viene del servidor. Con <code>/medias showlocal</code>, el archivo debe existir en la carpeta de cada jugador.</p>
         </article>
         <article class="panel pad">
           <h3>Loaders</h3>
@@ -653,8 +706,6 @@
             <span class="chip">Fabric</span>
             <span class="chip">Forge</span>
             <span class="chip">NeoForge</span>
-            <span class="chip">Bukkit</span>
-            <span class="chip">Paper</span>
             <span class="chip">Purpur</span>
             <span class="chip">Spigot</span>
           </div>
@@ -667,17 +718,18 @@
         <div>
           <div class="ribbon-text">Commands</div>
           <h2 class="sr-only">Comandos</h2>
-          <p data-i18n="commandsLead">Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos.</p>
+          <p data-i18n="commandsLead">Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos de OP o admin.</p>
         </div>
       </div>
+      <h3 style="margin:0 0 10px" data-i18n="clientCmdsTitle">Comandos de cliente (<code>/mediac</code>) — solo los ves vos</h3>
       <div class="feed">
         <article class="command">
           <code>/mediac show &lt;name&gt; [duration] [position] [scale] [volume]</code>
-          <p data-i18n="cmdShow">Muestra un archivo solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code></p>
+          <p data-i18n="cmdShow">Muestra un archivo local solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code></p>
         </article>
         <article class="command">
           <code>/mediac stop</code>
-          <p data-i18n="cmdStop">Detiene el medio actual del cliente.</p>
+          <p data-i18n="cmdStop">Detiene todo el medio activo en tu pantalla.</p>
         </article>
         <article class="command">
           <code>/mediac list</code>
@@ -687,14 +739,76 @@
           <code>/mediac lang &lt;en|es&gt;</code>
           <p data-i18n="cmdLang">Cambia el idioma de los mensajes del mod.</p>
         </article>
-        <article class="command">
+      </div>
+      <h3 style="margin:26px 0 10px" data-i18n="serverCmdsTitle">Comandos de servidor (<code>/medias</code>) — requiere OP o admin</h3>
+      <div class="feed">
+        <article class="command is-new">
           <code>/medias show &lt;player|@a&gt; &lt;name&gt; [duration] [position] [scale] [volume]</code>
-          <p data-i18n="cmdServerShow">Envia un medio a jugadores seleccionados. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code></p>
+          <p data-i18n="cmdServerShow">Envia un archivo del servidor a los jugadores seleccionados y lo reproduce. No necesitan tenerlo de antemano. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code></p>
+        </article>
+        <article class="command is-new">
+          <code>/medias showlocal &lt;player|@a&gt; &lt;name&gt; [duration] [position] [scale] [volume]</code>
+          <p data-i18n="cmdServerShowLocal">Reproduce un archivo ya guardado en la carpeta local de cada jugador seleccionado. Mantiene el comportamiento anterior de <code>/medias show</code>. Ejemplo: <code>/medias showlocal @a example.gif 15 topleft 2.0 80</code></p>
         </article>
         <article class="command">
           <code>/medias stop &lt;player|@a&gt;</code>
           <p data-i18n="cmdServerStop">Detiene el medio para jugadores seleccionados.</p>
         </article>
+        <article class="command is-new">
+          <code>/medias list</code>
+          <p data-i18n="cmdServerList">Lista los archivos en la carpeta de medios del servidor.</p>
+        </article>
+        <article class="command is-new">
+          <code>/medias help</code>
+          <p data-i18n="cmdServerHelp">Muestra la ayuda de comandos.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="archivos" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="filesTitle">Ubicacion De Archivos</h2>
+          <p data-i18n="filesLead">Tres carpetas distintas segun donde corra AnimatedFrames.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel pad">
+          <h3 data-i18n="folderClientTitle">Carpeta de cliente</h3>
+          <p><code>.minecraft/config/animatedframes/media/</code></p>
+          <p data-i18n="folderClientText">La usan <code>/mediac show</code> y <code>/medias showlocal</code>.</p>
+        </article>
+        <article class="panel pad">
+          <h3 data-i18n="folderServerModTitle">Carpeta de servidor (mod)</h3>
+          <p><code>config/animatedframes/media/</code></p>
+          <p data-i18n="folderServerModText"><code>/medias show</code> toma el archivo de aca y lo transfiere a los jugadores seleccionados.</p>
+        </article>
+        <article class="panel pad">
+          <h3 data-i18n="folderServerPluginTitle">Carpeta de servidor (plugin)</h3>
+          <p><code>plugins/AnimatedFramesPL/media/</code></p>
+          <p data-i18n="folderServerPluginText">Misma logica que la carpeta de servidor, pero para la version plugin.</p>
+        </article>
+      </div>
+      <p style="margin-top:16px" data-i18n="filesNote">Las carpetas se crean automaticamente al iniciar. Los archivos recibidos por transferencia se guardan en una cache de cliente separada. Si usas un launcher con instancias separadas, usa la carpeta de la instancia correspondiente.</p>
+    </section>
+
+    <section id="plugin" class="section">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="pluginTitle">Soporte De Plugin</h2>
+          <p data-i18n="pluginLead">Control desde el servidor sin necesitar el mod instalado ahi.</p>
+        </div>
+      </div>
+      <div class="panel pad">
+        <p data-i18n="pluginText">AnimatedFrames tambien tiene una version <strong>plugin para Bukkit/Spigot/Paper/Purpur</strong>. Con el plugin, los admins pueden mostrar medios en la pantalla de los jugadores sin necesitar el mod en el servidor.</p>
+        <p data-i18n="pluginText2">Coloca los archivos del servidor en <code>plugins/AnimatedFramesPL/media/</code> y usa <code>/medias show</code> para enviarlos a los jugadores.</p>
+        <p data-i18n="pluginText3">El plugin usa el permiso <code>animatedframes.admin</code>, otorgado a los OP por defecto. Usa <code>/medias lang &lt;en|es&gt;</code> para cambiar el idioma del plugin.</p>
+        <div class="chips">
+          <span class="chip">Bukkit</span>
+          <span class="chip">Spigot</span>
+          <span class="chip">Paper</span>
+          <span class="chip">Purpur</span>
+        </div>
       </div>
     </section>
 
@@ -718,6 +832,7 @@
           <span class="chip">rightcenter</span>
           <span class="chip green">fullscreen</span>
         </div>
+        <p style="margin-top:12px" data-i18n="fullscreenNote"><strong>fullscreen</strong> llena toda la pantalla en videos manteniendo el aspect ratio y recorta los bordes si hace falta. Omite la escala y pone el volumen justo despues de <code>fullscreen</code>. Ejemplo: <code>/medias show @a intro.mp4 0 fullscreen 80</code>.</p>
       </div>
     </section>
 
@@ -725,28 +840,28 @@
       <div class="section-head">
         <div>
           <h2 data-i18n="versionsTitle">Versiones Y Loaders</h2>
-          <p data-i18n="versionsLead">Compatibilidad indicada en las paginas publicas del proyecto, revisada el 4 de mayo de 2026.</p>
+          <p data-i18n="versionsLead">Compatibilidad indicada en las paginas publicas del proyecto.</p>
         </div>
       </div>
       <div class="versions">
         <article class="version">
           <strong>1.21.4</strong>
-          <span>AnimatedFrames 1.6.2</span>
+          <span>AnimatedFrames 1.7</span>
           <span>Fabric / NeoForge</span>
         </article>
         <article class="version">
           <strong>1.21.1</strong>
-          <span>AnimatedFrames 1.6.2</span>
+          <span>AnimatedFrames 1.7</span>
           <span>Fabric / NeoForge</span>
         </article>
         <article class="version">
           <strong>1.21</strong>
-          <span>AnimatedFrames 1.6.2</span>
+          <span>AnimatedFrames 1.7</span>
           <span>Fabric / NeoForge</span>
         </article>
         <article class="version">
           <strong>1.20.1</strong>
-          <span>AnimatedFrames 1.6.2</span>
+          <span>AnimatedFrames 1.7</span>
           <span>Fabric / Forge</span>
         </article>
       </div>
@@ -761,12 +876,23 @@
       </div>
       <ol class="steps">
         <li><span data-i18n="step1">Instala AnimatedFrames y Watermedia para tu version de Minecraft y loader.</span></li>
-        <li><span data-i18n="step2">Abre <code>.minecraft/config/animatedframes/media/</code>.</span></li>
-        <li><span data-i18n="step3">Copia tus archivos <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code>.</span></li>
-        <li><span data-i18n="step4">Comprueba la lista con <code>/mediac list</code>.</span></li>
-        <li><span data-i18n="step5">Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.</span></li>
-        <li><span data-i18n="step6">Para enviarlo a jugadores usa <code>/medias show @a sunny.gif 15 center 1.0 80</code>.</span></li>
+        <li><span data-i18n="step2">Copia tu archivo <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code> en la carpeta correcta: la de cliente para <code>/mediac show</code> o <code>/medias showlocal</code>, o la de servidor para <code>/medias show</code>.</span></li>
+        <li><span data-i18n="step3">Comprueba la lista con <code>/mediac list</code> (cliente) o <code>/medias list</code> (servidor).</span></li>
+        <li><span data-i18n="step4">Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.</span></li>
+        <li><span data-i18n="step5">Envia un archivo del servidor a todos con <code>/medias show @a sunny.gif 15 center 1.0 80</code> — no necesitan tenerlo antes.</span></li>
+        <li><span data-i18n="step6">Para reproducir un archivo que los jugadores ya tienen instalado, usa <code>/medias showlocal @a sunny.gif 15 center 1.0 80</code>.</span></li>
       </ol>
+      <div class="panel pad" style="margin-top:14px">
+        <h3 data-i18n="tipsTitle">Tips</h3>
+        <ul style="margin:0;padding-left:18px;color:var(--muted)">
+          <li data-i18n="tip1">Actualizando desde 1.6.2: cambia <code>/medias show</code> por <code>/medias showlocal</code> si querias mantener el comportamiento anterior con archivos ya instalados.</li>
+          <li data-i18n="tip2">Nombres de archivo con espacios van entre comillas: <code>/medias show @a "welcome video.mp4" 10 center 1.0 80</code>.</li>
+          <li data-i18n="tip3">Los archivos grandes pueden tardar en transferirse antes de reproducirse.</li>
+          <li data-i18n="tip4">Duracion en segundos; <code>0</code> significa sin limite de tiempo por comando (el video igual se detiene al terminar).</li>
+          <li data-i18n="tip5">Escala: <code>0.05–10</code> (por defecto <code>1.0</code>). Volumen: <code>0–100</code> (por defecto <code>80</code>).</li>
+          <li data-i18n="tip6">El medio se detiene automaticamente cuando el jugador se desconecta.</li>
+        </ul>
+      </div>
     </section>
 
     <section id="links" class="section">
@@ -796,8 +922,11 @@
     const translations = {
       es: {
         brand: "AnimatedFrames Wiki",
+        navNew: "Novedades",
         navInfo: "Info",
         navCommands: "Comandos",
+        navFiles: "Archivos",
+        navPlugin: "Plugin",
         navVersions: "Versiones",
         navTutorial: "Tutorial",
         kicker: "Mod / Plugin",
@@ -808,37 +937,73 @@
         listedVersions: "Versiones soportadas",
         dependency: "Dependencia principal",
         creator: "Creador / soporte",
+        whatsNewTitle: "Novedades En 1.7",
+        whatsNewLead: "Los cambios principales de esta version.",
+        whatsNewHeading: "Que cambio",
+        new1: '<code>/medias show</code> ahora <strong>transfiere el archivo desde el servidor</strong> a los jugadores: ya no necesitan tenerlo instalado antes.',
+        new2: 'Nuevo comando <code>/medias showlocal</code>: mantiene el comportamiento anterior de <code>/medias show</code>, usando el archivo que cada jugador ya tiene en su carpeta local.',
+        new3: 'Nuevos comandos <code>/medias list</code> y <code>/medias help</code> en el lado servidor.',
         infoLead: "Todo lo basico para saber que hace, donde van los archivos y que necesita cada jugador.",
         whatTitle: "Que hace",
         whatText: "AnimatedFrames permite reproducir imagenes, GIFs y videos MP4 como overlays en pantalla. Es ideal para eventos, intros, avisos, pantallas de rol y contenido decorativo.",
-        folderTitle: "Carpeta local",
-        folderText: "Los medios se cargan desde la carpeta del cliente. Cada jugador que deba ver el contenido necesita tener el archivo en su propia instalacion.",
+        importantTitle: "Importante",
+        importantText: 'Los jugadores siempre necesitan el mod de cliente y Watermedia. Con <code>/medias show</code> el archivo viene del servidor. Con <code>/medias showlocal</code>, el archivo debe existir en la carpeta de cada jugador.',
         loadersText: "El proyecto lista soporte para mod y plugin segun plataforma. Descarga siempre el archivo que coincida con tu Minecraft y loader.",
-        commandsLead: "Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos.",
-        cmdShow: 'Muestra un archivo solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
-        cmdStop: "Detiene el medio actual del cliente.",
+        commandsLead: "Cliente para verlo solo tu, servidor para enviarlo a jugadores. En servidor requiere permisos de OP o admin.",
+        clientCmdsTitle: 'Comandos de cliente (<code>/mediac</code>) — solo los ves vos',
+        serverCmdsTitle: 'Comandos de servidor (<code>/medias</code>) — requiere OP o admin',
+        cmdShow: 'Muestra un archivo local solo para ti. Ejemplo: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
+        cmdStop: "Detiene todo el medio activo en tu pantalla.",
         cmdList: "Lista los archivos disponibles en tu carpeta local.",
         cmdLang: "Cambia el idioma de los mensajes del mod.",
-        cmdServerShow: 'Envia un medio a jugadores seleccionados. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
+        cmdServerShow: 'Envia un archivo del servidor a los jugadores seleccionados y lo reproduce. No necesitan tenerlo de antemano. Ejemplo: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
+        cmdServerShowLocal: 'Reproduce un archivo ya guardado en la carpeta local de cada jugador seleccionado. Mantiene el comportamiento anterior de <code>/medias show</code>. Ejemplo: <code>/medias showlocal @a example.gif 15 topleft 2.0 80</code>',
         cmdServerStop: "Detiene el medio para jugadores seleccionados.",
+        cmdServerList: "Lista los archivos en la carpeta de medios del servidor.",
+        cmdServerHelp: "Muestra la ayuda de comandos.",
+        filesTitle: "Ubicacion De Archivos",
+        filesLead: "Tres carpetas distintas segun donde corra AnimatedFrames.",
+        folderClientTitle: "Carpeta de cliente",
+        folderClientText: 'La usan <code>/mediac show</code> y <code>/medias showlocal</code>.',
+        folderServerModTitle: "Carpeta de servidor (mod)",
+        folderServerModText: '<code>/medias show</code> toma el archivo de aca y lo transfiere a los jugadores seleccionados.',
+        folderServerPluginTitle: "Carpeta de servidor (plugin)",
+        folderServerPluginText: "Misma logica que la carpeta de servidor, pero para la version plugin.",
+        filesNote: "Las carpetas se crean automaticamente al iniciar. Los archivos recibidos por transferencia se guardan en una cache de cliente separada. Si usas un launcher con instancias separadas, usa la carpeta de la instancia correspondiente.",
+        pluginTitle: "Soporte De Plugin",
+        pluginLead: "Control desde el servidor sin necesitar el mod instalado ahi.",
+        pluginText: 'AnimatedFrames tambien tiene una version <strong>plugin para Bukkit/Spigot/Paper/Purpur</strong>. Con el plugin, los admins pueden mostrar medios en la pantalla de los jugadores sin necesitar el mod en el servidor.',
+        pluginText2: 'Coloca los archivos del servidor en <code>plugins/AnimatedFramesPL/media/</code> y usa <code>/medias show</code> para enviarlos a los jugadores.',
+        pluginText3: 'El plugin usa el permiso <code>animatedframes.admin</code>, otorgado a los OP por defecto. Usa <code>/medias lang &lt;en|es&gt;</code> para cambiar el idioma del plugin.',
         positionsLead: "Opciones soportadas para ubicar el medio en pantalla.",
+        fullscreenNote: '<strong>fullscreen</strong> llena toda la pantalla en videos manteniendo el aspect ratio y recorta los bordes si hace falta. Omite la escala y pone el volumen justo despues de <code>fullscreen</code>. Ejemplo: <code>/medias show @a intro.mp4 0 fullscreen 80</code>.',
         versionsTitle: "Versiones Y Loaders",
-        versionsLead: "Compatibilidad indicada en las paginas publicas del proyecto, revisada el 4 de mayo de 2026.",
+        versionsLead: "Compatibilidad indicada en las paginas publicas del proyecto.",
         tutorialTitle: "Tutorial Rapido",
         tutorialLead: "La ruta corta para probarlo sin perderse.",
         step1: "Instala AnimatedFrames y Watermedia para tu version de Minecraft y loader.",
-        step2: 'Abre <code>.minecraft/config/animatedframes/media/</code>.',
-        step3: 'Copia tus archivos <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code>.',
-        step4: 'Comprueba la lista con <code>/mediac list</code>.',
-        step5: 'Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
-        step6: 'Para enviarlo a jugadores usa <code>/medias show @a sunny.gif 15 center 1.0 80</code>.',
+        step2: 'Copia tu archivo <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> o <code>.mp4</code> en la carpeta correcta: la de cliente para <code>/mediac show</code> o <code>/medias showlocal</code>, o la de servidor para <code>/medias show</code>.',
+        step3: 'Comprueba la lista con <code>/mediac list</code> (cliente) o <code>/medias list</code> (servidor).',
+        step4: 'Muestra algo localmente con <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
+        step5: 'Envia un archivo del servidor a todos con <code>/medias show @a sunny.gif 15 center 1.0 80</code> — no necesitan tenerlo antes.',
+        step6: 'Para reproducir un archivo que los jugadores ya tienen instalado, usa <code>/medias showlocal @a sunny.gif 15 center 1.0 80</code>.',
+        tipsTitle: "Tips",
+        tip1: 'Actualizando desde 1.6.2: cambia <code>/medias show</code> por <code>/medias showlocal</code> si querias mantener el comportamiento anterior con archivos ya instalados.',
+        tip2: 'Nombres de archivo con espacios van entre comillas: <code>/medias show @a "welcome video.mp4" 10 center 1.0 80</code>.',
+        tip3: "Los archivos grandes pueden tardar en transferirse antes de reproducirse.",
+        tip4: 'Duracion en segundos; <code>0</code> significa sin limite de tiempo por comando (el video igual se detiene al terminar).',
+        tip5: 'Escala: <code>0.05–10</code> (por defecto <code>1.0</code>). Volumen: <code>0–100</code> (por defecto <code>80</code>).',
+        tip6: "El medio se detiene automaticamente cuando el jugador se desconecta.",
         downloadTitle: "Descargas",
         downloadLead: "Accesos rapidos a las paginas principales del proyecto."
       },
       en: {
         brand: "AnimatedFrames Wiki",
+        navNew: "What's New",
         navInfo: "Info",
         navCommands: "Commands",
+        navFiles: "Files",
+        navPlugin: "Plugin",
         navVersions: "Versions",
         navTutorial: "Guide",
         kicker: "Mod / Plugin",
@@ -849,30 +1014,63 @@
         listedVersions: "Supported versions",
         dependency: "Main dependency",
         creator: "Creator / support",
+        whatsNewTitle: "What's New In 1.7",
+        whatsNewLead: "The main changes in this release.",
+        whatsNewHeading: "What changed",
+        new1: '<code>/medias show</code> now <strong>transfers the file from the server</strong> to players — they no longer need it beforehand.',
+        new2: 'New command <code>/medias showlocal</code>: keeps the previous behavior of <code>/medias show</code>, using the file each player already has locally.',
+        new3: 'New server-side commands <code>/medias list</code> and <code>/medias help</code>.',
         infoLead: "The essentials: what it does, where files go and what each player needs.",
         whatTitle: "What it does",
         whatText: "AnimatedFrames plays images, GIFs and MP4 videos as screen overlays. It is useful for events, intros, alerts, roleplay screens and decorative content.",
-        folderTitle: "Local folder",
-        folderText: "Media loads from the client folder. Every player who needs to see the content must have the file in their own installation.",
+        importantTitle: "Important",
+        importantText: 'Players always need the client mod and Watermedia. With <code>/medias show</code> the file comes from the server. With <code>/medias showlocal</code>, the file must already exist in each player\'s own folder.',
         loadersText: "The project lists mod and plugin support depending on platform. Always download the file that matches your Minecraft version and loader.",
-        commandsLead: "Client commands show media only for you. Server commands send media to selected players and require permissions.",
-        cmdShow: 'Shows a file only for you. Example: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
-        cmdStop: "Stops the current client media.",
-        cmdList: "Lists available files in your local folder.",
+        commandsLead: "Client commands show media only for you. Server commands send media to selected players and require OP or admin permission.",
+        clientCmdsTitle: 'Client-side commands (<code>/mediac</code>) — only you see them',
+        serverCmdsTitle: 'Server-side commands (<code>/medias</code>) — requires OP or admin',
+        cmdShow: 'Shows a local file only for you. Example: <code>/mediac show sunny.gif 10 center 1.0 80</code>',
+        cmdStop: "Stops all active media on your screen.",
+        cmdList: "Lists files in your local folder.",
         cmdLang: "Changes the mod message language.",
-        cmdServerShow: 'Sends media to selected players. Example: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
+        cmdServerShow: 'Sends a file from the server to the selected players and plays it. Players do not need to have the file beforehand. Example: <code>/medias show @a example.gif 15 topleft 2.0 80</code>',
+        cmdServerShowLocal: "Plays a file already stored in each selected player's local media folder. This preserves the previous behavior of <code>/medias show</code>. Example: <code>/medias showlocal @a example.gif 15 topleft 2.0 80</code>",
         cmdServerStop: "Stops media for selected players.",
+        cmdServerList: "Lists files in the server's media folder.",
+        cmdServerHelp: "Displays command help.",
+        filesTitle: "File Location",
+        filesLead: "Three different folders depending on where AnimatedFrames runs.",
+        folderClientTitle: "Client folder",
+        folderClientText: 'Used by <code>/mediac show</code> and <code>/medias showlocal</code>.',
+        folderServerModTitle: "Server folder (mod)",
+        folderServerModText: '<code>/medias show</code> takes the file from here and transfers it to the selected players.',
+        folderServerPluginTitle: "Server folder (plugin)",
+        folderServerPluginText: "Same idea as the server folder, but for the plugin version.",
+        filesNote: "Media folders are created automatically on startup. Received files are stored automatically in a separate client cache. For launchers with separate instances, use the corresponding instance's folder.",
+        pluginTitle: "Plugin Support",
+        pluginLead: "Server-side control without needing the mod there.",
+        pluginText: 'AnimatedFrames also has a <strong>Bukkit/Spigot/Paper/Purpur plugin</strong> version for server-side control. With the plugin, server admins can trigger media on players\' screens without needing the mod on the server.',
+        pluginText2: 'Place server files in <code>plugins/AnimatedFramesPL/media/</code> and use <code>/medias show</code> to send them to players.',
+        pluginText3: 'The plugin uses the <code>animatedframes.admin</code> permission, granted to OPs by default. Use <code>/medias lang &lt;en|es&gt;</code> to change the plugin\'s language.',
         positionsLead: "Supported options for placing media on screen.",
+        fullscreenNote: '<strong>fullscreen</strong> fills the entire screen for videos while keeping their aspect ratio, cropping the edges when necessary. Omit the scale and enter the volume right after <code>fullscreen</code>. Example: <code>/medias show @a intro.mp4 0 fullscreen 80</code>.',
         versionsTitle: "Versions And Loaders",
-        versionsLead: "Compatibility shown on the public project pages, reviewed on May 4, 2026.",
+        versionsLead: "Compatibility shown on the public project pages.",
         tutorialTitle: "Quick Guide",
         tutorialLead: "The short path to test it without getting lost.",
         step1: "Install AnimatedFrames and Watermedia for your Minecraft version and loader.",
-        step2: 'Open <code>.minecraft/config/animatedframes/media/</code>.',
-        step3: 'Copy your <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> or <code>.mp4</code> files.',
-        step4: 'Check the list with <code>/mediac list</code>.',
-        step5: 'Show something locally with <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
-        step6: 'To send it to players, use <code>/medias show @a sunny.gif 15 center 1.0 80</code>.',
+        step2: 'Copy your <code>.gif</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code> or <code>.mp4</code> file into the right folder: the client one for <code>/mediac show</code> or <code>/medias showlocal</code>, or the server one for <code>/medias show</code>.',
+        step3: 'Check the list with <code>/mediac list</code> (client) or <code>/medias list</code> (server).',
+        step4: 'Show something locally with <code>/mediac show sunny.gif 10 center 1.0 80</code>.',
+        step5: 'Send a server file to everyone with <code>/medias show @a sunny.gif 15 center 1.0 80</code> — they don\'t need it beforehand.',
+        step6: 'To play a file players already have installed, use <code>/medias showlocal @a sunny.gif 15 center 1.0 80</code>.',
+        tipsTitle: "Tips",
+        tip1: 'Updating from 1.6.2: replace <code>/medias show</code> with <code>/medias showlocal</code> if you want to keep the previous behavior with files already installed.',
+        tip2: 'Filenames with spaces need double quotes: <code>/medias show @a "welcome video.mp4" 10 center 1.0 80</code>.',
+        tip3: "Large files may take some time to transfer before playback begins.",
+        tip4: 'Duration is in seconds; <code>0</code> means no command-imposed time limit (videos still stop at the end).',
+        tip5: 'Scale: <code>0.05–10</code> (default <code>1.0</code>). Volume: <code>0–100</code> (default <code>80</code>).',
+        tip6: "Media stops automatically when the player disconnects.",
         downloadTitle: "Downloads",
         downloadLead: "Quick access to the main project pages."
       }
