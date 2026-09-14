@@ -1,93 +1,589 @@
 (() => {
   "use strict";
 
-  const DB_KEY = "syncsound:rooms:v1";
-  const SESSION_KEY = "syncsound:session:v1";
-  const channel = "BroadcastChannel" in window ? new BroadcastChannel("syncsound:signal:v1") : null;
-  const state = { role: null, room: null, participantId: null, localStream: null, displayStream: null, micStream: null, peers: new Map(), activeSourceKind: null, pendingOffer: null, connected: false, muted: false };
+  const APP_ID = "us.jolty.syncsound.public.v2";
+  const LOBBY_ID = "syncsound-public-lobby-v2";
+  const ROOM_PREFIX = "syncsound-room-v2-";
+  const ANNOUNCEMENT_TTL = 16000;
+  const JOIN_TIMEOUT = 18000;
+  const state = {
+    role: null,
+    room: null,
+    participantId: null,
+    adminPeerId: null,
+    localStream: null,
+    displayStream: null,
+    micStream: null,
+    networkRoom: null,
+    lobby: null,
+    lobbyActions: null,
+    roomActions: null,
+    publicRooms: new Map(),
+    muted: false,
+    networkReady: null,
+    joinTimer: null,
+    announceTimer: null
+  };
 
   const $ = (id) => document.getElementById(id);
-  const landing = $("landing-view"), roomView = $("room-view"), adminLayout = $("admin-layout"), guestLayout = $("guest-layout"), modalBackdrop = $("modal-backdrop");
-  const urlRoom = new URLSearchParams(location.search).get("room");
+  const landing = $("landing-view");
+  const roomView = $("room-view");
+  const adminLayout = $("admin-layout");
+  const guestLayout = $("guest-layout");
+  const modalBackdrop = $("modal-backdrop");
+  const urlRoom = new URLSearchParams(location.search).get("room")?.trim().toUpperCase() || "";
+  let pendingJoinCode = urlRoom;
+  let joinRoomNetwork = null;
+  let networkSelfId = null;
 
-  function readRooms() { try { return JSON.parse(localStorage.getItem(DB_KEY) || "{}"); } catch { return {}; } }
-  function writeRooms(rooms) { localStorage.setItem(DB_KEY, JSON.stringify(rooms)); }
-  function randomId(size = 10) { const bytes = new Uint8Array(size); crypto.getRandomValues(bytes); return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, size); }
-  function roomCode() { return Math.random().toString(36).slice(2, 8).toUpperCase(); }
-  function initials(name = "?") { return name.trim().split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(); }
-  function roomLink(code) { return `${location.origin}${location.pathname}?room=${code}`; }
-  async function hash(value) { if (!value) return ""; const data = new TextEncoder().encode(value); const digest = await crypto.subtle.digest("SHA-256", data); return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
-  function notify(message, type = "info") { const toast = document.createElement("div"); toast.className = `toast ${type}`; toast.textContent = message; $("toast-stack").appendChild(toast); setTimeout(() => toast.remove(), 5000); }
-  function setTopStatus(text) { $("top-status").textContent = text; }
-  function send(message) { if (channel) channel.postMessage({ ...message, roomCode: state.room?.code, sender: state.participantId }); }
-  function getRoom(code) { return readRooms()[code]; }
-  function saveRoom(room) { const rooms = readRooms(); rooms[room.code] = room; writeRooms(rooms); send({ type: "room-updated", room }); }
-  function removeRoom(code) { const rooms = readRooms(); delete rooms[code]; writeRooms(rooms); send({ type: "room-closed", roomCode: code }); }
+  function randomCode() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const bytes = new Uint8Array(6);
+    crypto.getRandomValues(bytes);
+    return [...bytes].map((value) => alphabet[value % alphabet.length]).join("");
+  }
 
-  function openModal(kind) { modalBackdrop.classList.remove("hidden"); ["create-modal", "join-modal", "help-modal"].forEach((id) => $(id).classList.toggle("hidden", id !== `${kind}-modal`)); if (kind === "join") { const direct = Boolean(urlRoom); $("join-code").value = direct ? urlRoom.toUpperCase() : ""; $("join-code-field").classList.toggle("hidden", direct); $("join-code").required = !direct; $("join-copy").textContent = direct ? "Escribe solamente tu nombre para entrar a esta sala pública." : "Usa el código de seis caracteres o abre el enlace que te compartió el anfitrión."; } setTimeout(() => $(kind === "create" ? "create-room-name" : kind === "join" ? (urlRoom ? "join-name" : "join-code") : "modal-close").focus(), 0); }
-  function closeModal() { modalBackdrop.classList.add("hidden"); }
-  function showRoom(role) { landing.classList.add("hidden"); roomView.classList.remove("hidden"); adminLayout.classList.toggle("hidden", role !== "admin"); guestLayout.classList.toggle("hidden", role !== "guest"); }
+  function initials(name = "?") {
+    return name.trim().split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, (character) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;"
+    })[character]);
+  }
+
+  function roomLink(code) {
+    return `${location.origin}${location.pathname}?room=${code}`;
+  }
+
+  function notify(message, type = "info") {
+    const stack = $("toast-stack");
+    const duplicate = [...stack.children].find((toast) => toast.dataset.message === message);
+    duplicate?.remove();
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.dataset.message = message;
+    toast.textContent = message;
+    stack.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  }
+
+  function setTopStatus(text) {
+    $("top-status").textContent = text;
+  }
+
+  function setJoinBusy(busy) {
+    const button = $("join-form").querySelector("button[type='submit']");
+    button.disabled = busy;
+    button.innerHTML = busy ? "Buscando anfitrión…" : "Ingresar a la sala <span>→</span>";
+  }
+
+  async function ensureNetwork() {
+    if (state.networkReady) return state.networkReady;
+    state.networkReady = (async () => {
+      try {
+        setTopStatus("Conectando a la red pública…");
+        const module = await import("https://esm.run/trystero@0.25.4");
+        joinRoomNetwork = module.joinRoom;
+        networkSelfId = module.selfId;
+        state.participantId = networkSelfId;
+        setupLobby();
+        setTopStatus("Red pública activa");
+        return true;
+      } catch (error) {
+        console.error("No se pudo iniciar la señalización pública", error);
+        setTopStatus("Red pública no disponible");
+        notify("No se pudo conectar con la red pública. Revisa Internet o bloqueadores del navegador.", "error");
+        return false;
+      }
+    })();
+    return state.networkReady;
+  }
+
+  function setupLobby() {
+    state.lobby = joinRoomNetwork({ appId: APP_ID }, LOBBY_ID, {
+      onJoinError: () => setTopStatus("Reconectando la lista pública…")
+    });
+    const announce = state.lobby.makeAction("room-announce");
+    const query = state.lobby.makeAction("room-query");
+    state.lobbyActions = { announce, query };
+
+    announce.onMessage = (data) => receiveAnnouncement(data);
+    query.onMessage = (_data, { peerId }) => announceCurrentRoom(peerId);
+    state.lobby.onPeerJoin = (peerId) => {
+      announceCurrentRoom(peerId);
+      query.send({ requestedAt: Date.now() }, { target: peerId }).catch(() => {});
+    };
+    query.send({ requestedAt: Date.now() }).catch(() => {});
+    state.announceTimer = setInterval(() => {
+      announceCurrentRoom();
+      prunePublicRooms();
+    }, 5000);
+  }
+
+  function publicRoomPayload() {
+    if (state.role !== "admin" || !state.room || state.room.closed) return null;
+    return {
+      code: state.room.code,
+      name: state.room.name,
+      adminName: state.room.adminName,
+      maxParticipants: state.room.maxParticipants,
+      participantCount: Object.keys(state.room.participants || {}).length,
+      locked: Boolean(state.room.locked),
+      activeSource: state.room.activeSource || null,
+      updatedAt: Date.now()
+    };
+  }
+
+  function announceCurrentRoom(target) {
+    const payload = publicRoomPayload();
+    if (!payload || !state.lobbyActions) return;
+    receiveAnnouncement(payload);
+    state.lobbyActions.announce.send(payload, target ? { target } : undefined).catch(() => {});
+  }
+
+  function receiveAnnouncement(data) {
+    if (!data || !/^[A-Z2-9]{6}$/.test(data.code || "") || !data.name || !data.adminName) return;
+    state.publicRooms.set(data.code, { ...data, receivedAt: Date.now() });
+    renderPublicRooms();
+  }
+
+  function prunePublicRooms() {
+    const now = Date.now();
+    for (const [code, room] of state.publicRooms) {
+      if (state.room?.code === code && state.role === "admin") continue;
+      if (now - room.receivedAt > ANNOUNCEMENT_TTL) state.publicRooms.delete(code);
+    }
+    renderPublicRooms();
+  }
+
+  function renderPublicRooms() {
+    const list = $("public-room-list");
+    const rooms = [...state.publicRooms.values()]
+      .filter((room) => Date.now() - room.receivedAt <= ANNOUNCEMENT_TTL)
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+
+    $("public-rooms-status").textContent = state.lobby ? "Sincronizado entre dispositivos" : "Conectando…";
+    if (!rooms.length) {
+      list.innerHTML = `<div class="public-rooms-empty"><span>◌</span><p>No hay salas públicas activas.<br /><small>Las salas aparecerán mientras su anfitrión esté conectado.</small></p></div>`;
+      return;
+    }
+
+    list.innerHTML = rooms.map((room) => {
+      const full = room.participantCount >= room.maxParticipants;
+      const unavailable = room.locked || full;
+      const status = room.locked ? "Bloqueada" : full ? "Completa" : `${room.participantCount}/${room.maxParticipants} personas`;
+      return `<div class="public-room"><span class="public-room-live"></span><div class="public-room-info"><span class="public-room-name">${escapeHtml(room.name)}</span><span class="public-room-meta">${escapeHtml(room.adminName)} · ${status}</span></div><span class="public-room-code">${room.code}</span><button class="secondary-button" type="button" data-public-room="${room.code}" ${unavailable ? "disabled" : ""}>Entrar</button></div>`;
+    }).join("");
+
+    list.querySelectorAll("[data-public-room]").forEach((button) => {
+      button.addEventListener("click", () => openModal("join", button.dataset.publicRoom));
+    });
+  }
+
+  function openModal(kind, code = "") {
+    modalBackdrop.classList.remove("hidden");
+    ["create-modal", "join-modal", "help-modal"].forEach((id) => $(id).classList.toggle("hidden", id !== `${kind}-modal`));
+    if (kind === "join") {
+      pendingJoinCode = (code || urlRoom || "").toUpperCase();
+      const direct = Boolean(pendingJoinCode);
+      $("join-code").value = pendingJoinCode;
+      $("join-code-field").classList.toggle("hidden", direct);
+      $("join-code").required = !direct;
+      $("join-copy").textContent = direct ? "Escribe solamente tu nombre para entrar a esta sala pública." : "Usa el código de seis caracteres o elige una sala pública.";
+      setJoinBusy(false);
+    }
+    const focusId = kind === "create" ? "create-room-name" : kind === "join" ? (pendingJoinCode ? "join-name" : "join-code") : "modal-close";
+    setTimeout(() => $(focusId).focus(), 0);
+  }
+
+  function closeModal() {
+    modalBackdrop.classList.add("hidden");
+  }
+
+  function showRoom(role) {
+    landing.classList.add("hidden");
+    roomView.classList.remove("hidden");
+    adminLayout.classList.toggle("hidden", role !== "admin");
+    guestLayout.classList.toggle("hidden", role !== "guest");
+  }
+
+  function participantRecord(id, name, role) {
+    return { id, name: name.trim(), role, joinedAt: Date.now() };
+  }
+
+  function cloneRoom() {
+    return JSON.parse(JSON.stringify(state.room));
+  }
 
   function renderParticipants() {
     const participants = Object.values(state.room?.participants || {});
-    const targets = state.role === "admin" ? [$("admin-participant-list")] : [$("guest-participant-list")];
-    targets.forEach((list) => { list.innerHTML = ""; participants.forEach((p) => { const row = document.createElement("div"); row.className = "participant"; row.innerHTML = `<span class="avatar ${p.role === "admin" ? "admin" : ""}">${initials(p.name)}</span><span class="participant-info"><span class="participant-name">${escapeHtml(p.name)}${p.id === state.participantId ? " (tú)" : ""}</span><span class="participant-role">${p.role === "admin" ? "Anfitrión" : "Escuchando"}</span></span>${state.role === "admin" && p.role !== "admin" ? `<button class="kick-button" type="button" data-kick="${p.id}" aria-label="Expulsar a ${escapeHtml(p.name)}">×</button>` : ""}`; list.appendChild(row); }); });
-    const count = participants.length; $("admin-participant-count").textContent = `${count} / ${state.room?.maxParticipants || 8}`; $("participant-count-badge").textContent = count; $("guest-participant-count").textContent = count;
+    const list = state.role === "admin" ? $("admin-participant-list") : $("guest-participant-list");
+    list.innerHTML = "";
+    participants.forEach((participant) => {
+      const row = document.createElement("div");
+      row.className = "participant";
+      row.innerHTML = `<span class="avatar ${participant.role === "admin" ? "admin" : ""}">${initials(participant.name)}</span><span class="participant-info"><span class="participant-name">${escapeHtml(participant.name)}${participant.id === state.participantId ? " (tú)" : ""}</span><span class="participant-role">${participant.role === "admin" ? "Anfitrión" : "Escuchando"}</span></span>${state.role === "admin" && participant.role !== "admin" ? `<button class="kick-button" type="button" data-kick="${participant.id}" aria-label="Expulsar a ${escapeHtml(participant.name)}">×</button>` : ""}`;
+      list.appendChild(row);
+    });
+    const count = participants.length;
+    $("admin-participant-count").textContent = `${count} / ${state.room?.maxParticipants || 8}`;
+    $("participant-count-badge").textContent = count;
+    $("guest-participant-count").textContent = count;
     document.querySelectorAll("[data-kick]").forEach((button) => button.addEventListener("click", () => kickParticipant(button.dataset.kick)));
   }
-  function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[char])); }
-  function renderPublicRooms() { const list = $("public-room-list"); if (!list) return; const rooms = Object.values(readRooms()).filter((room) => room && !room.closed && !room.locked && room.visibility !== "private"); if (!rooms.length) { list.innerHTML = `<div class="public-rooms-empty"><span>◌</span><p>Todavía no hay salas públicas aquí.<br /><small>Crea una sala para que aparezca en esta lista.</small></p></div>`; return; } list.innerHTML = rooms.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map((room) => `<div class="public-room"><span class="public-room-live"></span><div class="public-room-info"><span class="public-room-name">${escapeHtml(room.name)}</span><span class="public-room-meta">${escapeHtml(room.adminName)} · ${Object.keys(room.participants || {}).length}/${room.maxParticipants} personas</span></div><span class="public-room-code">${room.code}</span><button class="secondary-button" type="button" data-public-room="${room.code}">Entrar</button></div>`).join(""); list.querySelectorAll("[data-public-room]").forEach((button) => button.addEventListener("click", () => { $("join-code").value = button.dataset.publicRoom; openModal("join"); })); }
+
   function updateRoomUI() {
-    const room = state.room; if (!room) return;
-    $("room-code-top").textContent = room.code; $("admin-room-code").textContent = room.code; $("guest-room-code").textContent = room.code;
-    $("admin-room-name").textContent = room.name; $("guest-room-name").textContent = room.name; $("guest-admin-name").textContent = room.adminName;
-    $("admin-room-link").textContent = roomLink(room.code); $("admin-lock-status").textContent = room.locked ? "Bloqueado" : "Abierto"; $("lock-label").textContent = room.locked ? "Desbloquear nuevos ingresos" : "Bloquear nuevos ingresos";
+    const room = state.room;
+    if (!room) return;
+    $("room-code-top").textContent = room.code;
+    $("admin-room-code").textContent = room.code;
+    $("guest-room-code").textContent = room.code;
+    $("admin-room-name").textContent = room.name;
+    $("guest-room-name").textContent = room.name;
+    $("guest-admin-name").textContent = room.adminName;
+    $("admin-room-link").textContent = roomLink(room.code);
+    $("admin-lock-status").textContent = room.locked ? "Bloqueado" : "Abierto";
+    $("lock-label").textContent = room.locked ? "Desbloquear nuevos ingresos" : "Bloquear nuevos ingresos";
     $("room-state-label").textContent = room.closed ? "SALA CERRADA" : "SALA ACTIVA";
-    const sourceLabel = room.activeSource?.label || "Ninguna"; $("admin-active-source").textContent = sourceLabel; $("guest-active-source").textContent = sourceLabel === "Ninguna" ? "Sin transmisión" : sourceLabel; $("stop-source").classList.toggle("hidden", !room.activeSource); $("toggle-mic").classList.toggle("hidden", !room.activeSource?.kind?.includes("mic")); $("toggle-mic").textContent = state.muted ? "Activar micrófono" : "Silenciar micrófono";
+    const sourceLabel = room.activeSource?.label || "Ninguna";
+    $("admin-active-source").textContent = sourceLabel;
+    $("guest-active-source").textContent = sourceLabel === "Ninguna" ? "Sin transmisión" : sourceLabel;
+    $("stop-source").classList.toggle("hidden", !room.activeSource);
+    $("toggle-mic").classList.toggle("hidden", !room.activeSource?.kind?.includes("mic"));
+    $("toggle-mic").textContent = state.muted ? "Activar micrófono" : "Silenciar micrófono";
     $("guest-placeholder-title").textContent = room.activeSource?.hasVideo ? "La pantalla se está preparando" : room.activeSource ? "Transmisión de audio activa" : "Esperando transmisión";
     $("guest-placeholder-copy").textContent = room.activeSource ? "El audio llegará directamente desde el anfitrión." : "El anfitrión todavía no ha elegido una fuente.";
-    $("admin-stage-overlay").classList.toggle("hidden", !room.activeSource); $("guest-stage-overlay").classList.toggle("hidden", !room.activeSource); $("admin-overlay-label").textContent = room.activeSource?.label || "Transmitiendo"; $("guest-overlay-label").textContent = room.activeSource?.label || "En vivo";
-    $("admin-participant-count").textContent = `${Object.keys(room.participants || {}).length} / ${room.maxParticipants}`;
+    $("admin-stage-overlay").classList.toggle("hidden", !room.activeSource);
+    $("guest-stage-overlay").classList.toggle("hidden", !room.activeSource);
+    $("admin-overlay-label").textContent = room.activeSource?.label || "Transmitiendo";
+    $("guest-overlay-label").textContent = room.activeSource?.label || "En vivo";
     renderParticipants();
   }
 
-  function participantRecord(name, role) { return { id: state.participantId, name: name.trim(), role, joinedAt: Date.now() }; }
-  async function createRoom(event) { event.preventDefault(); const form = new FormData(event.currentTarget); const code = roomCode(); const room = { code, name: String(form.get("roomName")).trim(), adminName: String(form.get("adminName")).trim(), createdAt: Date.now(), maxParticipants: Number(form.get("maxParticipants")) || 8, locked: false, closed: false, activeSource: null, participants: {}, visibility: "public" }; state.role = "admin"; state.participantId = randomId(); room.participants[state.participantId] = participantRecord(room.adminName, "admin"); state.room = room; saveRoom(room); renderPublicRooms(); sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: "admin", code, id: state.participantId })); closeModal(); showRoom("admin"); updateRoomUI(); setTopStatus("Anfitrión conectado"); notify(`Sala ${code} creada. Comparte el código o enlace.`); send({ type: "admin-ready" }); }
-  async function joinRoom(event) { event.preventDefault(); const form = new FormData(event.currentTarget); const code = String(form.get("roomCode") || urlRoom || "").trim().toUpperCase(); const name = String(form.get("guestName") || "").trim(); if (!name) return notify("Escribe tu nombre para entrar.", "error"); const room = getRoom(code); if (!room) return notify("No encontramos una sala pública con ese enlace o código. Si estás en otro dispositivo, la sala necesita señalización compartida.", "error"); if (room.closed) return notify("Esta sala ya fue cerrada por el anfitrión.", "error"); if (room.locked) return notify("El anfitrión bloqueó nuevos ingresos.", "error"); if (Object.keys(room.participants || {}).length >= room.maxParticipants) return notify("La sala alcanzó su máximo de participantes.", "error"); state.role = "guest"; state.participantId = randomId(); room.participants[state.participantId] = participantRecord(name, "guest"); state.room = room; saveRoom(room); renderPublicRooms(); sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: "guest", code, id: state.participantId })); closeModal(); showRoom("guest"); updateRoomUI(); setTopStatus("Invitado conectado"); notify(`Entraste a ${room.name}.`); send({ type: "guest-hello", guestId: state.participantId }); }
+  function setupNetworkRoom() {
+    state.networkRoom?.leave();
+    state.networkRoom = joinRoomNetwork({ appId: APP_ID }, `${ROOM_PREFIX}${state.room.code.toLowerCase()}`, {
+      onJoinError: () => {
+        if (state.role === "guest") failGuestJoin("No se pudo establecer la conexión WebRTC con el anfitrión.");
+      }
+    });
+    const presence = state.networkRoom.makeAction("presence");
+    const roomState = state.networkRoom.makeAction("room-state");
+    const control = state.networkRoom.makeAction("room-control");
+    state.roomActions = { presence, roomState, control };
+
+    presence.onMessage = (data, { peerId }) => {
+      if (state.role !== "admin" || data?.type !== "join" || !data.name) return;
+      const participantCount = Object.keys(state.room.participants).length;
+      if (state.room.locked) return sendRoomState(peerId, "rejected", "La sala está bloqueada.");
+      if (participantCount >= state.room.maxParticipants) return sendRoomState(peerId, "rejected", "La sala está completa.");
+      state.room.participants[peerId] = participantRecord(peerId, String(data.name).slice(0, 30), "guest");
+      sendRoomState(peerId, "accepted");
+      broadcastRoomState();
+      if (state.localStream) Promise.allSettled(state.networkRoom.addStream(state.localStream, { target: peerId, metadata: state.room.activeSource }));
+      updateRoomUI();
+      announceCurrentRoom();
+    };
+
+    roomState.onMessage = (data, { peerId }) => {
+      if (state.role !== "guest" || !data?.room) return;
+      if (data.status === "rejected") return failGuestJoin(data.reason || "El anfitrión rechazó el ingreso.");
+      state.adminPeerId = peerId;
+      state.room = data.room;
+      clearTimeout(state.joinTimer);
+      setJoinBusy(false);
+      closeModal();
+      showRoom("guest");
+      updateRoomUI();
+      $("guest-connection-status").textContent = "Conectado";
+      setTopStatus("Conectado con el anfitrión");
+      if (data.status === "accepted") notify(`Entraste a ${state.room.name}.`);
+    };
+
+    control.onMessage = (data, { peerId }) => {
+      if (state.role !== "guest" || (state.adminPeerId && peerId !== state.adminPeerId)) return;
+      if (data?.type === "kicked") {
+        notify("El anfitrión te expulsó de la sala.", "error");
+        leaveRoom(true, false);
+      } else if (data?.type === "closed") {
+        notify("El anfitrión cerró la sala.", "error");
+        leaveRoom(true, false);
+      }
+    };
+
+    state.networkRoom.onPeerJoin = (peerId) => {
+      if (state.role === "guest") {
+        state.roomActions.presence.send({ type: "join", name: state.room.participants[state.participantId].name }, { target: peerId }).catch(() => {});
+      }
+    };
+
+    state.networkRoom.onPeerLeave = (peerId) => {
+      if (state.role === "admin" && state.room.participants[peerId]) {
+        delete state.room.participants[peerId];
+        updateRoomUI();
+        broadcastRoomState();
+        announceCurrentRoom();
+      } else if (state.role === "guest" && peerId === state.adminPeerId) {
+        notify("El anfitrión se desconectó y la sala se cerró.", "error");
+        leaveRoom(true, false);
+      }
+    };
+
+    state.networkRoom.onPeerStream = (stream, peerId) => {
+      if (state.role !== "guest" || (state.adminPeerId && peerId !== state.adminPeerId)) return;
+      $("guest-video").srcObject = stream;
+      $("guest-video").muted = true;
+      $("guest-audio").srcObject = stream;
+      const hasVideo = stream.getVideoTracks().length > 0;
+      $("guest-video").classList.toggle("hidden", !hasVideo);
+      $("guest-media-placeholder").classList.toggle("hidden", hasVideo);
+      $("guest-audio").play().catch(() => notify("Toca la pantalla para habilitar el audio del navegador.", "info"));
+    };
+  }
+
+  function sendRoomState(peerId, status = "update", reason = "") {
+    state.roomActions.roomState.send({ status, reason, room: cloneRoom() }, peerId ? { target: peerId } : undefined).catch(() => {});
+  }
+
+  function broadcastRoomState() {
+    if (state.role === "admin" && state.roomActions) sendRoomState();
+  }
+
+  async function createRoom(event) {
+    event.preventDefault();
+    if (!await ensureNetwork()) return;
+    const form = new FormData(event.currentTarget);
+    const code = randomCode();
+    state.role = "admin";
+    state.adminPeerId = state.participantId;
+    state.room = {
+      code,
+      name: String(form.get("roomName")).trim(),
+      adminName: String(form.get("adminName")).trim(),
+      maxParticipants: Number(form.get("maxParticipants")) || 8,
+      locked: false,
+      closed: false,
+      activeSource: null,
+      participants: {}
+    };
+    state.room.participants[state.participantId] = participantRecord(state.participantId, state.room.adminName, "admin");
+    setupNetworkRoom();
+    closeModal();
+    showRoom("admin");
+    updateRoomUI();
+    setTopStatus("Anfitrión conectado");
+    announceCurrentRoom();
+    notify(`Sala ${code} creada y publicada.`);
+  }
+
+  async function joinPublicRoom(event) {
+    event.preventDefault();
+    if (!await ensureNetwork()) return;
+    const form = new FormData(event.currentTarget);
+    const code = String(form.get("roomCode") || pendingJoinCode || urlRoom || "").trim().toUpperCase();
+    const name = String(form.get("guestName") || "").trim();
+    if (!/^[A-Z2-9]{6}$/.test(code)) return notify("El código debe tener seis caracteres.", "error");
+    if (!name) return notify("Escribe tu nombre para entrar.", "error");
+    setJoinBusy(true);
+    state.role = "guest";
+    state.adminPeerId = null;
+    state.room = {
+      code,
+      name: state.publicRooms.get(code)?.name || "Conectando…",
+      adminName: state.publicRooms.get(code)?.adminName || "Buscando anfitrión",
+      maxParticipants: state.publicRooms.get(code)?.maxParticipants || 8,
+      locked: false,
+      closed: false,
+      activeSource: null,
+      participants: {}
+    };
+    state.room.participants[state.participantId] = participantRecord(state.participantId, name, "guest");
+    showRoom("guest");
+    updateRoomUI();
+    $("guest-connection-status").textContent = "Buscando anfitrión";
+    setTopStatus("Buscando anfitrión…");
+    setupNetworkRoom();
+    clearTimeout(state.joinTimer);
+    state.joinTimer = setTimeout(() => failGuestJoin("No se encontró al anfitrión. Comprueba el código y que la sala siga abierta."), JOIN_TIMEOUT);
+  }
+
+  function failGuestJoin(message) {
+    clearTimeout(state.joinTimer);
+    state.networkRoom?.leave();
+    state.networkRoom = null;
+    state.roomActions = null;
+    state.role = null;
+    state.room = null;
+    state.adminPeerId = null;
+    roomView.classList.add("hidden");
+    landing.classList.remove("hidden");
+    setJoinBusy(false);
+    setTopStatus("Red pública activa");
+    notify(message, "error");
+  }
 
   async function requestSource(kind) {
     if (state.role !== "admin") return;
-    if (!navigator.mediaDevices?.getDisplayMedia && ["tab", "app-audio", "screen", "mix"].includes(kind)) return notify("Este navegador no permite compartir pantalla o audio.", "error");
+    const displayKinds = ["tab", "app-audio", "screen", "mix"];
+    if (!navigator.mediaDevices?.getDisplayMedia && displayKinds.includes(kind)) return notify("Este navegador no permite compartir pantalla o audio.", "error");
     if (!navigator.mediaDevices?.getUserMedia && ["mic", "mix"].includes(kind)) return notify("Este navegador no permite acceder al micrófono.", "error");
     try {
       await stopLocalStream(false);
-      let display = null, mic = null, tracks = [];
-      if (["tab", "app-audio", "screen", "mix"].includes(kind)) { display = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }); state.displayStream = display; display.getTracks().forEach((track) => track.addEventListener("ended", () => stopLocalStream(true))); tracks.push(...(kind === "app-audio" ? display.getAudioTracks() : display.getVideoTracks().concat(display.getAudioTracks()))); if (kind === "app-audio") display.getVideoTracks().forEach((track) => track.stop()); }
-      if (["mic", "mix"].includes(kind)) { mic = await navigator.mediaDevices.getUserMedia({ audio: true }); state.micStream = mic; tracks.push(...mic.getAudioTracks()); }
+      let tracks = [];
+      if (displayKinds.includes(kind)) {
+        state.displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+        const displayVideo = state.displayStream.getVideoTracks()[0];
+        displayVideo?.addEventListener("ended", () => stopLocalStream(true));
+        tracks.push(...(kind === "app-audio" ? state.displayStream.getAudioTracks() : state.displayStream.getTracks()));
+      }
+      if (["mic", "mix"].includes(kind)) {
+        state.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        tracks.push(...state.micStream.getAudioTracks());
+      }
+      if (kind === "app-audio" && !tracks.length) throw new Error("NO_AUDIO");
       if (!tracks.length) throw new Error("NO_MEDIA");
-      state.localStream = new MediaStream(tracks); state.activeSourceKind = kind; state.muted = false;
-      const videoTrack = state.localStream.getVideoTracks()[0]; if (videoTrack) { $("admin-preview").srcObject = new MediaStream([videoTrack]); $("admin-preview").classList.remove("hidden"); $("admin-stage-placeholder").classList.add("hidden"); } else { $("admin-preview").classList.add("hidden"); $("admin-stage-placeholder").classList.remove("hidden"); }
-      const labels = { tab: "Pestaña + audio", "app-audio": "Solo audio de app", screen: "Pantalla + audio", mic: "Micrófono", mix: "Pantalla + micrófono" }; const source = { kind, label: labels[kind], hasVideo: Boolean(videoTrack), hasAudio: state.localStream.getAudioTracks().length > 0 };
-      state.room.activeSource = source; saveRoom(state.room); updateRoomUI(); document.querySelectorAll(".source-button").forEach((button) => button.classList.toggle("active", button.dataset.source === kind)); await renegotiateAll(); notify(`Transmitiendo: ${source.label}.`); send({ type: "media-ready" });
-    } catch (error) { if (error?.name === "NotAllowedError") notify("Permiso rechazado. Puedes intentarlo nuevamente cuando quieras.", "error"); else if (error?.message === "NO_MEDIA") notify("No se obtuvo ninguna fuente de audio o video.", "error"); else notify("No se pudo iniciar la transmisión en este navegador.", "error"); await stopLocalStream(false); }
+      state.localStream = new MediaStream(tracks);
+      state.muted = false;
+      const videoTrack = state.localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        $("admin-preview").srcObject = new MediaStream([videoTrack]);
+        $("admin-preview").classList.remove("hidden");
+        $("admin-stage-placeholder").classList.add("hidden");
+      } else {
+        $("admin-preview").classList.add("hidden");
+        $("admin-stage-placeholder").classList.remove("hidden");
+      }
+      const labels = { tab: "Pestaña + audio", "app-audio": "Solo audio de app", screen: "Pantalla + audio", mic: "Micrófono", mix: "Pantalla + micrófono" };
+      state.room.activeSource = { kind, label: labels[kind], hasVideo: Boolean(videoTrack), hasAudio: state.localStream.getAudioTracks().length > 0 };
+      Promise.allSettled(state.networkRoom.addStream(state.localStream, { metadata: state.room.activeSource }));
+      updateRoomUI();
+      broadcastRoomState();
+      announceCurrentRoom();
+      document.querySelectorAll(".source-button").forEach((button) => button.classList.toggle("active", button.dataset.source === kind));
+      notify(`Transmitiendo: ${state.room.activeSource.label}.`);
+    } catch (error) {
+      if (error?.name === "NotAllowedError") notify("Permiso rechazado. Puedes intentarlo nuevamente.", "error");
+      else if (error?.message === "NO_AUDIO") notify("La fuente seleccionada no entregó audio. Elige una pestaña o app y activa “Compartir audio”.", "error");
+      else notify("No se pudo iniciar la transmisión en este navegador.", "error");
+      await stopLocalStream(false);
+    }
   }
-  async function stopLocalStream(updateRoom = true) { if (state.localStream) state.localStream.getTracks().forEach((track) => track.stop()); if (state.displayStream) state.displayStream.getTracks().forEach((track) => track.stop()); if (state.micStream) state.micStream.getTracks().forEach((track) => track.stop()); state.localStream = null; state.displayStream = null; state.micStream = null; state.activeSourceKind = null; state.muted = false; $("admin-preview").srcObject = null; $("admin-preview").classList.add("hidden"); $("admin-stage-placeholder").classList.remove("hidden"); document.querySelectorAll(".source-button").forEach((button) => button.classList.remove("active")); if (updateRoom && state.room) { state.room.activeSource = null; saveRoom(state.room); updateRoomUI(); await renegotiateAll(); notify("La transmisión se detuvo."); } }
-  function toggleMicMute() { if (!state.micStream) return notify("Elige “Micrófono” o “Pantalla + micrófono” para silenciarlo.", "info"); state.muted = !state.muted; state.micStream.getAudioTracks().forEach((track) => { track.enabled = !state.muted; }); notify(state.muted ? "Micrófono silenciado." : "Micrófono activo."); }
 
-  function createPeer(peerId, initiator) { if (state.peers.has(peerId)) return state.peers.get(peerId); const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] }); const peer = { pc, makingOffer: false }; state.peers.set(peerId, peer); pc.onicecandidate = (event) => { if (event.candidate) send({ type: "ice", target: peerId, candidate: event.candidate }); }; pc.onconnectionstatechange = () => { if (["failed", "disconnected", "closed"].includes(pc.connectionState)) { $("admin-connection-status").textContent = "Revisando conexión"; if (pc.connectionState === "failed") notify("Una conexión WebRTC necesita reconectarse.", "error"); } else if (pc.connectionState === "connected") { $("admin-connection-status").textContent = "Conectado"; $("guest-connection-status").textContent = "Conectado"; } }; pc.ontrack = (event) => { if (state.role === "guest") { const stream = event.streams[0] || new MediaStream([event.track]); $("guest-video").srcObject = stream; $("guest-video").muted = true; $("guest-audio").srcObject = stream; if (event.track.kind === "video") { $("guest-video").classList.remove("hidden"); $("guest-media-placeholder").classList.add("hidden"); } else { $("guest-audio").play().catch(() => notify("Toca la sala para habilitar el audio del navegador.", "info")); } } }; if (initiator && state.localStream) state.localStream.getTracks().forEach((track) => pc.addTrack(track, state.localStream)); return peer; }
-  async function makeOffer(peerId) { const peer = createPeer(peerId, true); const offer = await peer.pc.createOffer(); await peer.pc.setLocalDescription(offer); send({ type: "offer", target: peerId, description: peer.pc.localDescription }); }
-  async function renegotiateAll() { for (const [peerId, peer] of state.peers) { const senders = peer.pc.getSenders(); const tracks = state.localStream ? state.localStream.getTracks() : []; for (const sender of senders) { const matching = tracks.find((track) => track.kind === sender.track?.kind); await sender.replaceTrack(matching || null); } const existingKinds = new Set(senders.map((sender) => sender.track?.kind)); tracks.filter((track) => !existingKinds.has(track.kind)).forEach((track) => peer.pc.addTrack(track, state.localStream)); try { await makeOffer(peerId); } catch { /* reconexión de la próxima señal */ } } }
-  async function handleSignal(message) { if (message.roomCode !== state.room?.code || message.sender === state.participantId) return; if (state.role === "admin" && message.type === "guest-hello") { const peer = createPeer(message.guestId, true); if (state.localStream) state.localStream.getTracks().forEach((track) => { if (!peer.pc.getSenders().some((sender) => sender.track?.kind === track.kind)) peer.pc.addTrack(track, state.localStream); }); await makeOffer(message.guestId); return; } if (message.target && message.target !== state.participantId) return; if (message.type === "offer" && state.role === "guest") { const peer = createPeer(message.sender, false); await peer.pc.setRemoteDescription(message.description); const answer = await peer.pc.createAnswer(); await peer.pc.setLocalDescription(answer); send({ type: "answer", target: message.sender, description: peer.pc.localDescription }); return; } if (message.type === "answer" && state.role === "admin") { const peer = state.peers.get(message.sender); if (peer) await peer.pc.setRemoteDescription(message.description); return; } if (message.type === "ice") { const peer = state.peers.get(message.sender); if (peer && message.candidate) await peer.pc.addIceCandidate(message.candidate).catch(() => {}); return; } if (message.type === "room-updated" && message.room) { state.room = message.room; if (state.role === "guest" && state.room.closed) { notify("El anfitrión cerró la sala.", "error"); await leaveRoom(false); } else updateRoomUI(); return; } if (message.type === "room-closed") { notify("La sala fue cerrada por el anfitrión.", "error"); await leaveRoom(false); } }
-  function kickParticipant(id) { if (state.role !== "admin" || !state.room.participants[id]) return; const name = state.room.participants[id].name; delete state.room.participants[id]; saveRoom(state.room); updateRoomUI(); send({ type: "kicked", target: id }); notify(`${name} fue expulsado de la sala.`); const peer = state.peers.get(id); if (peer) peer.pc.close(); state.peers.delete(id); }
-  async function leaveRoom(showLanding = true) { await stopLocalStream(false); state.peers.forEach(({ pc }) => pc.close()); state.peers.clear(); if (state.room && state.role === "admin") { state.room.closed = true; state.room.activeSource = null; saveRoom(state.room); send({ type: "room-closed" }); } else if (state.room && state.participantId) { delete state.room.participants[state.participantId]; saveRoom(state.room); send({ type: "participant-left" }); } sessionStorage.removeItem(SESSION_KEY); state.room = null; state.role = null; state.participantId = null; if (showLanding) { roomView.classList.add("hidden"); landing.classList.remove("hidden"); renderPublicRooms(); setTopStatus("Listo para sincronizar"); } }
+  async function stopLocalStream(updateRoom = true) {
+    if (state.localStream && state.networkRoom) {
+      try { state.networkRoom.removeStream(state.localStream); } catch {}
+    }
+    state.localStream?.getTracks().forEach((track) => track.stop());
+    state.displayStream?.getTracks().forEach((track) => track.stop());
+    state.micStream?.getTracks().forEach((track) => track.stop());
+    state.localStream = null;
+    state.displayStream = null;
+    state.micStream = null;
+    state.muted = false;
+    $("admin-preview").srcObject = null;
+    $("admin-preview").classList.add("hidden");
+    $("admin-stage-placeholder").classList.remove("hidden");
+    document.querySelectorAll(".source-button").forEach((button) => button.classList.remove("active"));
+    if (updateRoom && state.room) {
+      state.room.activeSource = null;
+      updateRoomUI();
+      broadcastRoomState();
+      announceCurrentRoom();
+      notify("La transmisión se detuvo.");
+    }
+  }
 
-  function copyText(value, success = "Copiado al portapapeles.") { navigator.clipboard?.writeText(value).then(() => notify(success)).catch(() => notify("No se pudo copiar automáticamente. Selecciona el enlace manualmente.", "error")); }
-  function toggleRoomLock() { if (!state.room || state.role !== "admin") return; state.room.locked = !state.room.locked; saveRoom(state.room); updateRoomUI(); notify(state.room.locked ? "La sala está bloqueada." : "La sala vuelve a aceptar invitados."); }
-  function bindEvents() { $("open-create").addEventListener("click", () => openModal("create")); $("open-join").addEventListener("click", () => openModal("join")); $("help-button").addEventListener("click", () => openModal("help")); $("modal-close").addEventListener("click", closeModal); modalBackdrop.addEventListener("click", (event) => { if (event.target === modalBackdrop) closeModal(); }); $("create-form").addEventListener("submit", createRoom); $("join-form").addEventListener("submit", joinRoom); $("toggle-lock").addEventListener("click", toggleRoomLock); $("close-room").addEventListener("click", () => { if (confirm("¿Cerrar la sala para todos?")) leaveRoom(true); }); $("copy-room-link").addEventListener("click", () => copyText(roomLink(state.room.code), "Enlace copiado.")); $("copy-invite").addEventListener("click", () => copyText(roomLink(state.room.code), "Enlace copiado.")); $("stop-source").addEventListener("click", () => stopLocalStream(true)); $("toggle-mic").addEventListener("click", toggleMicMute); $("guest-leave").addEventListener("click", () => leaveRoom(true)); $("leave-room-top").addEventListener("click", () => leaveRoom(true)); $("guest-volume").addEventListener("input", (event) => { $("guest-audio").volume = Number(event.target.value); $("guest-video").volume = Number(event.target.value); $("volume-value").textContent = `${Math.round(Number(event.target.value) * 100)}%`; }); $("guest-fullscreen").addEventListener("click", () => { const target = $("guest-video").classList.contains("hidden") ? $("guest-media-placeholder") : $("guest-video"); target.requestFullscreen?.(); }); document.querySelectorAll(".source-button").forEach((button) => button.addEventListener("click", () => requestSource(button.dataset.source))); document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); }); }
+  function toggleMicMute() {
+    if (!state.micStream) return notify("Esta fuente no utiliza el micrófono.");
+    state.muted = !state.muted;
+    state.micStream.getAudioTracks().forEach((track) => { track.enabled = !state.muted; });
+    updateRoomUI();
+    notify(state.muted ? "Micrófono silenciado." : "Micrófono activo.");
+  }
 
-  function restoreFromUrl() { if (urlRoom) { openModal("join"); $("join-code").value = urlRoom.toUpperCase(); } }
-  window.addEventListener("storage", (event) => { if (event.key === DB_KEY) { renderPublicRooms(); if (state.room) { const next = getRoom(state.room.code); if (next) { state.room = next; updateRoomUI(); } } } });
-  channel?.addEventListener("message", (event) => handleSignal(event.data).catch(() => {}));
-  window.addEventListener("beforeunload", () => { if (state.room && state.role === "admin") { state.room.closed = true; state.room.activeSource = null; saveRoom(state.room); } });
-  bindEvents(); renderPublicRooms(); restoreFromUrl();
+  function kickParticipant(id) {
+    if (state.role !== "admin" || !state.room.participants[id]) return;
+    const name = state.room.participants[id].name;
+    state.roomActions.control.send({ type: "kicked" }, { target: id }).catch(() => {});
+    state.networkRoom.getPeers()[id]?.close();
+    delete state.room.participants[id];
+    updateRoomUI();
+    broadcastRoomState();
+    announceCurrentRoom();
+    notify(`${name} fue expulsado de la sala.`);
+  }
+
+  function toggleRoomLock() {
+    if (state.role !== "admin" || !state.room) return;
+    state.room.locked = !state.room.locked;
+    updateRoomUI();
+    broadcastRoomState();
+    announceCurrentRoom();
+    notify(state.room.locked ? "La sala está bloqueada." : "La sala vuelve a aceptar invitados.");
+  }
+
+  async function leaveRoom(showLanding = true, tellPeers = true) {
+    clearTimeout(state.joinTimer);
+    if (state.role === "admin" && state.room) {
+      state.room.closed = true;
+      if (tellPeers) state.roomActions?.control.send({ type: "closed" }).catch(() => {});
+      state.publicRooms.delete(state.room.code);
+    }
+    await stopLocalStream(false);
+    state.networkRoom?.leave();
+    state.networkRoom = null;
+    state.roomActions = null;
+    state.room = null;
+    state.role = null;
+    state.adminPeerId = null;
+    if (showLanding) {
+      roomView.classList.add("hidden");
+      landing.classList.remove("hidden");
+      renderPublicRooms();
+      setTopStatus("Red pública activa");
+    }
+  }
+
+  function copyText(value) {
+    navigator.clipboard?.writeText(value).then(() => notify("Enlace copiado.")).catch(() => notify("No se pudo copiar automáticamente.", "error"));
+  }
+
+  function bindEvents() {
+    $("open-create").addEventListener("click", () => openModal("create"));
+    $("open-join").addEventListener("click", () => openModal("join"));
+    $("help-button").addEventListener("click", () => openModal("help"));
+    $("modal-close").addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (event) => { if (event.target === modalBackdrop) closeModal(); });
+    $("create-form").addEventListener("submit", createRoom);
+    $("join-form").addEventListener("submit", joinPublicRoom);
+    $("toggle-lock").addEventListener("click", toggleRoomLock);
+    $("close-room").addEventListener("click", () => { if (confirm("¿Cerrar la sala para todos?")) leaveRoom(true); });
+    $("copy-room-link").addEventListener("click", () => copyText(roomLink(state.room.code)));
+    $("copy-invite").addEventListener("click", () => copyText(roomLink(state.room.code)));
+    $("stop-source").addEventListener("click", () => stopLocalStream(true));
+    $("toggle-mic").addEventListener("click", toggleMicMute);
+    $("guest-leave").addEventListener("click", () => leaveRoom(true));
+    $("leave-room-top").addEventListener("click", () => leaveRoom(true));
+    $("guest-volume").addEventListener("input", (event) => {
+      $("guest-audio").volume = Number(event.target.value);
+      $("volume-value").textContent = `${Math.round(Number(event.target.value) * 100)}%`;
+    });
+    $("guest-fullscreen").addEventListener("click", () => {
+      const target = $("guest-video").classList.contains("hidden") ? $("guest-media-placeholder") : $("guest-video");
+      target.requestFullscreen?.();
+    });
+    document.querySelectorAll(".source-button").forEach((button) => button.addEventListener("click", () => requestSource(button.dataset.source)));
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); });
+  }
+
+  window.addEventListener("online", () => { setTopStatus("Red pública activa"); ensureNetwork(); });
+  window.addEventListener("offline", () => setTopStatus("Sin conexión a Internet"));
+  window.addEventListener("beforeunload", () => state.networkRoom?.leave());
+
+  bindEvents();
+  renderPublicRooms();
+  ensureNetwork();
+  if (urlRoom) openModal("join", urlRoom);
 })();
