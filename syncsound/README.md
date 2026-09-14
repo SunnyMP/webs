@@ -1,10 +1,10 @@
 # SyncSound
 
-MVP de salas privadas para escuchar audio o ver una pantalla en tiempo real con WebRTC nativo.
+MVP de salas públicas para escuchar audio o ver una pantalla en tiempo real con WebRTC.
 
 ## Qué incluye
 
-- Crear una sala con nombre, anfitrión, contraseña opcional y límite de participantes.
+- Crear una sala pública con nombre, anfitrión y límite de participantes.
 - Código corto y enlace de invitación.
 - Unirse por código o por enlace directo.
 - Panel separado para anfitrión e invitado.
@@ -13,8 +13,8 @@ MVP de salas privadas para escuchar audio o ver una pantalla en tiempo real con 
 - Fuente adicional “solo audio de app”: usa el selector del navegador para elegir una pestaña o ventana; el navegador puede exigir que también se seleccione una pista de video, que la aplicación descarta.
 - Salas públicas visibles en la portada y enlaces directos que piden únicamente el nombre del invitado.
 - Previsualización local, estado de transmisión, lista de participantes, expulsión y bloqueo.
-- WebRTC nativo con STUN público y señalización local entre pestañas mediante `BroadcastChannel`.
-- Manejo de permisos rechazados, pantalla detenida, sala llena, contraseña incorrecta y sala cerrada.
+- WebRTC P2P con descubrimiento entre dispositivos mediante Trystero y relés públicos de Nostr.
+- Manejo de permisos rechazados, pantalla detenida, sala llena y sala cerrada.
 - No se graba ni se sube audio/video.
 
 ## Ejecutar localmente
@@ -27,23 +27,19 @@ py -m http.server 4173 --directory dist
 
 Después abre `http://localhost:4173/`.
 
-Para probar el MVP local abre dos pestañas del mismo navegador: crea la sala en una y usa el código/enlace en la otra. Para que una transmisión de pantalla/audio funcione, el navegador debe estar en un contexto seguro (`https` o `localhost`) y el usuario debe activar “Compartir audio” en el diálogo del navegador.
+Para probar el MVP abre la aplicación en dos navegadores o dispositivos: crea la sala en uno y usa el código/enlace en el otro. Para que una transmisión de pantalla/audio funcione, el navegador debe estar en un contexto seguro (`https` o `localhost`) y el usuario debe activar “Compartir audio” en el diálogo del navegador.
 
-## Limitación actual de señalización
+## Señalización pública
 
-La demo usa `BroadcastChannel` y `localStorage`, por lo que la prueba P2P completa está pensada para dos o más pestañas del mismo origen/navegador. La lista de salas públicas también se actualiza localmente. Un enlace abierto desde otro dispositivo todavía necesita una señalización compartida; GitHub Pages no puede guardar esa lista por sí solo. La carpeta ya deja documentado el punto de sustitución para Firebase Realtime Database/Firestore. Para publicar una versión multi-dispositivo hay que:
+La aplicación usa Trystero para que los navegadores se descubran mediante relés públicos de Nostr. Las salas activas se anuncian temporalmente en un lobby P2P y desaparecen cuando el anfitrión se desconecta. El audio, el video y los datos de la sala viajan directamente entre pares y no se almacenan en GitHub Pages ni en un servidor de SyncSound.
 
-1. Crear un proyecto Firebase.
-2. Activar Authentication anónima y Realtime Database.
-3. Copiar `firebase-config.example.js` como `dist/firebase-config.js` y completar sus valores.
-4. Sustituir la capa `send()`/`handleSignal()` por listeners de Firebase y usar `onDisconnect()` para borrar participantes y cerrar la sala del anfitrión.
-5. Configurar reglas que expiren o limpien `rooms/{roomId}/participants` y `rooms/{roomId}/signals`; nunca guardar media.
+La disponibilidad depende de que la red permita WebRTC y conexiones a los relés públicos. Para una versión con garantías operativas, moderación persistente o historial de salas se recomienda reemplazar los relés públicos por Firebase, Supabase o un servidor WebSocket propio.
 
 Para muchas personas, la topología mesh de WebRTC no escala bien. La siguiente evolución recomendada es un SFU como LiveKit, mediasoup o Janus.
 
 ## Variables de entorno / configuración
 
-En la versión estática no se inyectan variables de entorno. `firebase-config.example.js` documenta las claves públicas del cliente Firebase. Las reglas y credenciales administrativas deben vivir fuera del frontend.
+La versión actual no necesita variables de entorno ni credenciales para funcionar.
 
 ## Compatibilidad y privacidad
 
