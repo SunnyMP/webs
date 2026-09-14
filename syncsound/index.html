@@ -7,6 +7,7 @@
     <meta name="description" content="SyncSound: salas de escucha y transmisión en tiempo real con WebRTC." />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23111620'/%3E%3Cpath d='M17 35h7l5 11V18l5 11h7l5 9h2' fill='none' stroke='%236df2b5' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="extra.css" />
     <title>SyncSound</title>
   </head>
   <body>
@@ -52,6 +53,10 @@
               <button class="secondary-button full-button" id="open-join" type="button">Ingresar a una sala <span>→</span></button>
             </article>
           </div>
+          <section class="public-rooms-panel" aria-labelledby="public-rooms-title">
+            <div class="public-rooms-heading"><div><p class="section-label">Salas públicas</p><h2 id="public-rooms-title">En vivo ahora</h2></div><span class="public-rooms-refresh"><span class="status-dot"></span><span id="public-rooms-status">Actualizado en este navegador</span></span></div>
+            <div class="public-room-list" id="public-room-list"><div class="public-rooms-empty"><span>◌</span><p>Todavía no hay salas públicas aquí.<br /><small>Crea una sala para que aparezca en esta lista.</small></p></div></div>
+          </section>
           <div class="landing-footnote"><span class="shield-icon">◈</span> Tus permisos se solicitan solamente cuando eliges compartir una fuente.</div>
         </section>
 
@@ -87,6 +92,7 @@
                 <div class="source-toolbar-head"><span>Selecciona una fuente</span><span class="source-note">Permiso requerido por el navegador</span></div>
                 <div class="source-actions">
                   <button class="source-button" data-source="tab" type="button"><span class="source-button-icon">▣</span><span><strong>Pestaña + audio</strong><small>Ideal para música y video</small></span></button>
+                  <button class="source-button" data-source="app-audio" type="button"><span class="source-button-icon">◫</span><span><strong>Solo audio de app</strong><small>Elige una ventana o app</small></span></button>
                   <button class="source-button" data-source="screen" type="button"><span class="source-button-icon">▤</span><span><strong>Pantalla + audio</strong><small>Comparte pantalla o ventana</small></span></button>
                   <button class="source-button" data-source="mic" type="button"><span class="source-button-icon">♩</span><span><strong>Micrófono</strong><small>Solo tu voz</small></span></button>
                   <button class="source-button" data-source="mix" type="button"><span class="source-button-icon">✦</span><span><strong>Pantalla + micrófono</strong><small>Mezcla ambas fuentes</small></span></button>
@@ -150,8 +156,8 @@
     <div class="modal-backdrop hidden" id="modal-backdrop">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <button class="modal-close" id="modal-close" type="button" aria-label="Cerrar">×</button>
-        <div id="create-modal" class="modal-content hidden"><p class="eyebrow">Nuevo espacio de escucha</p><h2 id="modal-title">Crea tu sala</h2><p class="modal-copy">Configura lo esencial. La fuente de audio se elige después, desde el panel del anfitrión.</p><form id="create-form"><label>Nombre de la sala<input id="create-room-name" name="roomName" placeholder="Ej. Sesión de estudio" maxlength="50" required /></label><label>Tu nombre<input id="create-admin-name" name="adminName" placeholder="Ej. Agus" maxlength="30" required /></label><div class="form-grid"><label>Contraseña <span class="optional">opcional</span><input id="create-password" name="password" type="password" placeholder="••••••••" maxlength="64" /></label><label>Máximo de personas<input id="create-max" name="maxParticipants" type="number" min="2" max="50" value="8" required /></label></div><p class="form-note">La sala se cierra cuando el anfitrión se desconecta.</p><button class="primary-button full-button" type="submit">Crear sala <span>→</span></button></form></div>
-        <div id="join-modal" class="modal-content hidden"><p class="eyebrow">Entra a una experiencia</p><h2 id="modal-title-join">Únete a una sala</h2><p class="modal-copy">Usa el código de seis caracteres o abre el enlace que te compartió el anfitrión.</p><form id="join-form"><label>Código de sala<input id="join-code" name="roomCode" placeholder="ABC123" maxlength="6" autocomplete="off" required /></label><label>Tu nombre<input id="join-name" name="guestName" placeholder="Ej. Sofi" maxlength="30" required /></label><label id="join-password-label">Contraseña <span class="optional">si la sala la requiere</span><input id="join-password" name="password" type="password" placeholder="Contraseña de la sala" maxlength="64" /></label><button class="primary-button full-button" type="submit">Ingresar a la sala <span>→</span></button></form></div>
+        <div id="create-modal" class="modal-content hidden"><p class="eyebrow">Nuevo espacio de escucha</p><h2 id="modal-title">Crea tu sala</h2><p class="modal-copy">Configura lo esencial. La fuente de audio se elige después, desde el panel del anfitrión.</p><form id="create-form"><label>Nombre de la sala<input id="create-room-name" name="roomName" placeholder="Ej. Sesión de estudio" maxlength="50" required /></label><label>Tu nombre<input id="create-admin-name" name="adminName" placeholder="Ej. Agus" maxlength="30" required /></label><label>Máximo de personas<input id="create-max" name="maxParticipants" type="number" min="2" max="50" value="8" required /></label><p class="form-note">Las salas son públicas. Cualquiera con el enlace puede entrar.</p><button class="primary-button full-button" type="submit">Crear sala <span>→</span></button></form></div>
+        <div id="join-modal" class="modal-content hidden"><p class="eyebrow">Entra a una experiencia</p><h2 id="modal-title-join">Únete a una sala</h2><p class="modal-copy" id="join-copy">Usa el código de seis caracteres o abre el enlace que te compartió el anfitrión.</p><form id="join-form"><label id="join-code-field">Código de sala<input id="join-code" name="roomCode" placeholder="ABC123" maxlength="6" autocomplete="off" required /></label><label>Tu nombre<input id="join-name" name="guestName" placeholder="Ej. Sofi" maxlength="30" required /></label><button class="primary-button full-button" type="submit">Ingresar a la sala <span>→</span></button></form></div>
         <div id="help-modal" class="modal-content hidden"><p class="eyebrow">Cómo funciona</p><h2>Sincroniza el momento</h2><div class="help-list"><div><span>01</span><p><strong>Crea o únete</strong><br />El anfitrión comparte el código o enlace.</p></div><div><span>02</span><p><strong>Elige una fuente</strong><br />El navegador pedirá permiso solo al compartir.</p></div><div><span>03</span><p><strong>Escuchen juntos</strong><br />El audio y la pantalla viajan en tiempo real.</p></div></div><div class="form-note">Para escuchar audio de una pestaña o pantalla, activa “Compartir audio” en el diálogo del navegador. La disponibilidad depende del navegador y del sistema operativo.</div></div>
       </div>
     </div>
