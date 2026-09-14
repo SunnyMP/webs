@@ -10,6 +10,8 @@ MVP de salas privadas para escuchar audio o ver una pantalla en tiempo real con 
 - Panel separado para anfitrión e invitado.
 - Captura bajo demanda con `getDisplayMedia()` y `getUserMedia()`.
 - Fuentes: pestaña + audio, pantalla + audio, micrófono y pantalla + micrófono.
+- Fuente adicional “solo audio de app”: usa el selector del navegador para elegir una pestaña o ventana; el navegador puede exigir que también se seleccione una pista de video, que la aplicación descarta.
+- Salas públicas visibles en la portada y enlaces directos que piden únicamente el nombre del invitado.
 - Previsualización local, estado de transmisión, lista de participantes, expulsión y bloqueo.
 - WebRTC nativo con STUN público y señalización local entre pestañas mediante `BroadcastChannel`.
 - Manejo de permisos rechazados, pantalla detenida, sala llena, contraseña incorrecta y sala cerrada.
@@ -29,7 +31,7 @@ Para probar el MVP local abre dos pestañas del mismo navegador: crea la sala en
 
 ## Limitación actual de señalización
 
-La demo usa `BroadcastChannel` y `localStorage`, por lo que la prueba P2P completa está pensada para dos o más pestañas del mismo origen/navegador. La carpeta ya deja documentado el punto de sustitución para Firebase Realtime Database/Firestore. Para publicar una versión multi-dispositivo hay que:
+La demo usa `BroadcastChannel` y `localStorage`, por lo que la prueba P2P completa está pensada para dos o más pestañas del mismo origen/navegador. La lista de salas públicas también se actualiza localmente. Un enlace abierto desde otro dispositivo todavía necesita una señalización compartida; GitHub Pages no puede guardar esa lista por sí solo. La carpeta ya deja documentado el punto de sustitución para Firebase Realtime Database/Firestore. Para publicar una versión multi-dispositivo hay que:
 
 1. Crear un proyecto Firebase.
 2. Activar Authentication anónima y Realtime Database.
@@ -51,7 +53,7 @@ La captura de audio depende del navegador y del sistema operativo. Chrome suele 
 
 - Crear sala: nombre, anfitrión, código y enlace.
 - Unirse con código y con enlace.
-- Contraseña incorrecta, sala llena y sala bloqueada.
+- Sala llena y sala bloqueada.
 - Compartir pestaña con audio y validar la previsualización.
 - Compartir pantalla con audio y validar video/audio en la pestaña invitada.
 - Detener la fuente desde la barra del navegador y verificar que la sala vuelve a “Sin transmisión”.
