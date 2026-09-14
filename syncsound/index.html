@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b11" />
+    <meta name="description" content="SyncSound: salas de escucha y transmisión en tiempo real con WebRTC." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23111620'/%3E%3Cpath d='M17 35h7l5 11V18l5 11h7l5 9h2' fill='none' stroke='%236df2b5' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>SyncSound</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="SyncSound inicio">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span>SyncSound</span>
+        </a>
+        <div class="topbar-actions">
+          <span class="connection-pill"><span class="status-dot"></span><span id="top-status">Listo para sincronizar</span></span>
+          <button class="icon-button" id="help-button" type="button" aria-label="Ver ayuda">?</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="landing-view" id="landing-view">
+          <div class="landing-copy">
+            <p class="eyebrow"><span class="live-dot"></span> Escucha en tiempo real</p>
+            <h1>Comparte el sonido.<br /><em>Vivan la misma escena.</em></h1>
+            <p class="lede">Crea una sala privada para escuchar una pestaña, ver tu pantalla o transmitir tu micrófono con quienes quieras.</p>
+            <div class="trust-row">
+              <span>WebRTC directo</span><span class="separator">•</span><span>Sin grabaciones</span><span class="separator">•</span><span>Control total del anfitrión</span>
+            </div>
+          </div>
+          <div class="entry-grid">
+            <article class="entry-card create-card">
+              <div class="entry-icon create-icon"><span>+</span></div>
+              <div>
+                <p class="card-kicker">Para anfitriones</p>
+                <h2>Crea una sala</h2>
+                <p>Elige la fuente y controla quién entra.</p>
+              </div>
+              <button class="primary-button full-button" id="open-create" type="button">Crear sala <span>→</span></button>
+            </article>
+            <article class="entry-card join-card">
+              <div class="entry-icon join-icon"><span>↗</span></div>
+              <div>
+                <p class="card-kicker">Para invitados</p>
+                <h2>Únete a una sala</h2>
+                <p>Ingresa con un código o enlace.</p>
+              </div>
+              <button class="secondary-button full-button" id="open-join" type="button">Ingresar a una sala <span>→</span></button>
+            </article>
+          </div>
+          <div class="landing-footnote"><span class="shield-icon">◈</span> Tus permisos se solicitan solamente cuando eliges compartir una fuente.</div>
+        </section>
+
+        <section class="room-view hidden" id="room-view">
+          <div class="room-topline">
+            <button class="back-button" id="leave-room-top" type="button">← <span>Salir de la sala</span></button>
+            <div class="room-identity">
+              <span class="room-live-badge"><span class="live-dot"></span><span id="room-state-label">SALA ACTIVA</span></span>
+              <span class="room-code-top" id="room-code-top">------</span>
+            </div>
+          </div>
+
+          <div class="admin-layout hidden" id="admin-layout">
+            <section class="stage-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-label">Panel del anfitrión</p>
+                  <h1 id="admin-room-name">Mi sala</h1>
+                </div>
+                <div class="mini-status"><span class="status-dot"></span><span id="admin-connection-status">Conectado</span></div>
+              </div>
+              <div class="stage-card admin-stage">
+                <div class="stage-placeholder" id="admin-stage-placeholder">
+                  <div class="stage-placeholder-icon">◉</div>
+                  <h2>Tu transmisión aparecerá aquí</h2>
+                  <p>Elige una fuente debajo. El navegador te pedirá permiso en ese momento.</p>
+                  <div class="permission-tip"><span>ⓘ</span> Al compartir pantalla, activa <strong>“Compartir audio”</strong> si quieres que los demás escuchen el sonido del sistema.</div>
+                </div>
+                <video id="admin-preview" class="stage-video hidden" autoplay muted playsinline></video>
+                <div class="stage-overlay hidden" id="admin-stage-overlay"><span class="live-dot"></span><span id="admin-overlay-label">Transmitiendo</span></div>
+              </div>
+              <div class="source-toolbar">
+                <div class="source-toolbar-head"><span>Selecciona una fuente</span><span class="source-note">Permiso requerido por el navegador</span></div>
+                <div class="source-actions">
+                  <button class="source-button" data-source="tab" type="button"><span class="source-button-icon">▣</span><span><strong>Pestaña + audio</strong><small>Ideal para música y video</small></span></button>
+                  <button class="source-button" data-source="screen" type="button"><span class="source-button-icon">▤</span><span><strong>Pantalla + audio</strong><small>Comparte pantalla o ventana</small></span></button>
+                  <button class="source-button" data-source="mic" type="button"><span class="source-button-icon">♩</span><span><strong>Micrófono</strong><small>Solo tu voz</small></span></button>
+                  <button class="source-button" data-source="mix" type="button"><span class="source-button-icon">✦</span><span><strong>Pantalla + micrófono</strong><small>Mezcla ambas fuentes</small></span></button>
+                </div>
+                <div class="active-source-row"><span>Fuente activa</span><span class="active-source-value" id="admin-active-source">Ninguna</span><button class="text-button hidden" id="toggle-mic" type="button">Silenciar micrófono</button><button class="text-button hidden" id="stop-source" type="button">Detener transmisión</button></div>
+              </div>
+            </section>
+
+            <aside class="room-sidebar">
+              <div class="sidebar-card room-info-card">
+                <div class="sidebar-card-heading"><span class="section-label">Tu sala</span><button class="icon-button small" id="copy-invite" type="button" aria-label="Copiar enlace">↗</button></div>
+                <div class="room-code-display" id="admin-room-code">------</div>
+                <p class="room-link" id="admin-room-link">Enlace de invitación listo</p>
+                <button class="secondary-button small-button" id="copy-room-link" type="button">Copiar enlace</button>
+                <div class="divider"></div>
+                <div class="stats-row"><span>Participantes</span><strong id="admin-participant-count">1 / 8</strong></div>
+                <div class="stats-row"><span>Acceso</span><strong id="admin-lock-status">Abierto</strong></div>
+              </div>
+              <div class="sidebar-card participants-card">
+                <div class="sidebar-card-heading"><span class="section-label">Participantes</span><span class="count-badge" id="participant-count-badge">1</span></div>
+                <div class="participant-list" id="admin-participant-list"></div>
+              </div>
+              <div class="sidebar-card controls-card">
+                <div class="sidebar-card-heading"><span class="section-label">Controles de sala</span></div>
+                <button class="control-row" id="toggle-lock" type="button"><span class="control-icon">⌑</span><span><strong id="lock-label">Bloquear nuevos ingresos</strong><small>Evita que se unan más personas</small></span><span class="chevron">›</span></button>
+                <button class="control-row danger-row" id="close-room" type="button"><span class="control-icon">×</span><span><strong>Cerrar sala</strong><small>Finaliza la transmisión para todos</small></span><span class="chevron">›</span></button>
+              </div>
+              <div class="privacy-note"><span>◈</span><p>No se graba ni se almacena el audio o video. La transmisión viaja directamente entre participantes.</p></div>
+            </aside>
+          </div>
+
+          <div class="guest-layout hidden" id="guest-layout">
+            <section class="stage-panel">
+              <div class="panel-heading">
+                <div><p class="section-label">Estás escuchando</p><h1 id="guest-room-name">Sala</h1><p class="admin-byline">Anfitrión: <strong id="guest-admin-name">—</strong></p></div>
+                <div class="mini-status"><span class="status-dot"></span><span id="guest-connection-status">Conectando</span></div>
+              </div>
+              <div class="stage-card guest-stage">
+                <div class="guest-media-placeholder" id="guest-media-placeholder"><div class="sound-orb"><span></span><span></span><span></span><span></span><span></span></div><h2 id="guest-placeholder-title">Esperando transmisión</h2><p id="guest-placeholder-copy">El anfitrión todavía no ha elegido una fuente.</p></div>
+                <video id="guest-video" class="stage-video hidden" autoplay playsinline></video>
+                <audio id="guest-audio" autoplay></audio>
+                <div class="stage-overlay guest-overlay hidden" id="guest-stage-overlay"><span class="live-dot"></span><span id="guest-overlay-label">En vivo</span></div>
+              </div>
+              <div class="guest-player-controls">
+                <div class="player-source"><span class="live-dot"></span><span id="guest-active-source">Sin transmisión</span></div>
+                <div class="volume-control"><span>♬</span><input id="guest-volume" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volumen" /><span id="volume-value">80%</span></div>
+                <button class="icon-button" id="guest-fullscreen" type="button" aria-label="Pantalla completa">⛶</button>
+              </div>
+            </section>
+            <aside class="room-sidebar">
+              <div class="sidebar-card room-info-card guest-info-card"><div class="sidebar-card-heading"><span class="section-label">Detalles de la sala</span></div><div class="guest-room-title" id="guest-room-code">------</div><p class="muted-copy">Comparte la experiencia en silencio. Tu micrófono y pantalla están desactivados.</p></div>
+              <div class="sidebar-card participants-card"><div class="sidebar-card-heading"><span class="section-label">En la sala</span><span class="count-badge" id="guest-participant-count">1</span></div><div class="participant-list" id="guest-participant-list"></div></div>
+              <div class="sidebar-card guest-actions-card"><button class="secondary-button full-button" id="guest-leave" type="button">Abandonar sala</button></div>
+              <div class="privacy-note"><span>◈</span><p>Solo el anfitrión puede compartir una fuente. No se activa ningún permiso en tu dispositivo.</p></div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="modal-backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button class="modal-close" id="modal-close" type="button" aria-label="Cerrar">×</button>
+        <div id="create-modal" class="modal-content hidden"><p class="eyebrow">Nuevo espacio de escucha</p><h2 id="modal-title">Crea tu sala</h2><p class="modal-copy">Configura lo esencial. La fuente de audio se elige después, desde el panel del anfitrión.</p><form id="create-form"><label>Nombre de la sala<input id="create-room-name" name="roomName" placeholder="Ej. Sesión de estudio" maxlength="50" required /></label><label>Tu nombre<input id="create-admin-name" name="adminName" placeholder="Ej. Agus" maxlength="30" required /></label><div class="form-grid"><label>Contraseña <span class="optional">opcional</span><input id="create-password" name="password" type="password" placeholder="••••••••" maxlength="64" /></label><label>Máximo de personas<input id="create-max" name="maxParticipants" type="number" min="2" max="50" value="8" required /></label></div><p class="form-note">La sala se cierra cuando el anfitrión se desconecta.</p><button class="primary-button full-button" type="submit">Crear sala <span>→</span></button></form></div>
+        <div id="join-modal" class="modal-content hidden"><p class="eyebrow">Entra a una experiencia</p><h2 id="modal-title-join">Únete a una sala</h2><p class="modal-copy">Usa el código de seis caracteres o abre el enlace que te compartió el anfitrión.</p><form id="join-form"><label>Código de sala<input id="join-code" name="roomCode" placeholder="ABC123" maxlength="6" autocomplete="off" required /></label><label>Tu nombre<input id="join-name" name="guestName" placeholder="Ej. Sofi" maxlength="30" required /></label><label id="join-password-label">Contraseña <span class="optional">si la sala la requiere</span><input id="join-password" name="password" type="password" placeholder="Contraseña de la sala" maxlength="64" /></label><button class="primary-button full-button" type="submit">Ingresar a la sala <span>→</span></button></form></div>
+        <div id="help-modal" class="modal-content hidden"><p class="eyebrow">Cómo funciona</p><h2>Sincroniza el momento</h2><div class="help-list"><div><span>01</span><p><strong>Crea o únete</strong><br />El anfitrión comparte el código o enlace.</p></div><div><span>02</span><p><strong>Elige una fuente</strong><br />El navegador pedirá permiso solo al compartir.</p></div><div><span>03</span><p><strong>Escuchen juntos</strong><br />El audio y la pantalla viajan en tiempo real.</p></div></div><div class="form-note">Para escuchar audio de una pestaña o pantalla, activa “Compartir audio” en el diálogo del navegador. La disponibilidad depende del navegador y del sistema operativo.</div></div>
+      </div>
+    </div>
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+    <script src="app.js" defer></script>
+  </body>
+</html>
