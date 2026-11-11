@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnimatedFrames Stream Add-on</title>
+  <meta name="description" content="Wiki de AnimatedFrames Stream Add-on: complemento opcional que hace que los links de YouTube de AnimatedFrames carguen en 1 segundo.">
+  <link rel="icon" href="assets/afstream-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ffffff;
+      --bg-2: #fff5f5;
+      --ink: #1a0d0f;
+      --muted: #5d4a4d;
+      --red: #e3242b;
+      --red-hi: #ff4d52;
+      --red-dark: #8f0c14;
+      --line: #1a0d0f;
+      --soft: #ffe1e2;
+      --pixel: "Press Start 2P", ui-monospace, monospace;
+      --body: "Space Mono", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(227, 36, 43, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(227, 36, 43, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      color: var(--ink);
+      font: 16px/1.7 var(--body);
+    }
+
+    html[lang="es"] [data-l="en"],
+    html[lang="en"] [data-l="es"] {
+      display: none !important;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    p {
+      color: var(--muted);
+    }
+
+    h1,
+    h2,
+    h3,
+    .brand,
+    .kicker,
+    .stat strong,
+    .version strong {
+      font-family: var(--pixel);
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(18px, 3vw, 26px);
+      line-height: 1.45;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--red-dark);
+    }
+
+    code {
+      padding: 2px 6px;
+      border: 1px solid #f2b8bb;
+      background: var(--bg-2);
+      color: var(--red-dark);
+      font-family: var(--body);
+      font-size: 0.92em;
+      overflow-wrap: anywhere;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px max(18px, calc((100vw - 1120px) / 2));
+      border-bottom: 4px solid var(--line);
+      background: var(--red);
+      box-shadow: 0 3px 0 var(--red-dark);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-size: 11px;
+      text-decoration: none;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 var(--red-dark);
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--line);
+      background: #fff;
+      image-rendering: pixelated;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .nav-links a {
+      padding: 6px 10px;
+      border: 2px solid transparent;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      border-color: #fff;
+    }
+
+    .button,
+    .quick-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 8px 16px;
+      border: 3px solid var(--line);
+      background: #fff;
+      color: var(--red-dark);
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .button:hover,
+    .quick-links a:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0 var(--line);
+    }
+
+    .button.red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .nav-links .button {
+      color: var(--red-dark);
+      min-height: 34px;
+      padding: 4px 12px;
+      box-shadow: 3px 3px 0 var(--line);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 90px;
+    }
+
+    .hero {
+      border: 4px solid var(--line);
+      background: #fff;
+      box-shadow: 8px 8px 0 var(--line);
+    }
+
+    .hero-media {
+      border-bottom: 4px solid var(--line);
+      background: var(--red);
+    }
+
+    .hero-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+    }
+
+    .hero-content {
+      padding: 28px 30px 30px;
+    }
+
+    .kicker {
+      display: inline-block;
+      margin: 0 0 14px;
+      padding: 6px 10px;
+      border: 2px solid var(--line);
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(22px, 4.4vw, 42px);
+      line-height: 1.3;
+      text-shadow: 3px 3px 0 var(--soft);
+    }
+
+    h1 span {
+      color: var(--red);
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin: 16px 0 0;
+      font-size: 17px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 4px solid var(--line);
+    }
+
+    .stat {
+      padding: 16px 18px;
+      border-right: 3px solid var(--line);
+      background: var(--bg-2);
+    }
+
+    .stat:last-child {
+      border-right: 0;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--red);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 52px;
+    }
+
+    .section-head {
+      margin-bottom: 16px;
+    }
+
+    .section-head h2 {
+      display: inline-block;
+      padding: 10px 34px 10px 16px;
+      border: 3px solid var(--line);
+      background: var(--red);
+      color: #fff;
+      text-shadow: 2px 2px 0 var(--red-dark);
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%);
+    }
+
+    .section-head p {
+      margin: 10px 0 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel {
+      padding: 20px;
+      border: 3px solid var(--line);
+      background: #fff;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .panel p:last-child {
+      margin-bottom: 0;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border: 2px solid var(--line);
+      background: var(--soft);
+      color: var(--red-dark);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+      padding: 14px;
+      border: 3px solid var(--line);
+      background: #fff;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--line);
+      background: var(--red);
+      color: #fff;
+      font-family: var(--pixel);
+      font-size: 12px;
+    }
+
+    .versions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .version {
+      padding: 14px;
+      border: 3px solid var(--line);
+      background: #fff;
+      box-shadow: 3px 3px 0 var(--line);
+    }
+
+    .version strong {
+      display: block;
+      color: var(--red);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .version span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .version.req {
+      background: var(--red);
+    }
+
+    .version.req strong,
+    .version.req span {
+      color: #fff;
+    }
+
+    .note {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      border: 3px solid var(--line);
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .lang-switch {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 20;
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border: 3px solid var(--line);
+      background: #fff;
+      box-shadow: 3px 3px 0 var(--line);
+    }
+
+    .lang-switch button {
+      width: 40px;
+      height: 34px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .lang-switch button.active {
+      background: var(--soft);
+      box-shadow: inset 0 -3px var(--red);
+    }
+
+    .site-footer {
+      padding: 22px 16px;
+      border-top: 4px solid var(--line);
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .site-footer a {
+      font-weight: 700;
+    }
+
+    @media (max-width: 920px) {
+      .site-nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .grid,
+      .versions,
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stat:nth-child(2) {
+        border-right: 0;
+      }
+
+      .stat:nth-child(-n+2) {
+        border-bottom: 3px solid var(--line);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: calc(100% - 24px);
+        padding-top: 20px;
+      }
+
+      .hero {
+        box-shadow: 4px 4px 0 var(--line);
+      }
+
+      .hero-content {
+        padding: 22px 18px;
+      }
+
+      .grid,
+      .grid.two,
+      .versions,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .stat {
+        border-right: 0;
+        border-bottom: 3px solid var(--line);
+      }
+
+      .stat:last-child {
+        border-bottom: 0;
+      }
+
+      .steps li {
+        grid-template-columns: 32px minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .steps li::before {
+        width: 30px;
+        height: 30px;
+      }
+
+      .lang-switch {
+        right: 10px;
+        bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-switch" aria-label="Idioma / Language">
+    <button class="active" type="button" data-lang="es" aria-label="Español">🇪🇸</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+  </div>
+
+  <header id="top" class="site-nav">
+    <a class="brand" href="#top" aria-label="Inicio">
+      <img src="assets/afstream-icon.png" alt="AnimatedFrames Stream Add-on">
+      <span>AF Stream Add-on</span>
+    </a>
+    <nav class="nav-links" data-l="es" aria-label="Navegacion principal">
+      <a href="#que-es">Que es</a>
+      <a href="#instalar">Instalar</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#versiones">Versiones</a>
+      <a class="button" href="https://jolty.us/animatedframes-wiki/">Wiki de AnimatedFrames</a>
+    </nav>
+    <nav class="nav-links" data-l="en" aria-label="Main navigation">
+      <a href="#que-es-en">What it is</a>
+      <a href="#instalar-en">Install</a>
+      <a href="#como-funciona-en">How it works</a>
+      <a href="#versiones-en">Versions</a>
+      <a class="button" href="https://jolty.us/animatedframes-wiki/">AnimatedFrames Wiki</a>
+    </nav>
+  </header>
+
+  <main class="page" data-l="es">
+    <section class="hero" aria-labelledby="title-es">
+      <div class="hero-media">
+        <img src="assets/afstream-banner.png" alt="Banner de AnimatedFrames Stream Add-on" width="1280" height="488">
+      </div>
+      <div class="hero-content">
+          <p class="kicker">Complemento opcional</p>
+          <h1 id="title-es">AnimatedFrames <span>Stream Add-on</span></h1>
+          <p class="hero-copy">Hace que los links de YouTube de AnimatedFrames carguen en 1 segundo mas o menos. Solo va en el cliente y es un solo JAR para todas las versiones.</p>
+          <div class="hero-actions">
+            <a class="button red" href="#instalar">Instalar</a>
+            <a class="button" href="https://jolty.us/animatedframes-wiki/">Wiki de AnimatedFrames</a>
+          </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>~1 s</strong>
+          <span>Carga de YouTube (sin el: 2–3 s)</span>
+        </div>
+        <div class="stat">
+          <strong>1 JAR</strong>
+          <span>Fabric, Forge y NeoForge, 1.20.1 – 26.3</span>
+        </div>
+        <div class="stat">
+          <strong>Solo cliente</strong>
+          <span>No va en el servidor</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="que-es" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Que Es</h2>
+          <p>Un mod chico que acompana a AnimatedFrames.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel">
+          <h3>Para que sirve</h3>
+          <p>AnimatedFrames puede reproducir links de YouTube. Con este mod instalado, el link se lee directo desde el juego y el video empieza en 1 segundo mas o menos.</p>
+        </article>
+        <article class="panel">
+          <h3>Sin el</h3>
+          <p>AnimatedFrames sigue reproduciendo YouTube, pero usa yt-dlp: tarda 2–3 segundos y la primera vez lo descarga de GitHub.</p>
+        </article>
+        <article class="panel">
+          <h3>Por que es aparte</h3>
+          <p>YouTube cambia su web seguido. Cuando eso rompe los links, solo hay que actualizar este mod chico. AnimatedFrames no se toca.</p>
+        </article>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Que links lee</h3>
+        <div class="chips">
+          <span class="chip green">Videos</span>
+          <span class="chip green">Shorts</span>
+          <span class="chip green">Directos</span>
+          <span class="chip green">YouTube Music</span>
+          <span class="chip green">youtu.be</span>
+          <span class="chip green">Links de celular</span>
+          <span class="chip green">?feature=share</span>
+        </div>
+        <p style="margin-top:12px">Elige la mejor calidad hasta 1080p. Los directos arrancan en lo ultimo en vivo.</p>
+      </div>
+    </section>
+
+    <section id="instalar" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Instalar</h2>
+          <p>Lo pone cada jugador en su Minecraft.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><span>Instala <strong>AnimatedFrames 1.8</strong> o mas nuevo para tu version y loader.</span></li>
+        <li><span>Descarga <code>[AF]AnimatedFrames-StreamAddon-1.0.0.jar</code>. Es el mismo archivo para todas las versiones y loaders.</span></li>
+        <li><span>Ponelo en la carpeta <code>mods</code>, al lado de AnimatedFrames.</span></li>
+        <li><span>Abri el juego. No tiene comandos ni configuracion: AnimatedFrames lo usa solo.</span></li>
+        <li><span>Proba con <code>/mediac show "https://youtu.be/XXXX" 0 center 1 80</code>.</span></li>
+      </ol>
+      <p class="note">No hace falta en el servidor. Si lo pones igual, no pasa nada.</p>
+    </section>
+
+    <section id="como-funciona" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Como Funciona</h2>
+          <p>Que pasa cuando se manda un link de YouTube.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><span>AnimatedFrames recibe el link (de <code>/medias show</code>, <code>/mediac show</code>, la cola o un bloque Pantalla).</span></li>
+        <li><span>Si este mod esta instalado, le pide el video y el audio. Tarda 1 segundo mas o menos.</span></li>
+        <li><span>Si no esta o falla, AnimatedFrames usa yt-dlp automaticamente.</span></li>
+        <li><span>Si yt-dlp pudo y este mod no, al jugador le sale un aviso en el chat para que actualice AnimatedFrames Stream Add-on.</span></li>
+      </ol>
+    </section>
+
+    <section id="versiones" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Versiones Y Loaders</h2>
+          <p>Un solo JAR sirve para todas.</p>
+        </div>
+      </div>
+      <div class="versions">
+        <article class="version"><strong>26.3</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>26.2</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>26.1.2</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.21.11</strong><span>Fabric</span></article>
+        <article class="version"><strong>1.21.4</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.21 – 1.21.1</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.20.1</strong><span>Fabric / Forge</span></article>
+        <article class="version req"><strong>Requiere</strong><span>AnimatedFrames 1.8+</span></article>
+      </div>
+    </section>
+
+    <section id="links" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Links</h2>
+          <p>Accesos rapidos.</p>
+        </div>
+      </div>
+      <div class="quick-links">
+        <a href="https://jolty.us/animatedframes-wiki/">Wiki de AnimatedFrames</a>
+        <a href="https://modrinth.com/plugin/animated-frames">Modrinth</a>
+        <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+      </div>
+    </section>
+  </main>
+
+  <main class="page" data-l="en">
+    <section class="hero" aria-labelledby="title-en">
+      <div class="hero-media">
+        <img src="assets/afstream-banner.png" alt="AnimatedFrames Stream Add-on banner" width="1280" height="488">
+      </div>
+      <div class="hero-content">
+          <p class="kicker">Optional add-on</p>
+          <h1 id="title-en">AnimatedFrames <span>Stream Add-on</span></h1>
+          <p class="hero-copy">Makes AnimatedFrames YouTube links load in about 1 second. Client only, and one JAR for every version.</p>
+          <div class="hero-actions">
+            <a class="button red" href="#instalar-en">Install</a>
+            <a class="button" href="https://jolty.us/animatedframes-wiki/">AnimatedFrames Wiki</a>
+          </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>~1 s</strong>
+          <span>YouTube load time (without it: 2–3 s)</span>
+        </div>
+        <div class="stat">
+          <strong>1 JAR</strong>
+          <span>Fabric, Forge and NeoForge, 1.20.1 – 26.3</span>
+        </div>
+        <div class="stat">
+          <strong>Client only</strong>
+          <span>Not for the server</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="que-es-en" class="section">
+      <div class="section-head">
+        <div>
+          <h2>What It Is</h2>
+          <p>A small mod that goes along with AnimatedFrames.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="panel">
+          <h3>What it does</h3>
+          <p>AnimatedFrames can play YouTube links. With this mod installed, the link is read straight from the game and the video starts in about 1 second.</p>
+        </article>
+        <article class="panel">
+          <h3>Without it</h3>
+          <p>AnimatedFrames still plays YouTube, but uses yt-dlp: it takes 2–3 seconds and is downloaded from GitHub the first time.</p>
+        </article>
+        <article class="panel">
+          <h3>Why it's separate</h3>
+          <p>YouTube changes its site often. When that breaks links, only this small mod needs an update. AnimatedFrames stays the same.</p>
+        </article>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Supported links</h3>
+        <div class="chips">
+          <span class="chip green">Videos</span>
+          <span class="chip green">Shorts</span>
+          <span class="chip green">Live streams</span>
+          <span class="chip green">YouTube Music</span>
+          <span class="chip green">youtu.be</span>
+          <span class="chip green">Mobile links</span>
+          <span class="chip green">?feature=share</span>
+        </div>
+        <p style="margin-top:12px">Picks the best quality up to 1080p. Live streams start at the live edge.</p>
+      </div>
+    </section>
+
+    <section id="instalar-en" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Install</h2>
+          <p>Each player adds it to their own Minecraft.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><span>Install <strong>AnimatedFrames 1.8</strong> or newer for your version and loader.</span></li>
+        <li><span>Download <code>[AF]AnimatedFrames-StreamAddon-1.0.0.jar</code>. It's the same file for every version and loader.</span></li>
+        <li><span>Put it in the <code>mods</code> folder, next to AnimatedFrames.</span></li>
+        <li><span>Start the game. It has no commands or settings: AnimatedFrames uses it automatically.</span></li>
+        <li><span>Try it with <code>/mediac show "https://youtu.be/XXXX" 0 center 1 80</code>.</span></li>
+      </ol>
+      <p class="note">It's not needed on the server. If you add it there anyway, nothing happens.</p>
+    </section>
+
+    <section id="como-funciona-en" class="section">
+      <div class="section-head">
+        <div>
+          <h2>How It Works</h2>
+          <p>What happens when a YouTube link is sent.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><span>AnimatedFrames gets the link (from <code>/medias show</code>, <code>/mediac show</code>, the queue or a Screen block).</span></li>
+        <li><span>If this mod is installed, it asks it for the video and audio. Takes about 1 second.</span></li>
+        <li><span>If it's missing or fails, AnimatedFrames uses yt-dlp automatically.</span></li>
+        <li><span>If yt-dlp worked and this mod didn't, the player gets a chat message to update AnimatedFrames Stream Add-on.</span></li>
+      </ol>
+    </section>
+
+    <section id="versiones-en" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Versions And Loaders</h2>
+          <p>One JAR works for all of them.</p>
+        </div>
+      </div>
+      <div class="versions">
+        <article class="version"><strong>26.3</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>26.2</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>26.1.2</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.21.11</strong><span>Fabric</span></article>
+        <article class="version"><strong>1.21.4</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.21 – 1.21.1</strong><span>Fabric / NeoForge</span></article>
+        <article class="version"><strong>1.20.1</strong><span>Fabric / Forge</span></article>
+        <article class="version req"><strong>Requires</strong><span>AnimatedFrames 1.8+</span></article>
+      </div>
+    </section>
+
+    <section id="links-en" class="section">
+      <div class="section-head">
+        <div>
+          <h2>Links</h2>
+          <p>Quick access.</p>
+        </div>
+      </div>
+      <div class="quick-links">
+        <a href="https://jolty.us/animatedframes-wiki/">AnimatedFrames Wiki</a>
+        <a href="https://modrinth.com/plugin/animated-frames">Modrinth</a>
+        <a href="https://discord.com/invite/RSGhtFsTca">Discord</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">AnimatedFrames Stream Add-on · <a href="https://jolty.us/animatedframes-wiki/">AnimatedFrames</a> · <a href="https://discord.com/invite/RSGhtFsTca">Discord</a> · <a href="https://x.com/SunnyDeb_">X</a></footer>
+
+  <script>
+    function setLang(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-lang]").forEach((item) => item.classList.toggle("active", item.dataset.lang === lang));
+      try { localStorage.setItem("af-wiki-lang", lang); } catch (e) {}
+    }
+
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => setLang(button.dataset.lang));
+    });
+
+    try {
+      const saved = localStorage.getItem("af-wiki-lang");
+      if (saved === "es" || saved === "en") setLang(saved);
+    } catch (e) {}
+  </script>
+</body>
+</html>

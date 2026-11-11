@@ -74,9 +74,29 @@
 
     .wiki-main {
       min-height: calc(100vh - 80px);
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      align-content: center;
+      justify-content: center;
+      gap: 18px;
       padding: 54px 18px;
+    }
+
+    .wiki-panel.addons-panel {
+      flex: 0 1 260px;
+      width: min(260px, 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .addons-panel h1 {
+      font-size: 40px;
+    }
+
+    .addons-panel .wiki-list {
+      flex: 1;
+      grid-template-columns: 1fr;
     }
 
     .glass-panel {
@@ -89,6 +109,7 @@
 
     .wiki-panel {
       width: min(900px, 100%);
+      flex: 0 1 900px;
       padding: 28px;
       text-align: center;
     }
@@ -166,6 +187,11 @@
         grid-template-columns: 1fr;
       }
 
+      .wiki-panel.addons-panel {
+        flex-basis: 100%;
+        width: 100%;
+      }
+
       h1 {
         font-size: 40px;
       }
@@ -205,6 +231,17 @@
           <a class="wiki-card" href="morphy-wiki/" target="_blank" rel="noopener">
             <img src="morphy-wiki/assets/morphy-icon.png" alt="Morphy">
             <strong>Morphy</strong>
+            <span>Abrir wiki</span>
+          </a>
+        </div>
+      </section>
+      <section class="wiki-panel addons-panel glass-panel">
+        <p class="kicker">Complementos</p>
+        <h1>Add-ons</h1>
+        <div class="wiki-list">
+          <a class="wiki-card" href="https://jolty.us/animatedframes-stream-wiki/" target="_blank" rel="noopener">
+            <img src="animatedframes-stream-wiki/assets/afstream-icon.png" alt="AnimatedFrames Stream">
+            <strong>AnimatedFrames Stream</strong>
             <span>Abrir wiki</span>
           </a>
         </div>
