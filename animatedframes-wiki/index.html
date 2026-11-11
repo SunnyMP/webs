@@ -810,7 +810,7 @@
           <h3>Mientras se ve algo</h3>
           <ul>
             <li>Se ocultan la barra de items y la mira.</li>
-            <li>El chat se puede abrir y queda detras de la imagen o video.</li>
+            <li>El chat se abre con T o / para escribir y usar comandos. Los mensajes quedan detras de la imagen o video; lo que escribis se ve encima.</li>
             <li><strong>F1</strong> no oculta el video.</li>
             <li>El audio y el video van siempre sincronizados.</li>
           </ul>
@@ -818,7 +818,7 @@
         <article class="panel pad">
           <h3>Pantalla completa</h3>
           <ul>
-            <li>No se abre ningun menu: chat, inventario, cofres, pausa ni logros.</li>
+            <li>Solo se puede abrir el chat. No se abre el inventario, cofres, pausa ni logros.</li>
             <li>No se puede golpear, usar, soltar ni cambiar de slot.</li>
             <li>Los avisos de Minecraft no se dibujan encima.</li>
             <li>Un video con transparencia (<code>_alpha</code>) deja ver el juego detras.</li>
@@ -911,7 +911,7 @@
             <tr><td><code>"link"</code></td><td>YouTube o un link directo, siempre entre comillas.</td></tr>
             <tr><td><code>tiempo</code></td><td>Segundos. <code>0</code> = sin limite (un video termina solo al acabar).</td></tr>
             <tr><td><code>posicion</code></td><td>Ver <a href="#posiciones">Posiciones</a>. Por defecto <code>center</code>.</td></tr>
-            <tr><td><code>escala</code></td><td><code>0.05</code> a <code>10</code>. Por defecto <code>1.0</code>. Con <code>fullscreen</code> no se pone.</td></tr>
+            <tr><td><code>escala</code></td><td><code>0.05</code> a <code>10</code>. Por defecto <code>1.0</code> = lo mas grande que entra en la pantalla sin cortarse (igual para todos los jugadores). Con <code>fullscreen</code> no se pone.</td></tr>
             <tr><td><code>volumen</code></td><td><code>0</code> a <code>100</code>. Por defecto <code>80</code>.</td></tr>
           </table>
         </div>
@@ -930,7 +930,7 @@
           <table class="tbl">
             <tr><th>Opcion</th><th>Que hace</th></tr>
             <tr><td><code>loop</code></td><td>Repite el video o el audio hasta que se acabe el tiempo o hasta <code>stop</code>.</td></tr>
-            <tr><td><code>fade:0</code></td><td>Quita el fundido. Por defecto hay fundido de entrada y de salida de 0,5 s.</td></tr>
+            <tr><td><code>fade:0</code></td><td>Quita el fundido. Por defecto las imagenes y GIF tienen fundido de entrada y salida de 0,5 s; los videos aparecen al instante y solo se van con fundido.</td></tr>
             <tr><td><code>fade:2</code></td><td>Fundido de entrada y de salida de 2 segundos. Tambien baja el volumen.</td></tr>
             <tr><td><code>fadein:1</code> <code>fadeout:3</code></td><td>Solo el fundido de entrada o de salida, en segundos.</td></tr>
             <tr><td><code>x:0 y:0</code></td><td>Posicion desde el centro de la pantalla, de <code>-100</code> a <code>100</code>. <code>x:100</code> = borde derecho, <code>x:-100</code> = izquierdo, <code>y:100</code> = arriba, <code>y:-100</code> = abajo.</td></tr>
@@ -1035,6 +1035,7 @@
           <h3>Como funciona</h3>
           <ul>
             <li>Varias pantallas juntas se unen en una grande, hasta 32×32 bloques.</li>
+            <li>Si rompes un bloque, el video se acomoda solo al rectangulo completo que mejor le queda. Si la pantalla se parte, sigue en el pedazo mas grande. Al volver a poner el bloque, ocupa todo de nuevo.</li>
             <li>El video siempre llena toda la pantalla.</li>
             <li><strong>Clic derecho</strong> abre una ventana: archivo o link, volumen, loop, reproducir, detener y pausar.</li>
             <li><strong>Audio 3D</strong>: se escucha desde la pantalla.</li>
@@ -1331,7 +1332,7 @@
           <h3>While media is showing</h3>
           <ul>
             <li>The hotbar and crosshair are hidden.</li>
-            <li>The chat can be opened and stays behind the image or video.</li>
+            <li>Open the chat with T or / to type and run commands. Messages stay behind the image or video; what you type shows on top.</li>
             <li><strong>F1</strong> does not hide the video.</li>
             <li>Audio and video always stay in sync.</li>
           </ul>
@@ -1339,7 +1340,7 @@
         <article class="panel pad">
           <h3>Fullscreen</h3>
           <ul>
-            <li>No menu opens: chat, inventory, chests, pause or advancements.</li>
+            <li>Only the chat can be opened. Inventory, chests, pause and advancements stay closed.</li>
             <li>Players can't attack, use, drop or switch slots.</li>
             <li>Minecraft toasts are not drawn on top.</li>
             <li>A video with transparency (<code>_alpha</code>) shows the game behind it.</li>
@@ -1432,7 +1433,7 @@
             <tr><td><code>"link"</code></td><td>YouTube or a direct link, always in quotes.</td></tr>
             <tr><td><code>time</code></td><td>Seconds. <code>0</code> = no limit (a video still ends on its own).</td></tr>
             <tr><td><code>position</code></td><td>See <a href="#posiciones-en">Positions</a>. Default <code>center</code>.</td></tr>
-            <tr><td><code>scale</code></td><td><code>0.05</code> to <code>10</code>. Default <code>1.0</code>. Not used with <code>fullscreen</code>.</td></tr>
+            <tr><td><code>scale</code></td><td><code>0.05</code> to <code>10</code>. Default <code>1.0</code> = as big as fits on screen without cropping (the same for every player). Not used with <code>fullscreen</code>.</td></tr>
             <tr><td><code>volume</code></td><td><code>0</code> to <code>100</code>. Default <code>80</code>.</td></tr>
           </table>
         </div>
@@ -1451,7 +1452,7 @@
           <table class="tbl">
             <tr><th>Option</th><th>What it does</th></tr>
             <tr><td><code>loop</code></td><td>Repeats the video or audio until the time runs out or until <code>stop</code>.</td></tr>
-            <tr><td><code>fade:0</code></td><td>Turns the fade off. By default media fades in and out over 0.5 s.</td></tr>
+            <tr><td><code>fade:0</code></td><td>Turns the fade off. By default images and GIFs fade in and out over 0.5 s; videos appear instantly and only fade out.</td></tr>
             <tr><td><code>fade:2</code></td><td>2-second fade in and out. Also fades the volume.</td></tr>
             <tr><td><code>fadein:1</code> <code>fadeout:3</code></td><td>Only the fade in or fade out, in seconds.</td></tr>
             <tr><td><code>x:0 y:0</code></td><td>Position from the center of the screen, from <code>-100</code> to <code>100</code>. <code>x:100</code> = right edge, <code>x:-100</code> = left, <code>y:100</code> = top, <code>y:-100</code> = bottom.</td></tr>
@@ -1556,6 +1557,7 @@
           <h3>How it works</h3>
           <ul>
             <li>Screens placed together join into one big screen, up to 32×32 blocks.</li>
+            <li>If you break a block, the video resizes to the best full rectangle left. If the screen splits, it keeps playing on the biggest piece. Put the block back and it fills the whole screen again.</li>
             <li>The video always fills the whole screen.</li>
             <li><strong>Right-click</strong> opens a window: file or link, volume, loop, play, stop and pause.</li>
             <li><strong>3D audio</strong>: the sound comes from the screen.</li>
